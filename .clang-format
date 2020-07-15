@@ -1,0 +1,10 @@
+BasedOnStyle: Chromium
+MaxEmptyLinesToKeep: 3
+IndentCaseLabels: false
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+TabWidth: 4
+UseTab: Never
+IndentWidth: 4
+BreakBeforeBraces: Linux
+AccessModifierOffset: -4
