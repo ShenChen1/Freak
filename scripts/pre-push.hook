@@ -14,7 +14,7 @@ if [[ $current_branch = $protected_branch ]] ; then
     echo -e "${YELLOW}Trying to build tests project...${NC}"
 
     # build the project
-    make clean; make
+    # make clean; make
 
     # $? is a shell variable which stores the return code from what we just ran
     rc=$?

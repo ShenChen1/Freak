@@ -57,6 +57,7 @@ prompt_help() {
   echo -e "${RED}$(cat <<-EOF
 e - edit commit message
 n - abort commit
+f - commit anyway
 ? - print help
 EOF
 )${NC}"
@@ -299,7 +300,7 @@ while true; do
   display_warnings
 
   # Ask the question (not using "read -p" as it uses stderr not stdout)
-  echo -en "${CYAN}Proceed with commit? [e/n/?] ${NC}"
+  echo -en "${CYAN}Proceed with commit? [e/n/f/?] ${NC}"
 
   # Read the answer
   read REPLY < "$TTY"
@@ -308,6 +309,7 @@ while true; do
   case "$REPLY" in
     E*|e*) $HOOK_EDITOR "$COMMIT_MSG_FILE" < $TTY; continue ;;
     N*|n*) exit 1 ;;
+    F*|f*) exit 0 ;;
     *)     SKIP_DISPLAY_WARNINGS=1; prompt_help; continue ;;
   esac
 

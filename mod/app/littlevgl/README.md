@@ -1,4 +1,0 @@
-# linux_frame_buffer
-LittlevGL configured to work with /dev/fb0 on Linux
-
-make CC=arm-hisiv510-linux-gcc
