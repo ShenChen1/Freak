@@ -3,6 +3,7 @@ set(CMAKE_SYSTEM_PROCESSOR arm)
 
 set(CMAKE_C_COMPILER    "arm-himix200-linux-gcc")
 set(CMAKE_CXX_COMPILER  "arm-himix200-linux-g++")
+set(CMAKE_LINER         "arm-himix200-linux-ld")
 
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
