@@ -1,6 +1,7 @@
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR arm)
 
+set(CMAKE_CROSS_PREFIX  "arm-himix200-linux-")
 set(CMAKE_C_COMPILER    "arm-himix200-linux-gcc")
 set(CMAKE_CXX_COMPILER  "arm-himix200-linux-g++")
 set(CMAKE_LINER         "arm-himix200-linux-ld")
