@@ -7,6 +7,7 @@ project(HIVIEW)
 set(HIVIEW_HOME_PATH ${PROJECT_SOURCE_DIR})
 set(HIVIEW_BUILD_PATH ${PROJECT_SOURCE_DIR}/build)
 set(HIVIEW_SYSROOT_PATH ${PROJECT_SOURCE_DIR}/sysroot)
+set(HIVIEW_TOOLS_PATH ${PROJECT_SOURCE_DIR}/tools)
 
 add_subdirectory(fw)
 add_subdirectory(mod)
