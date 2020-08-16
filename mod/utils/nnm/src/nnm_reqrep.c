@@ -1,0 +1,173 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <pthread.h>
+#include <errno.h>
+#include <nanomsg/nn.h>
+#include <nanomsg/reqrep.h>
+#include "nnm.h"
+
+#define NNM_MAGIC   "NNM_REQREP"
+
+typedef struct __nnm_reqrep {
+    int                 socket;
+    nnm_transfer_cb_t   callback;
+    pthread_t           thread;
+} nnm_reqrep_t;
+
+static void fatal(const char *func)
+{
+    fprintf(stderr, "%s: %s\n", func, nn_strerror(nn_errno()));
+    exit(1);
+}
+
+static void *nnm_rep_routine(void *arg)
+{
+    int bytes;
+    char msg[] = NNM_MAGIC;
+    nnm_reqrep_t *self = (nnm_reqrep_t *)arg;
+
+    while(1) {
+        char *buf = NULL;
+        bytes = nn_recv(self->socket, &buf, NN_MSG, 0);
+        if (bytes < 0) {
+            fatal("nn_recv");
+        }
+
+        if (bytes == sizeof(msg) &&
+            !memcmp(msg, buf, sizeof(msg))) {
+            nn_freemsg(buf);
+            break;
+        }
+
+        void *outbuf = NULL;
+        size_t outlen = 0;
+        if (!self->callback(buf, bytes, &outbuf, &outlen)) {
+            bytes = nn_send(self->socket, outbuf, outlen, 0);
+            if (bytes != outlen) {
+                fatal("nn_send");
+            }
+        }
+
+        nn_freemsg(buf);
+    }
+
+    return NULL;
+}
+
+int nnm_rep_create(const char* url, nnm_transfer_cb_t callback, nnm_t *handle)
+{
+    int sock;
+    int ret;
+
+    if (url == NULL || callback == NULL || handle == NULL) {
+        return -EINVAL;
+    }
+
+    sock = nn_socket(AF_SP, NN_REP);
+    if (sock < 0) {
+        fatal("nn_socket");
+    }
+
+    ret = nn_bind(sock, url);
+    if (ret < 0) {
+        fatal("nn_bind");
+    }
+
+    nnm_reqrep_t *self = malloc(sizeof(nnm_reqrep_t));
+    if (self == NULL) {
+        fatal("malloc");
+    }
+
+    memset(self, 0, sizeof(nnm_reqrep_t));
+    self->socket = sock;
+    self->callback = callback;
+    ret = pthread_create(&self->thread, NULL, nnm_rep_routine, (void *)self);
+    if (ret < 0) {
+        fatal("pthread_create");
+    }
+
+    *handle = self;
+    return 0;
+}
+
+int nnm_rep_destory(nnm_t handle)
+{
+    char msg[] = NNM_MAGIC;
+    nnm_reqrep_t *self = (nnm_reqrep_t *)handle;
+
+    if (self == NULL) {
+        return -EINVAL;
+    }
+
+    nn_send(self->socket, msg, sizeof(msg), 0);
+    pthread_join(self->thread, NULL);
+    nn_close(self->socket);
+    free(self);
+    return 0;
+}
+
+int nnm_req_create(const char* url, nnm_t *handle)
+{
+    int sock;
+    int ret;
+
+    sock = nn_socket(AF_SP, NN_REQ);
+    if (sock < 0) {
+        fatal("nn_socket");
+    }
+
+    ret = nn_connect(sock, url);
+    if (ret < 0) {
+        fatal("nn_connect");
+    }
+
+    nnm_reqrep_t *self = malloc(sizeof(nnm_reqrep_t));
+    if (self == NULL) {
+        fatal("malloc");
+    }
+
+    memset(self, 0, sizeof(nnm_reqrep_t));
+    self->socket = sock;
+
+    *handle = self;
+    return 0;
+}
+
+int nnm_req_destory(nnm_t handle)
+{
+    nnm_reqrep_t *self = (nnm_reqrep_t *)handle;
+
+    if (self == NULL) {
+        return -EINVAL;
+    }
+
+    nn_shutdown(self->socket, 0);
+    free(self);
+    return 0;
+}
+
+int nnm_req_exchange(nnm_t handle, void *in, size_t isize, void **out, size_t *osize)
+{
+    int ret;
+    nnm_reqrep_t *self = (nnm_reqrep_t *)handle;
+
+    if (self == NULL ||
+        in == NULL || isize == 0 ||
+        out == NULL || osize == 0) {
+        return -EINVAL;
+    }
+
+    ret = nn_send(self->socket, in, isize, 0);
+    if (ret < 0) {
+        fatal("nn_send");
+    }
+
+    ret = nn_recv(self->socket, out, NN_MSG, 0);
+    if (ret < 0) {
+        fatal("nn_recv");
+    }
+
+    *osize = ret;
+    return 0;
+}
