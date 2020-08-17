@@ -1,5 +1,6 @@
 project(bsp)
 
+add_definitions(-DMODULE_NAME="${PROJECT_NAME}")
 add_executable(${PROJECT_NAME}
     src/main.c
     cfg/cfg.c)
