@@ -58,7 +58,7 @@ int log_printf(log_lv_t level, const char *fmt, ...)
 
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
-    n = snprintf(buf, sizeof(buf), LOG_CLR_NONE"%ld.%06ld ", (long)ts.tv_sec, (long)ts.tv_nsec);
+    n = snprintf(buf, sizeof(buf), LOG_CLR_NONE"%ld.%09ld ", (long)ts.tv_sec, (long)ts.tv_nsec);
 
     va_start(ap, fmt);
     n += vsnprintf(&buf[n], sizeof(buf) - n, fmt, ap);

@@ -63,7 +63,6 @@ int nnm_pub_destory(nnm_t handle)
 
 int nnm_pub_send(nnm_t handle, void *buf, size_t len)
 {
-    int ret;
     nnm_pubsub_t *self = (nnm_pubsub_t *)handle;
 
     if (self == NULL || buf == NULL || len == 0) {

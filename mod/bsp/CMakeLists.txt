@@ -3,6 +3,7 @@ project(bsp)
 add_definitions(-DMODULE_NAME="${PROJECT_NAME}")
 add_executable(${PROJECT_NAME}
     src/main.c
+    src/msgbox.c
     cfg/cfg.c)
 
 target_link_libraries(${PROJECT_NAME}
