@@ -4,7 +4,8 @@
 #include <time.h>
 #include "nnm.h"
 #include "log.h"
-#include "node.h"
+
+#define PROTO_LOG_COM_NODE "ipc:///tmp/log-com.ipc"
 
 static log_lv_t s_level = LOG_LV_INFO;
 static nnm_t s_nnm = NULL;
@@ -21,11 +22,11 @@ int log_init(int master)
 
     if (master) {
         // just keep it on the background
-        ret = nnm_pull_create(GSF_LOG_COM_NODE, log_callback, &s_nnm);
+        ret = nnm_pull_create(PROTO_LOG_COM_NODE, log_callback, &s_nnm);
         assert(ret == 0);
     }
 
-    ret = nnm_push_create(GSF_LOG_COM_NODE, &s_nnm);
+    ret = nnm_push_create(PROTO_LOG_COM_NODE, &s_nnm);
     assert(ret == 0);
 
     return 0;

@@ -1,0 +1,9 @@
+JSONB_STRUCT_START(proto_bsp_dummy_t)
+JSONB_FIELD(value, int)
+JSONB_STRUCT_END(proto_bsp_dummy_t)
+
+JSONB_STRUCT_START(proto_bsp_board_t)
+JSONB_STRING(model, 32)
+JSONB_STRING(sn, 32)
+JSONB_STRING(chip, 32)
+JSONB_STRUCT_END(proto_bsp_board_t)
