@@ -2,6 +2,7 @@
 #define __PROTO_H__
 
 #include <stdint.h>
+#include <string.h>
 #include "node.h"
 #include "path.h"
 #include "proto_bsp.h"
@@ -18,20 +19,9 @@ typedef struct {
     uint8_t     data[0];
 } proto_header_t;
 
-#define proto_header_dump(package) ({ \
-    infof("----------------------\n"); \
-    infof("- version:   %u\n", (package)->version); \
-    infof("- chn:       %u\n", (package)->chn); \
-    infof("- action:    %s\n", (package)->action ? "SET" : "GET"); \
-    infof("- key:       %u\n", (package)->key); \
-    infof("- errcode:   %u\n", (package)->errcode); \
-    infof("- size:      %u\n", (package)->size); \
-    infof("----------------------\n"); \
-})
-
 typedef enum {
-    PROTP_ACTION_GET,
-    PROTP_ACTION_SET,
+    PROTO_ACTION_GET,
+    PROTO_ACTION_SET,
 } proto_action_e;
 
 typedef enum {
@@ -40,5 +30,42 @@ typedef enum {
     PROTP_BSP_KEY_ETH,
     PROTP_BSP_KEY_MAX,
 } proto_bsp_key_e;
+
+#define proto_header_dump(_package) \
+(void)({ \
+    proto_header_t *p = (void *)(_package); \
+    infof("----------------------"); \
+    infof("- version:   %u", p->version); \
+    infof("- chn:       %u", p->chn); \
+    infof("- action:    %s", p->action ? "SET" : "GET"); \
+    infof("- key:       %u", p->key); \
+    infof("- errcode:   %u", p->errcode); \
+    infof("- size:      %u", p->size); \
+    infof("----------------------"); \
+})
+
+#define proto_package_fill(_package, _chn, _action, _key, _data, _size) \
+(void)({ \
+    proto_header_t *p = (void *)(_package); \
+    p->version = 1; \
+    p->chn = (_chn); \
+    p->action = (_action); \
+    p->key = (_key); \
+    p->errcode = 0; \
+    p->size = (_size); \
+    memcpy(p->data, (_data), (_size)); \
+})
+
+#define proto_package_size(_package) \
+({ \
+    proto_header_t *p = (void *)(_package); \
+    p->size + sizeof(proto_header_t); \
+})
+
+#define proto_package_data(_package) \
+({ \
+    proto_header_t *p = (void *)(_package); \
+    p->data; \
+})
 
 #endif /* __PROTO_H__ */

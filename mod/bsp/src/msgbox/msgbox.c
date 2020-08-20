@@ -6,22 +6,23 @@
 #include "inc/msgbox.h"
 
 static box_t s_box = NULL;
+extern int msgbox_dummy(uint8_t chn, uint8_t action, void *in, size_t isize, void *out, size_t *osize);
 
 int msgbox_init()
 {
+    int ret = 0;
+
     s_box = box_new(PROTP_BSP_KEY_MAX);
-    return !s_box;
+    assert(s_box);
+
+    ret |= box_add(s_box, PROTP_BSP_KEY_DUMMY, msgbox_dummy);
+    return ret;
 }
 
 int msgbox_deinit()
 {
     box_free(s_box);
     return 0;
-}
-
-int msgbox_add_handler(uint32_t key, msgbox_handler_t func)
-{
-    return box_add(s_box, key, (void *)func);
 }
 
 int msgbox_do_handler(void *in, size_t isize, void *out, size_t *osize)

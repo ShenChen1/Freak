@@ -18,5 +18,5 @@ void *nnm_reallocmsg(void *msg, size_t size)
 
 int nnm_free(void *msg)
 {
-    return nnm_free(msg);
+    return nn_freemsg(msg);
 }

@@ -11,7 +11,7 @@ typedef struct dummy {
      * @param  self     dummy instance
      * @return 0 on successs, <0 otherwise.
      */
-    int (*deinit)(struct dummy *self);
+    int (*destory)(struct dummy *self);
 
     /**
      * @brief Set dummy value
