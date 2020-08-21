@@ -4,7 +4,7 @@
 #include <errno.h>
 #include "json-cfg.h"
 
-int json_cfg_load(char *filename, void *cfg, size_t size, jsonb_opt_func_t callback)
+int json_cfg_load(const char *filename, void *cfg, size_t size, jsonb_opt_func_t callback)
 {
     int ret = 0;
     char *data = NULL;
@@ -50,7 +50,7 @@ end1:
     return ret;
 }
 
-int json_cfg_save(char *filename, void *cfg, size_t size, jsonb_opt_func_t callback)
+int json_cfg_save(const char *filename, void *cfg, size_t size, jsonb_opt_func_t callback)
 {
     int ret = 0;
     char *data = NULL;

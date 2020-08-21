@@ -4,6 +4,7 @@
 #include "box.h"
 #include "log.h"
 #include "inc/msgbox.h"
+#include "inc/cfg.h"
 
 static box_t s_box = NULL;
 extern int msgbox_dummy(uint8_t chn, uint8_t action, void *in, size_t isize, void *out, size_t *osize);
@@ -40,6 +41,10 @@ int msgbox_do_handler(void *in, size_t isize, void *out, size_t *osize)
                                packet_out->data, &size);
     packet_out->size = size;
     proto_header_dump(packet_out);
+
+    if (packet_in->action == PROTO_ACTION_SET) {
+        cfg_save(PROTO_BSP_CFG_PATH);
+    }
 
     *osize = packet_out->size + sizeof(proto_header_t);
     return 0;
