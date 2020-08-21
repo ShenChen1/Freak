@@ -5,10 +5,9 @@
 #include "nnm.h"
 #include "log.h"
 
-#define PROTO_LOG_COM_NODE "ipc:///tmp/log-com.ipc"
-
 static log_lv_t s_level = LOG_LV_INFO;
 static nnm_t s_nnm = NULL;
+static nnm_t s_server = NULL;
 
 static int log_callback(void *buf, size_t len)
 {
@@ -16,17 +15,17 @@ static int log_callback(void *buf, size_t len)
     return len;
 }
 
-int log_init(int master)
+int log_init(const char *url, int server)
 {
     int ret;
 
-    if (master) {
+    if (server) {
         // just keep it on the background
-        ret = nnm_pull_create(PROTO_LOG_COM_NODE, log_callback, &s_nnm);
+        ret = nnm_pull_create(url, log_callback, &s_server);
         assert(ret == 0);
     }
 
-    ret = nnm_push_create(PROTO_LOG_COM_NODE, &s_nnm);
+    ret = nnm_push_create(url, &s_nnm);
     assert(ret == 0);
 
     return 0;
@@ -34,7 +33,17 @@ int log_init(int master)
 
 int log_deinit()
 {
-    return nnm_push_destory(s_nnm);
+    int ret;
+
+    ret = nnm_push_destory(s_nnm);
+    assert(ret == 0);
+
+    if (s_server) {
+        ret = nnm_pull_destory(s_server);
+        assert(ret == 0);
+    }
+
+    return ret;
 }
 
 int log_setlevel(log_lv_t level)

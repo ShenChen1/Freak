@@ -79,7 +79,7 @@ typedef enum {
         asset(0);                                                    \
     } while (0)
 
-int log_init(int master);
+int log_init(const char *url, int server);
 int log_deinit();
 int log_setlevel(log_lv_t level);
 int log_printf(log_lv_t level, const char *fmt, ...);

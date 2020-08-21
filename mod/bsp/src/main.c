@@ -21,7 +21,7 @@ static bsp_cfg_t s_cfg = {
 
 static int bsp_rep_recv(void *in, size_t isize, void **out, size_t *osize)
 {
-    uint8_t obuf[PROTO_PACKAGE_MAXSIZE];
+    static uint8_t obuf[PROTO_PACKAGE_MAXSIZE];
 
     *out = obuf;
     return msgbox_do_handler(in, isize, *out, osize);
@@ -36,11 +36,12 @@ int main()
     json_cfg_load(PROTO_BSP_CFG_PATH, &s_cfg, sizeof(bsp_cfg_t), jsonb_opt_bsp_cfg_t);
     json_cfg_save(PROTO_BSP_CFG_PATH, &s_cfg, sizeof(bsp_cfg_t), jsonb_opt_bsp_cfg_t);
 
-    log_init(1);
+    log_init(PROTO_LOG_COM_NODE, true);
 
     total = getDummyResourceNum();
     for (i = 0; i < total; i++) {
-        createDummy(i);
+        dummy_t *obj = createDummy(i);
+        obj->set(obj, s_cfg.dummy.value);
     }
 
     msgbox_init();
@@ -49,17 +50,17 @@ int main()
 
     nnm_t req = NULL;
     nnm_req_create(PROTO_BSP_COM_NODE, &req);
-    while (1) {
+    {
         errorf("sleep 1");
         sleep(1);
 
         uint8_t ibuf[PROTO_PACKAGE_MAXSIZE];
         uint8_t *obuf = NULL;
         size_t osize = 0;
-        proto_bsp_dummy_t data = {.value = i++};
+        proto_bsp_dummy_t data = {.value = 123};
 
         infof("set value");
-        proto_package_fill(ibuf, 1, PROTO_ACTION_SET, PROTP_BSP_KEY_DUMMY, &data, sizeof(proto_bsp_dummy_t));
+        proto_package_fill(ibuf, 0, PROTO_ACTION_SET, PROTP_BSP_KEY_DUMMY, &data, sizeof(proto_bsp_dummy_t));
         nnm_req_exchange(req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
         assert(osize == sizeof(proto_header_t));
         infof("obuf:%p osize:%zu", obuf, osize);
@@ -67,12 +68,13 @@ int main()
         nnm_free(obuf);
 
         infof("get value");
-        proto_package_fill(ibuf, 1, PROTO_ACTION_GET, PROTP_BSP_KEY_DUMMY, &data, 0);
+        proto_package_fill(ibuf, 0, PROTO_ACTION_GET, PROTP_BSP_KEY_DUMMY, &data, 0);
         nnm_req_exchange(req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
         assert(osize == sizeof(proto_header_t) + sizeof(proto_bsp_dummy_t));
         infof("value = %d", ((proto_bsp_dummy_t *)proto_package_data(obuf))->value);
         nnm_free(obuf);
     }
+    nnm_req_destory(req);
 
     nnm_rep_destory(rep);
     nnm_pub_destory(pub);

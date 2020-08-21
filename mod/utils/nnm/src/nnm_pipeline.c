@@ -7,8 +7,6 @@
 #include <nanomsg/pipeline.h>
 #include "nnm.h"
 
-#define NNM_MAGIC    "NNM_PIPELINE"
-
 typedef struct __nnm_pipeline {
     int             socket;
     nnm_recv_cb_t   callback;
@@ -24,19 +22,12 @@ static void fatal(const char *func)
 static void *nnm_pull_routine(void *arg)
 {
     int bytes;
-    char msg[] = NNM_MAGIC;
     nnm_pipeline_t *self = (nnm_pipeline_t *)arg;
 
     while(1) {
         char *buf = NULL;
         bytes = nn_recv(self->socket, &buf, NN_MSG, 0);
         if (bytes < 0) {
-            fatal("nn_recv");
-        }
-
-        if (bytes == sizeof(msg) &&
-            !memcmp(msg, buf, sizeof(msg))) {
-            nn_freemsg(buf);
             break;
         }
 
@@ -85,16 +76,14 @@ int nnm_pull_create(const char* url, nnm_recv_cb_t callback, nnm_t *handle)
 
 int nnm_pull_destory(nnm_t handle)
 {
-    char msg[] = NNM_MAGIC;
     nnm_pipeline_t *self = (nnm_pipeline_t *)handle;
 
     if (self == NULL) {
         return -EINVAL;
     }
 
-    nn_send(self->socket, msg, sizeof(msg), 0);
-    pthread_join(self->thread, NULL);
     nn_close(self->socket);
+    pthread_join(self->thread, NULL);
     free(self);
     return 0;
 }
@@ -134,7 +123,7 @@ int nnm_push_destory(nnm_t handle)
         return -EINVAL;
     }
 
-    nn_shutdown(self->socket, 0);
+    nn_close(self->socket);
     free(self);
     return 0;
 }

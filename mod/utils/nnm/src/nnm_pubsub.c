@@ -7,8 +7,6 @@
 #include <nanomsg/pubsub.h>
 #include "nnm.h"
 
-#define NNM_MAGIC   "NNM_PUBSUB"
-
 typedef struct __nnm_pubsub {
     int             socket;
     nnm_recv_cb_t   callback;
@@ -56,7 +54,7 @@ int nnm_pub_destory(nnm_t handle)
         return -EINVAL;
     }
 
-    nn_shutdown(self->socket, 0);
+    nn_close(self->socket);
     free(self);
     return 0;
 }
@@ -75,19 +73,12 @@ int nnm_pub_send(nnm_t handle, void *buf, size_t len)
 static void *nnm_sub_routine(void *arg)
 {
     int bytes;
-    char msg[] = NNM_MAGIC;
     nnm_pubsub_t *self = (nnm_pubsub_t *)arg;
 
     while(1) {
         char *buf = NULL;
         bytes = nn_recv(self->socket, &buf, NN_MSG, 0);
         if (bytes < 0) {
-            fatal("nn_recv");
-        }
-
-        if (bytes == sizeof(msg) &&
-            !memcmp(msg, buf, sizeof(msg))) {
-            nn_freemsg(buf);
             break;
         }
 
@@ -142,16 +133,14 @@ int nnm_sub_create(const char* url, nnm_recv_cb_t callback, nnm_t *handle)
 
 int nnm_sub_destory(nnm_t handle)
 {
-    char msg[] = NNM_MAGIC;
     nnm_pubsub_t *self = (nnm_pubsub_t *)handle;
 
     if (self == NULL) {
         return -EINVAL;
     }
 
-    nn_send(self->socket, msg, sizeof(msg), 0);
-    pthread_join(self->thread, NULL);
     nn_close(self->socket);
+    pthread_join(self->thread, NULL);
     free(self);
     return 0;
 }
