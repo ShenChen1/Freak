@@ -2,5 +2,5 @@ JSONB_INCLUDE_HEADER(proto_bsp.h)
 
 JSONB_STRUCT_START(bsp_cfg_t)
 JSONB_FIELD(board, proto_bsp_board_t)
-JSONB_FIELD(dummy, proto_bsp_dummy_t)
+JSONB_FIELD_ARRAY(dummy, 3, proto_bsp_dummy_t)
 JSONB_STRUCT_END(bsp_cfg_t)

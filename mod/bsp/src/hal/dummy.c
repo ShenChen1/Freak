@@ -5,7 +5,7 @@
 #include "log.h"
 #include "inc/dummy.h"
 
-#define DUMMY_RESOURCE_NUM  (1)
+#define DUMMY_RESOURCE_NUM  (3)
 
 typedef struct {
     int value;

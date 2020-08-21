@@ -11,7 +11,7 @@ static bsp_cfg_t s_cfg = {
         .sn = "123456",
         .chip = "HI3516DV300",
     },
-    .dummy = {
+    .dummy[0] = {
         .value = 0xdeadbeef,
     },
 };

@@ -7,7 +7,7 @@
 #include "inc/cfg.h"
 
 static box_t s_box = NULL;
-extern int msgbox_dummy(uint8_t chn, uint8_t action, void *in, size_t isize, void *out, size_t *osize);
+extern int msgbox_dummy(msgbox_param_t *param);
 
 int msgbox_init()
 {
@@ -31,15 +31,25 @@ int msgbox_do_handler(void *in, size_t isize, void *out, size_t *osize)
     size_t size = 0;
     proto_header_t *packet_in = in;
     proto_header_t *packet_out = out;
-    msgbox_handler_t func = box_get(s_box, packet_in->key, NULL);
-    assert(func);
+    msgbox_handler_t func = NULL;
 
     proto_header_dump(packet_in);
-    memcpy(packet_out, packet_in, sizeof(proto_header_t));
-    packet_out->errcode = func(packet_in->chn, packet_in->action,
-                               packet_in->data, packet_in->size,
-                               packet_out->data, &size);
+    func = box_get(s_box, packet_in->key, NULL);
+    assert(func);
+
+    msgbox_param_t param = {};
+    param.chn = packet_in->chn;
+    param.action = packet_in->action;
+    param.format = packet_in->format;
+    param.in = packet_in->data;
+    param.isize = packet_in->size;
+    param.out = packet_out->data;
+    param.osize = &size;
+
+    proto_package_fill(packet_out, packet_in->chn, packet_in->key, packet_in->action, packet_in->format, packet_in->data, 0);
+    packet_out->errcode = func(&param);
     packet_out->size = size;
+
     proto_header_dump(packet_out);
 
     if (packet_in->action == PROTO_ACTION_SET) {

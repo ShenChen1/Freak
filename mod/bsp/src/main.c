@@ -35,13 +35,28 @@ int main()
     // init dummy
     total = getDummyResourceNum();
     for (i = 0; i < total; i++) {
-        uint8_t ibuf[PROTO_PACKAGE_MAXSIZE];
+        uint8_t ibuf[PROTO_PACKAGE_MAXSIZE] = {};
         uint8_t *obuf = NULL;
         size_t osize = 0;
-        proto_package_fill(ibuf, i, PROTO_ACTION_SET, PROTP_BSP_KEY_DUMMY, cfg_get_member(dummy), sizeof(proto_bsp_dummy_t));
+        proto_package_fill(ibuf, i, PROTP_BSP_KEY_DUMMY, PROTO_ACTION_SET,
+            PROTO_FORMAT_STRUCTE, cfg_get_member(dummy[i]), sizeof(proto_bsp_dummy_t));
         nnm_req_exchange(req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
         assert(osize == sizeof(proto_header_t));
         memcpy(ibuf, obuf, osize);
+        nnm_free(obuf);
+
+        proto_package_fill(ibuf, i, PROTP_BSP_KEY_DUMMY, PROTO_ACTION_GET,
+            PROTO_FORMAT_STRUCTE, cfg_get_member(dummy[i]), 0);
+        nnm_req_exchange(req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
+        assert(osize == sizeof(proto_header_t) + sizeof(proto_bsp_dummy_t));
+        infof("value = %d", ((proto_bsp_dummy_t *)proto_package_data(obuf))->value);
+        nnm_free(obuf);
+
+        proto_package_fill(ibuf, i, PROTP_BSP_KEY_DUMMY, PROTO_ACTION_GET,
+            PROTO_FORMAT_JSON, cfg_get_member(dummy[i]), 0);
+        nnm_req_exchange(req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
+        assert(osize > sizeof(proto_header_t));
+        infof("%s", proto_package_data(obuf));
         nnm_free(obuf);
     }
     // init end

@@ -21,9 +21,10 @@ void jsonb_opt_bsp_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
         if (cJSON_IsNull(json)) assert(0);
         json_child = cJSON_GetObjectItem(json, "dummy");
     } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
+        json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "dummy", json_child);
     }
-    jsonb_opt_proto_bsp_dummy_t(opt, json_child, &element->dummy, sizeof(proto_bsp_dummy_t));
+    const size_t array_size_list[] = {3,0};
+    jsonb_opt_array(opt, json_child, element->dummy, sizeof(proto_bsp_dummy_t) * 3, array_size_list, jsonb_opt_proto_bsp_dummy_t);
 }
 }

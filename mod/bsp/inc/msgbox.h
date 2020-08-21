@@ -3,7 +3,17 @@
 
 #include "proto.h"
 
-typedef int (*msgbox_handler_t)(uint8_t chn, uint8_t action, void *in, size_t isize, void *out, size_t *osize);
+typedef struct {
+    uint8_t chn;
+    uint8_t action;
+    uint8_t format;
+    void *in;
+    size_t isize;
+    void *out;
+    size_t *osize;
+} msgbox_param_t;
+
+typedef int (*msgbox_handler_t)(msgbox_param_t *param);
 
 int msgbox_init();
 int msgbox_deinit();
