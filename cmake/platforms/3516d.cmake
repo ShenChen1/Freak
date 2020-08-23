@@ -6,6 +6,7 @@ set(CMAKE_C_COMPILER    "arm-himix200-linux-gcc")
 set(CMAKE_CXX_COMPILER  "arm-himix200-linux-g++")
 set(CMAKE_AR            "arm-himix200-linux-ar")
 set(CMAKE_LINER         "arm-himix200-linux-g++")
+set(CMAKE_LD            "arm-himix200-linux-ld")
 
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
