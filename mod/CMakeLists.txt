@@ -2,6 +2,8 @@ include(cjson)
 include(nanomsg)
 include(st)
 include(media-server)
+include(uthash)
+include(ufifo)
 
 add_compile_options(-g -Os -Wall -Werror)
 add_subdirectory(utils)

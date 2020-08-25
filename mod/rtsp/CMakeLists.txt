@@ -6,16 +6,23 @@ add_executable(${PROJECT_NAME}
     src/cfg.c
     src/msgbox/msgbox.c
     src/msgbox/msgbox_rtsp.c
+    src/rtsp-st/rtsp-server.c
     cfg/cfg.c)
 
 target_link_libraries(${PROJECT_NAME}
     ${LIB_CJSON_NAME}
     ${LIB_NANOMSG_NAME}
-    ${LIB_MEDIA_SRV_NAME}
     ${LIB_ST_NAME}
+    ${LIB_UFIFO_NAME}
+    ${LIB_MEDIA_SRV_NAME}::rtsp
+    ${LIB_MEDIA_SRV_NAME}::http
+    ${LIB_MEDIA_SRV_NAME}::aio
+    ${LIB_MEDIA_SRV_NAME}::utils
     utils
     proto)
 include_directories(${PROJECT_SOURCE_DIR})
+add_dependencies(${PROJECT_NAME} ${LIB_UTHASH_NAME})
+add_dependencies(${PROJECT_NAME} ${LIB_MEDIA_SRV_NAME})
 
 add_custom_target(cfg-${PROJECT_NAME}
     COMMAND python ${HIVIEW_TOOLS_PATH}/jsonb-c/src/jsonb_c.py --source=${PROJECT_SOURCE_DIR}/cfg/cfg.jsonb --installdir=${PROJECT_SOURCE_DIR}/cfg)
