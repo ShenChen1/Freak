@@ -1,0 +1,3 @@
+JSONB_STRUCT_START(proto_rtsp_url_t)
+JSONB_STRING(url, 256)
+JSONB_STRUCT_END(proto_rtsp_url_t)

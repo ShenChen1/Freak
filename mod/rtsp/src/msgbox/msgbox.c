@@ -5,9 +5,11 @@
 #include "inc/msgbox.h"
 #include "inc/cfg.h"
 
-extern int msgbox_dummy(msgbox_param_t *param);
-static msgbox_handler_t s_msgbox[PROTP_BSP_KEY_MAX] = {
-    [PROTP_BSP_KEY_DUMMY] = msgbox_dummy,
+extern int msgbox_rtsp_open(msgbox_param_t *param);
+extern int msgbox_rtsp_close(msgbox_param_t *param);
+static msgbox_handler_t s_msgbox[PROTP_RTSP_KEY_MAX] = {
+    [PROTP_RTSP_KEY_OPEN] = msgbox_rtsp_open,
+    [PROTP_RTSP_KEY_CLOSE] = msgbox_rtsp_open,
 };
 
 int msgbox_init()
@@ -47,7 +49,7 @@ int msgbox_do_handler(void *in, size_t isize, void *out, size_t *osize)
     proto_header_dump(packet_out);
 
     if (packet_in->action == PROTO_ACTION_SET) {
-        cfg_save(PROTO_BSP_CFG_PATH);
+        cfg_save(PROTO_RTSP_CFG_PATH);
     }
 
     *osize = packet_out->size + sizeof(proto_header_t);

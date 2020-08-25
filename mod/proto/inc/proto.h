@@ -7,6 +7,7 @@
 #include "node.h"
 #include "path.h"
 #include "proto_bsp.h"
+#include "proto_rtsp.h"
 
 #define PROTO_PACKAGE_MAXSIZE   (1024)
 
@@ -37,10 +38,14 @@ typedef enum {
 
 typedef enum {
     PROTP_BSP_KEY_DUMMY,
-    PROTP_BSP_KEY_TIME,
-    PROTP_BSP_KEY_ETH,
     PROTP_BSP_KEY_MAX,
 } proto_bsp_key_e;
+
+typedef enum {
+    PROTP_RTSP_KEY_OPEN,
+    PROTP_RTSP_KEY_CLOSE,
+    PROTP_RTSP_KEY_MAX,
+} proto_rtsp_key_e;
 
 #define proto_header_dump(_package) \
 (void)({ \
