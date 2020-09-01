@@ -6,7 +6,9 @@ add_executable(${PROJECT_NAME}
     src/cfg.c
     src/msgbox/msgbox.c
     src/msgbox/msgbox_rtsp.c
-    src/rtsp-st/rtsp-server.c
+    src/rtsp/rtp-media.c
+    src/rtsp/rtp-transport.c
+    src/rtsp/rtsp-server.c
     cfg/cfg.c)
 
 target_link_libraries(${PROJECT_NAME}

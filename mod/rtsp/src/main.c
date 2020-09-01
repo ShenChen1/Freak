@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include "inc/msgbox.h"
 #include "inc/cfg.h"
+#include "inc/rtsp.h"
 #include "nnm.h"
 #include "log.h"
 
@@ -16,22 +17,14 @@ static int __rep_recv(void *in, size_t isize, void **out, size_t *osize)
 
 int main()
 {
-    int ret;
+    void *server = NULL;
     nnm_t rep = NULL;
-    nnm_t req = NULL;
 
     log_init(PROTO_LOG_COM_NODE, false);
     cfg_load(PROTO_RTSP_CFG_PATH);
     msgbox_init();
-    nnm_rep_create(PROTO_BSP_COM_NODE, __rep_recv, &rep);
-
-    // init start
-    ret = nnm_req_create(PROTO_BSP_COM_NODE, &req);
-    assert(!ret);
-
-    // init end
-    ret = nnm_req_destory(req);
-    assert(!ret);
+    server = rtsp_server_init("0.0.0.0", 443);
+    nnm_rep_create(PROTO_RTSP_COM_NODE, __rep_recv, &rep);
 
     while (1) {
         infof("keep alive");
@@ -39,6 +32,7 @@ int main()
     }
 
     nnm_rep_destory(rep);
+    rtsp_server_uninit(server);
     msgbox_deinit();
     log_deinit();
 
