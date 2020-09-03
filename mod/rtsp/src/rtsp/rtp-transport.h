@@ -5,8 +5,8 @@
 #include <stdint.h>
 
 struct rtp_transport_t {
-    int (*send)(struct rtp_transport_t* t, int rtcp, const void* data, size_t bytes);
-    int (*recv)(struct rtp_transport_t* t, int rtcp, const void* data, size_t bytes);
+    int (*send)(struct rtp_transport_t* t, int rtcp, void* data, size_t bytes);
+    int (*recv)(struct rtp_transport_t* t, int rtcp, void* data, size_t bytes);
     void (*free)(struct rtp_transport_t* t);
 };
 

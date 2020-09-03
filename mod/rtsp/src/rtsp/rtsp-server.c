@@ -1,18 +1,20 @@
 #include "cstringext.h"
 #include "ctypedef.h"
-#include "librtsp/rtsp-server-aio.h"
 #include "libaio/aio-worker.h"
+#include "librtsp/rtsp-server-aio.h"
 #include "ntp-time.h"
-#include "rtp-media.h"
-#include "rtp-transport.h"
 #include "uri-parse.h"
 #include "urlcodec.h"
+#include "rtp-media.h"
+#include "rtp-transport.h"
 
-struct rtsp_session_t {
+typedef struct {
+    void* rtsp;
     struct rtp_media_t* media;
     struct rtp_transport_t* transport;
+
     int channel;
-};
+} rtsp_server_priv_t;
 
 int rtsp_uri_parse(const char* uri, char* path)
 {
@@ -38,7 +40,7 @@ static int rtsp_ondescribe(void* ptr, rtsp_server_t* rtsp, const char* uri)
         "c=IN IP4 0.0.0.0\n"
         "t=0 0\n"
         "a=control:*\n";
-    struct rtsp_session_t* priv = ptr;
+    rtsp_server_priv_t* priv = ptr;
 
     char filename[256] = {};
     rtsp_uri_parse(uri, filename);
@@ -48,8 +50,7 @@ static int rtsp_ondescribe(void* ptr, rtsp_server_t* rtsp, const char* uri)
     }
 
     char sdp[2048] = {};
-    snprintf(sdp, sizeof(sdp), pattern_live, ntp64_now(), ntp64_now(),
-             "0.0.0.0", uri);
+    snprintf(sdp, sizeof(sdp), pattern_live, ntp64_now(), ntp64_now(), "0.0.0.0", uri);
     priv->media->get_sdp(priv->media, sdp);
 
     return rtsp_server_reply_describe(rtsp, 200, sdp);
@@ -63,7 +64,7 @@ static int rtsp_onsetup(void* ptr,
                         size_t num)
 {
     size_t i;
-    struct rtsp_session_t* priv = (struct rtsp_session_t*)ptr;
+    rtsp_server_priv_t* priv = (rtsp_server_priv_t*)ptr;
     if (priv->media == NULL) {
         // 454 Session Not Found
         return rtsp_server_reply_setup(rtsp, 454, NULL, NULL);
@@ -100,19 +101,15 @@ static int rtsp_onsetup(void* ptr,
             interleaved[1] = transport->interleaved2;
         }
 
-        priv->transport =
-            rtp_tcp_transport_new(rtsp, interleaved[0], interleaved[1]);
-        int ret =
-            priv->media->add_transport(priv->media, NULL, priv->transport);
+        priv->transport = rtp_tcp_transport_new(rtsp, interleaved[0], interleaved[1]);
+        int ret = priv->media->add_transport(priv->media, NULL, priv->transport);
         if (ret < 0) {
             // 451 Invalid parameter
             return rtsp_server_reply_setup(rtsp, 451, NULL, NULL);
         }
 
         // RTP/AVP/TCP;interleaved=0-1
-        snprintf(rtsp_transport, sizeof(rtsp_transport),
-                 "RTP/AVP/TCP;interleaved=%d-%d", interleaved[0],
-                 interleaved[1]);
+        snprintf(rtsp_transport, sizeof(rtsp_transport), "RTP/AVP/TCP;interleaved=%d-%d", interleaved[0], interleaved[1]);
     } else if (transport->multicast) {
         // RFC 2326 1.6 Overall Operation p12
         // Multicast, client chooses address
@@ -123,15 +120,11 @@ static int rtsp_onsetup(void* ptr,
     } else {
         // unicast
         assert(transport->rtp.u.client_port1 && transport->rtp.u.client_port2);
-        uint16_t port[2] = {transport->rtp.u.client_port1,
-                            transport->rtp.u.client_port2};
-        const char* ip = transport->destination[0]
-                             ? transport->destination
-                             : rtsp_server_get_client(rtsp, NULL);
+        uint16_t port[2] = {transport->rtp.u.client_port1, transport->rtp.u.client_port2};
+        const char* ip = transport->destination[0] ? transport->destination : rtsp_server_get_client(rtsp, NULL);
 
         priv->transport = rtp_udp_transport_new(ip, port);
-        int ret =
-            priv->media->add_transport(priv->media, NULL, priv->transport);
+        int ret = priv->media->add_transport(priv->media, NULL, priv->transport);
         if (ret < 0) {
             // 451 Invalid parameter
             return rtsp_server_reply_setup(rtsp, 451, NULL, NULL);
@@ -158,7 +151,7 @@ static int rtsp_onplay(void* ptr,
                        const int64_t* npt,
                        const double* scale)
 {
-    struct rtsp_session_t* priv = (struct rtsp_session_t*)ptr;
+    rtsp_server_priv_t* priv = (rtsp_server_priv_t*)ptr;
 
     if (priv->media == NULL) {
         return rtsp_server_reply_play(rtsp, 454, NULL, NULL, NULL);
@@ -191,7 +184,7 @@ static int rtsp_onteardown(void* ptr,
                            const char* uri,
                            const char* session)
 {
-    struct rtsp_session_t* priv = (struct rtsp_session_t*)ptr;
+    rtsp_server_priv_t* priv = (rtsp_server_priv_t*)ptr;
 
     if (priv->media) {
         rtp_media_live_free(priv->media);
@@ -253,12 +246,17 @@ static int rtsp_onsetparameter(void* ptr,
 
 static void rtsp_onerror(void* ptr, rtsp_server_t* rtsp, int code)
 {
+
 }
 
 void* rtsp_server_init(const char* ip, int port)
 {
-    struct aio_rtsp_handler_t handler = {};
+    rtsp_server_priv_t* priv = malloc(sizeof(rtsp_server_priv_t));
+    if (priv == NULL) {
+        return NULL;
+    }
 
+    struct aio_rtsp_handler_t handler = {};
     handler.base.ondescribe = rtsp_ondescribe;
     handler.base.onsetup = rtsp_onsetup;
     handler.base.onplay = rtsp_onplay;
@@ -270,17 +268,21 @@ void* rtsp_server_init(const char* ip, int port)
     handler.base.ongetparameter = rtsp_ongetparameter;
     handler.base.onsetparameter = rtsp_onsetparameter;
     handler.onerror = rtsp_onerror;
-    void* rtsp = rtsp_server_listen(ip, port, &handler, NULL);
-    if (rtsp == NULL) {
-        return NULL;
-    }
 
-    return rtsp;
+    memset(priv, 0, sizeof(rtsp_server_priv_t));
+    priv->rtsp = rtsp_server_listen(ip, port, &handler, priv);
+
+    return priv;
 }
 
 int rtsp_server_uninit(void* rtsp)
 {
-    return rtsp_server_unlisten(rtsp);
+    rtsp_server_priv_t* priv = rtsp;
+
+    rtsp_server_unlisten(priv->rtsp);
+    free(priv);
+
+    return 0;
 }
 
 static void __attribute__((constructor)) __init()

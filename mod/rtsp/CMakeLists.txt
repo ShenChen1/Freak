@@ -7,8 +7,10 @@ add_executable(${PROJECT_NAME}
     src/msgbox/msgbox.c
     src/msgbox/msgbox_rtsp.c
     src/rtsp/rtp-media.c
-    src/rtsp/rtp-transport.c
+    src/rtsp/rtp-transport-tcp.c
+    src/rtsp/rtp-transport-udp.c
     src/rtsp/rtsp-server.c
+    src/rtsp/rtsp-client.c
     cfg/cfg.c)
 
 target_link_libraries(${PROJECT_NAME}
@@ -18,6 +20,7 @@ target_link_libraries(${PROJECT_NAME}
     ${LIB_UFIFO_NAME}
     ${LIB_MEDIA_SRV_NAME}::rtsp
     ${LIB_MEDIA_SRV_NAME}::http
+    ${LIB_MEDIA_SRV_NAME}::rtp
     ${LIB_MEDIA_SRV_NAME}::aio
     ${LIB_MEDIA_SRV_NAME}::utils
     utils
