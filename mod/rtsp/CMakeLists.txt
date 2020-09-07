@@ -7,6 +7,7 @@ add_executable(${PROJECT_NAME}
     src/msgbox/msgbox.c
     src/msgbox/msgbox_rtsp.c
     src/rtsp/rtp-media.c
+    src/rtsp/rtp-receiver.c
     src/rtsp/rtp-transport-tcp.c
     src/rtsp/rtp-transport-udp.c
     src/rtsp/rtsp-server.c

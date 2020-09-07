@@ -18,17 +18,20 @@ static int __rep_recv(void *in, size_t isize, void **out, size_t *osize)
 int main()
 {
     void *server = NULL;
+    void *client = NULL;
     nnm_t rep = NULL;
 
     log_init(PROTO_LOG_COM_NODE, false);
     cfg_load(PROTO_RTSP_CFG_PATH);
     msgbox_init();
-    server = rtsp_server_init("0.0.0.0", 443);
+    server = rtsp_server_init("0.0.0.0", 1234);
     nnm_rep_create(PROTO_RTSP_COM_NODE, __rep_recv, &rep);
 
     while (1) {
-        infof("keep alive");
-        sleep(1);
+        printf("keep alive");
+        client = rtsp_client_init("127.0.0.1");
+        sleep(5);
+        rtsp_client_uninit(client);
     }
 
     nnm_rep_destory(rep);

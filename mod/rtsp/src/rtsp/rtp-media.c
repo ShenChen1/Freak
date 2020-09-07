@@ -1,13 +1,15 @@
-#include "cstringext.h"
 #include "rtp-media.h"
+#include "cstringext.h"
+#include "librtp/rtp-payload.h"
+#include "librtp/rtp-profile.h"
 
 #define container_of(ptr, type, member) \
-    (type *)((char *)(ptr) - (char *) &((type *)0)->member)
+    (type*)((char*)(ptr) - (char*)&((type*)0)->member)
 
 enum {
-    MEDIA_TRACK_VIDEO = 0, // a=control:video
-    MEDIA_TRACK_AUDIO = 1, // a=control:audio
-    MEDIA_TRACK_META  = 2, // a=control:meta
+    MEDIA_TRACK_VIDEO = 0,  // a=control:video
+    MEDIA_TRACK_AUDIO = 1,  // a=control:audio
+    MEDIA_TRACK_META = 2,   // a=control:meta
     MEDIA_TRACK_BUTT,
 };
 
@@ -17,51 +19,54 @@ typedef struct {
 } rtp_media_priv_t;
 
 
-static int rtp_get_sdp(struct rtp_media_t* m, char *sdp)
+static int rtp_get_sdp(struct rtp_media_t* m, char* sdp)
 {
-    //rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
+    // rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
     return 0;
 }
 
 static int rtp_get_duration(struct rtp_media_t* m, int64_t* duration)
 {
-    //rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
+    // rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
     return 0;
 }
 
 static int rtp_play(struct rtp_media_t* m)
 {
-    //rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
+    // rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
     return 0;
 }
 
 static int rtp_pause(struct rtp_media_t* m)
 {
-    //rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
+    // rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
     return 0;
 }
 
 static int rtp_set_speed(struct rtp_media_t* m, double speed)
 {
-    //rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
+    // rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
     return 0;
 }
 
 static int rtp_seek(struct rtp_media_t* m, int64_t pos)
 {
-    //rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
+    // rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
     return 0;
 }
 
-static int rtp_get_rtpinfo(struct rtp_media_t* m, const char* uri, char *rtpinfo, size_t bytes)
+static int rtp_get_rtpinfo(struct rtp_media_t* m,
+                           const char* uri,
+                           char* rtpinfo,
+                           size_t bytes)
 {
-    //rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
+    // rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
     return 0;
 }
 
 static int rtp_add_transport(struct rtp_media_t* m, const char* track, void* t)
 {
-    //rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
+    // rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
     return 0;
 }
 

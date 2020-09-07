@@ -1,8 +1,7 @@
 #ifndef __RTP_TRANSPORT_H__
 #define __RTP_TRANSPORT_H__
 
-#include <stdlib.h>
-#include <stdint.h>
+#include "ctypedef.h"
 
 struct rtp_transport_t {
     int (*send)(struct rtp_transport_t* t, int rtcp, void* data, size_t bytes);

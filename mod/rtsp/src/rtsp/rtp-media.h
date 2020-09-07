@@ -1,9 +1,8 @@
 #ifndef __RTP_MEDIA_H__
 #define __RTP_MEDIA_H__
 
-#include <stdlib.h>
-#include "librtp/rtp-payload.h"
-#include "librtp/rtp-profile.h"
+#include <stdint.h>
+#include <stddef.h>
 
 struct rtp_media_t {
     int (*get_sdp)(struct rtp_media_t* m, char* sdp);
