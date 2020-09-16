@@ -14,7 +14,7 @@ add_library(${PROJECT_NAME} STATIC
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC ${PROJECT_SOURCE_DIR}/json-cfg/inc
-    PRIVATE ${HIVIEW_TOOLS_PATH}/jsonb-c/inc
+    PRIVATE ${FREAK_TOOLS_PATH}/jsonb-c/inc
     PUBLIC ${PROJECT_SOURCE_DIR}/log/inc
     PUBLIC ${PROJECT_SOURCE_DIR}/nnm/inc)
 
