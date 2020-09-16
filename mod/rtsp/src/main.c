@@ -22,14 +22,15 @@ int main()
     nnm_t rep = NULL;
 
     log_init(PROTO_LOG_COM_NODE, false);
+    log_setlevel(LOG_LV_DEBUG);
     cfg_load(PROTO_RTSP_CFG_PATH);
     msgbox_init();
     server = rtsp_server_init("0.0.0.0", 1234);
     nnm_rep_create(PROTO_RTSP_COM_NODE, __rep_recv, &rep);
 
-    while (1) {
-        printf("keep alive");
-        client = rtsp_client_init("127.0.0.1");
+    if (1) {
+        infof("keep alive");
+        client = rtsp_client_init("rtsp://admin@127.0.0.1:1234/test");
         sleep(5);
         rtsp_client_uninit(client);
     }

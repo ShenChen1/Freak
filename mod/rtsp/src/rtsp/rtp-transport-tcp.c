@@ -13,7 +13,6 @@ typedef struct {
     uint8_t packet[4 + (1 << 16)];
 } rtp_tcp_transport_t;
 
-
 static int rtp_tcp_transport_recv(struct rtp_transport_t* t, int rtcp, void* data, size_t bytes)
 {
     return 0;

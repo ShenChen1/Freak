@@ -1,4 +1,3 @@
-#define OS_LINUX
 #include "cstringext.h"
 #include "port/ip-route.h"
 #include "rtp-transport.h"

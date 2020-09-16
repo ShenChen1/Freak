@@ -74,5 +74,6 @@ int log_printf(log_lv_t level, const char *fmt, ...)
     n += vsnprintf(&buf[n], sizeof(buf) - n, fmt, ap);
     va_end(ap);
 
-    return nnm_push_send(s_nnm, buf, n + 1);
+    printf("%s\n", buf);
+    return 0;//nnm_push_send(s_nnm, buf, n + 1);
 }

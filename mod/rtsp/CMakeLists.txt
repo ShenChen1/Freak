@@ -1,13 +1,15 @@
 project(rtsp)
 
 add_definitions(-DMODULE_NAME="${PROJECT_NAME}")
+add_definitions(-DOS_LINUX)
 add_executable(${PROJECT_NAME}
     src/main.c
     src/cfg.c
     src/msgbox/msgbox.c
     src/msgbox/msgbox_rtsp.c
     src/rtsp/rtp-media.c
-    src/rtsp/rtp-receiver.c
+    src/rtsp/rtp-receiver-tcp.c
+    src/rtsp/rtp-receiver-udp.c
     src/rtsp/rtp-transport-tcp.c
     src/rtsp/rtp-transport-udp.c
     src/rtsp/rtsp-server.c

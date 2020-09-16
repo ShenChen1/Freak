@@ -1,3 +1,5 @@
+#include "log.h"
+#include "sys/thread.h"
 #include "cstringext.h"
 #include "ctypedef.h"
 #include "libaio/aio-worker.h"
@@ -11,8 +13,6 @@
 typedef struct {
     void* rtsp;
     struct rtp_media_t* media;
-    struct rtp_transport_t* transport;
-
     int channel;
 } rtsp_server_priv_t;
 
@@ -41,6 +41,7 @@ static int rtsp_ondescribe(void* ptr, rtsp_server_t* rtsp, const char* uri)
         "t=0 0\n"
         "a=control:*\n";
     rtsp_server_priv_t* priv = ptr;
+    tracef("ptr:%p rtsp:%p uri:%s", ptr, rtsp, uri);
 
     char filename[256] = {};
     rtsp_uri_parse(uri, filename);
@@ -65,6 +66,9 @@ static int rtsp_onsetup(void* ptr,
 {
     size_t i;
     rtsp_server_priv_t* priv = (rtsp_server_priv_t*)ptr;
+    tracef("ptr:%p rtsp:%p uri:%s session:%s transports:%p num:%d",
+        ptr, rtsp, uri, session, transports, num);
+
     if (priv->media == NULL) {
         // 454 Session Not Found
         return rtsp_server_reply_setup(rtsp, 454, NULL, NULL);
@@ -101,8 +105,7 @@ static int rtsp_onsetup(void* ptr,
             interleaved[1] = transport->interleaved2;
         }
 
-        priv->transport = rtp_tcp_transport_new(rtsp, interleaved[0], interleaved[1]);
-        int ret = priv->media->add_transport(priv->media, NULL, priv->transport);
+        int ret = priv->media->add_transport(priv->media, NULL, rtp_tcp_transport_new(rtsp, interleaved[0], interleaved[1]));
         if (ret < 0) {
             // 451 Invalid parameter
             return rtsp_server_reply_setup(rtsp, 451, NULL, NULL);
@@ -123,8 +126,7 @@ static int rtsp_onsetup(void* ptr,
         uint16_t port[2] = {transport->rtp.u.client_port1, transport->rtp.u.client_port2};
         const char* ip = transport->destination[0] ? transport->destination : rtsp_server_get_client(rtsp, NULL);
 
-        priv->transport = rtp_udp_transport_new(ip, port);
-        int ret = priv->media->add_transport(priv->media, NULL, priv->transport);
+        int ret = priv->media->add_transport(priv->media, "video", rtp_udp_transport_new(ip, port));
         if (ret < 0) {
             // 451 Invalid parameter
             return rtsp_server_reply_setup(rtsp, 451, NULL, NULL);
@@ -152,6 +154,8 @@ static int rtsp_onplay(void* ptr,
                        const double* scale)
 {
     rtsp_server_priv_t* priv = (rtsp_server_priv_t*)ptr;
+    tracef("ptr:%p rtsp:%p uri:%s session:%s npt:%p scale:%p",
+        ptr, rtsp, uri, session, npt, scale);
 
     if (priv->media == NULL) {
         return rtsp_server_reply_play(rtsp, 454, NULL, NULL, NULL);
@@ -175,6 +179,7 @@ static int rtsp_onpause(void* ptr,
                         const char* session,
                         const int64_t* npt)
 {
+    tracef("ptr:%p rtsp:%p uri:%s", ptr, rtsp, uri, npt);
     // 457 Invalid Range
     return rtsp_server_reply_pause(rtsp, 200);
 }
@@ -185,6 +190,7 @@ static int rtsp_onteardown(void* ptr,
                            const char* session)
 {
     rtsp_server_priv_t* priv = (rtsp_server_priv_t*)ptr;
+    tracef("ptr:%p rtsp:%p uri:%s session:%s", ptr, rtsp, uri, session);
 
     if (priv->media) {
         rtp_media_live_free(priv->media);
@@ -199,6 +205,8 @@ static int rtsp_onannounce(void* ptr,
                            const char* uri,
                            const char* sdp)
 {
+    tracef("ptr:%p rtsp:%p uri:%s sdp:%p", ptr, rtsp, uri, sdp);
+
     return rtsp_server_reply_announce(rtsp, 200);
 }
 
@@ -209,11 +217,16 @@ static int rtsp_onrecord(void* ptr,
                          const int64_t* npt,
                          const double* scale)
 {
+    tracef("ptr:%p rtsp:%p uri:%s, session:%s, npt:%p, scale:%p",
+        ptr, rtsp, uri, session, npt, npt);
+
     return rtsp_server_reply_record(rtsp, 200, NULL, NULL);
 }
 
 static int rtsp_onoptions(void* ptr, rtsp_server_t* rtsp, const char* uri)
 {
+    tracef("ptr:%p rtsp:%p uri:%s", ptr, rtsp, uri);
+
     // const char* require = rtsp_server_get_header(rtsp, "Require");
     return rtsp_server_reply_options(rtsp, 200);
 }
@@ -225,6 +238,9 @@ static int rtsp_ongetparameter(void* ptr,
                                const void* content,
                                int bytes)
 {
+    tracef("ptr:%p rtsp:%p uri:%s, session:%s, content:%s, bytes:%d",
+        ptr, rtsp, uri, session, content, bytes);
+
     // const char* ctype = rtsp_server_get_header(rtsp, "Content-Type");
     // const char* encoding = rtsp_server_get_header(rtsp, "Content-Encoding");
     // const char* language = rtsp_server_get_header(rtsp, "Content-Language");
@@ -238,6 +254,9 @@ static int rtsp_onsetparameter(void* ptr,
                                const void* content,
                                int bytes)
 {
+    tracef("ptr:%p rtsp:%p uri:%s, session:%s, content:%s, bytes:%d",
+        ptr, rtsp, uri, session, content, bytes);
+
     // const char* ctype = rtsp_server_get_header(rtsp, "Content-Type");
     // const char* encoding = rtsp_server_get_header(rtsp, "Content-Encoding");
     // const char* language = rtsp_server_get_header(rtsp, "Content-Language");
@@ -246,7 +265,7 @@ static int rtsp_onsetparameter(void* ptr,
 
 static void rtsp_onerror(void* ptr, rtsp_server_t* rtsp, int code)
 {
-
+    tracef("code:%s", strerror(code));
 }
 
 void* rtsp_server_init(const char* ip, int port)
@@ -272,6 +291,7 @@ void* rtsp_server_init(const char* ip, int port)
     memset(priv, 0, sizeof(rtsp_server_priv_t));
     priv->rtsp = rtsp_server_listen(ip, port, &handler, priv);
 
+    tracef("priv:%p", priv);
     return priv;
 }
 
@@ -280,6 +300,11 @@ int rtsp_server_uninit(void* rtsp)
     rtsp_server_priv_t* priv = rtsp;
 
     rtsp_server_unlisten(priv->rtsp);
+
+    if (priv->media) {
+        rtp_media_live_free(priv->media);
+        priv->media = NULL;
+    }
     free(priv);
 
     return 0;
