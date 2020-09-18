@@ -71,7 +71,12 @@ static void __packet(void* param,
 
 static int rtp_send_data(void *arg)
 {
+    size_t nread = 0;
+    uint32_t timestamp = 0;
     rtp_media_priv_t* priv = arg;
+
+    char *path = "/mnt/hgfs/WinShare/200frames_count.h264";
+    FILE *fp = fopen(path, "r");
 
     while (1) {
 
@@ -83,11 +88,16 @@ static int rtp_send_data(void *arg)
             continue;
         }
 
-        tracef("rtp_payload_encode_input");
-        rtp_payload_encode_input(priv->track[MEDIA_TRACK_VIDEO].packer, priv->data, 1024, 1 * 90 /*kHz*/);
-        usleep(40 * 1000);
+        nread = fread(priv->data, 1, sizeof(priv->data), fp);
+        if (nread <= 0) {
+            break;
+        }
+
+        rtp_payload_encode_input(priv->track[MEDIA_TRACK_VIDEO].packer, priv->data, 1024, timestamp * 90 /*kHz*/);
+        timestamp += 40;
     }
 
+    fclose(fp);
     return 0;
 }
 
@@ -109,7 +119,7 @@ static int rtp_get_sdp(struct rtp_media_t* m, char* sdp)
     priv->track[MEDIA_TRACK_VIDEO].packer = rtp_payload_encode_create(
         RTP_PAYLOAD_H264, "H264", (uint16_t)ssrc, ssrc, &func, &priv->track[MEDIA_TRACK_VIDEO]);
     struct rtp_event_t event = {NULL};
-    priv->track[MEDIA_TRACK_VIDEO].rtp = rtp_create(&event, NULL, ssrc, ssrc, 90000, 4*1024, 1);
+    priv->track[MEDIA_TRACK_VIDEO].rtp = rtp_create(&event, NULL, ssrc, 0, 90000, 4*1024, 1);
     rtp_set_info(priv->track[MEDIA_TRACK_VIDEO].rtp, "RTSPServer", "live.h264");
 
     sprintf(&sdp[strlen(sdp)], pattern_video, RTP_PAYLOAD_H264, RTP_PAYLOAD_H264, RTP_PAYLOAD_H264, 0, 0, 0);

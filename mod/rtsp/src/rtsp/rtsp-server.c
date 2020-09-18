@@ -65,7 +65,7 @@ static int rtsp_onsetup(void* ptr,
                         size_t num)
 {
     size_t i;
-    rtsp_server_priv_t* priv = (rtsp_server_priv_t*)ptr;
+    rtsp_server_priv_t* priv = ptr;
     tracef("ptr:%p rtsp:%p uri:%s session:%s transports:%p num:%d",
         ptr, rtsp, uri, session, transports, num);
 
@@ -153,7 +153,7 @@ static int rtsp_onplay(void* ptr,
                        const int64_t* npt,
                        const double* scale)
 {
-    rtsp_server_priv_t* priv = (rtsp_server_priv_t*)ptr;
+    rtsp_server_priv_t* priv = ptr;
     tracef("ptr:%p rtsp:%p uri:%s session:%s npt:%p scale:%p",
         ptr, rtsp, uri, session, npt, scale);
 
@@ -189,12 +189,14 @@ static int rtsp_onteardown(void* ptr,
                            const char* uri,
                            const char* session)
 {
-    rtsp_server_priv_t* priv = (rtsp_server_priv_t*)ptr;
+    struct rtp_media_t* m = NULL;
+    rtsp_server_priv_t* priv = ptr;
     tracef("ptr:%p rtsp:%p uri:%s session:%s", ptr, rtsp, uri, session);
 
     if (priv->media) {
-        rtp_media_live_free(priv->media);
+        m = priv->media;
         priv->media = NULL;
+        rtp_media_live_free(m);
     }
 
     return rtsp_server_reply_teardown(rtsp, 200);
@@ -303,7 +305,6 @@ int rtsp_server_uninit(void* rtsp)
 
     if (priv->media) {
         rtp_media_live_free(priv->media);
-        priv->media = NULL;
     }
     free(priv);
 

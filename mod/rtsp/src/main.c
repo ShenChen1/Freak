@@ -15,6 +15,17 @@ static int __rep_recv(void *in, size_t isize, void **out, size_t *osize)
     return msgbox_do_handler(in, isize, *out, osize);
 }
 
+static int __frame(void* param,
+                   const char* encoding,
+                   const void* packet,
+                   int bytes,
+                   uint32_t time,
+                   int flags)
+{
+    tracef("client:%p", param);
+    return 0;
+}
+
 int main()
 {
     void *server = NULL;
@@ -30,7 +41,8 @@ int main()
 
     if (1) {
         infof("keep alive");
-        client = rtsp_client_init("rtsp://admin@127.0.0.1:1234/test");
+        rtsp_client_callback_t cb = {&client, __frame};
+        client = rtsp_client_init("rtsp://admin@127.0.0.1:1234/test", &cb);
         sleep(5);
         rtsp_client_uninit(client);
     }

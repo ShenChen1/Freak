@@ -1,3 +1,4 @@
+#include "log.h"
 #include "cstringext.h"
 #include "port/ip-route.h"
 #include "rtp-transport.h"
@@ -16,12 +17,14 @@ typedef struct {
 
 static int rtp_udp_transport_recv(struct rtp_transport_t* t, int rtcp, void* data, size_t bytes)
 {
+    tracef("data:%s bytes:%zu", data, bytes);
     return 0;
 }
 
 static int rtp_udp_transport_send(struct rtp_transport_t* t, int rtcp, void* data, size_t bytes)
 {
     rtp_udp_transport_t* transport = container_of(t, rtp_udp_transport_t, base);
+    tracef("data:%s bytes:%zu", data, bytes);
 
     int i = rtcp ? 1 : 0;
     return socket_sendto(transport->socket[i], data, bytes, 0, (void*)&transport->addr[i], transport->addrlen[i]);

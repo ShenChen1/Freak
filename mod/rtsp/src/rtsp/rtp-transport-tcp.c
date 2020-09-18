@@ -1,3 +1,4 @@
+#include "log.h"
 #include "cstringext.h"
 #include "rtp-transport.h"
 #include "librtsp/rtsp-server.h"
@@ -15,6 +16,7 @@ typedef struct {
 
 static int rtp_tcp_transport_recv(struct rtp_transport_t* t, int rtcp, void* data, size_t bytes)
 {
+    tracef("data:%s bytes:%zu", data, bytes);
     return 0;
 }
 
@@ -22,6 +24,7 @@ static int rtp_tcp_transport_send(struct rtp_transport_t* t, int rtcp, void* dat
 {
     int ret;
     rtp_tcp_transport_t* transport = container_of(t, rtp_tcp_transport_t, base);
+    tracef("data:%s bytes:%zu", data, bytes);
 
     transport->packet[0] = '$';
     transport->packet[1] = rtcp ? transport->rtcp : transport->rtp;

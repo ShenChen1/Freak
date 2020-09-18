@@ -1,4 +1,5 @@
 #include "log.h"
+#include "inc/rtsp.h"
 #include "sys/thread.h"
 #include "librtsp/rtsp-client.h"
 #include "librtsp/rtsp-header-rtp-info.h"
@@ -15,6 +16,7 @@
 typedef struct {
     socket_t socket;
     pthread_t thread;
+    rtsp_client_callback_t cb;
 
     int transport;
     socket_t rtp[5][2];
@@ -115,7 +117,6 @@ static int onsetup(void* param, int64_t duration)
 
         if (RTSP_TRANSPORT_RTP_UDP == transport->transport) {
             int port[2] = {transport->rtp.u.server_port1, transport->rtp.u.server_port2};
-            // only
             assert(0 == transport->multicast);  // unicast only
             assert(transport->rtp.u.client_port1 == priv->port[i][0]);
             assert(transport->rtp.u.client_port2 == priv->port[i][1]);
@@ -123,10 +124,12 @@ static int onsetup(void* param, int64_t duration)
                 priv->receiver[i] = rtp_udp_receiver_create(priv->rtp[i], transport->source, port, payload, encoding);
             } else {
                 char ip[65];
-	            uint16_t rtspport;
+                uint16_t rtspport;
                 socket_getpeername(priv->socket, ip, &rtspport);
                 priv->receiver[i] = rtp_udp_receiver_create(priv->rtp[i], ip, port, payload, encoding);
             }
+            priv->receiver[i]->param = priv->cb.param;
+            priv->receiver[i]->frame = priv->cb.onframe;
         } else if (RTSP_TRANSPORT_RTP_TCP == transport->transport) {
             assert(transport->rtp.u.client_port1 == transport->interleaved1);
             assert(transport->rtp.u.client_port2 == transport->interleaved2);
@@ -169,10 +172,14 @@ static void onrtp(void* param,
                   const void* data,
                   uint16_t bytes)
 {
+    rtsp_client_priv_t* priv = param;
     tracef("param:%p channel:%u data:%p bytes:%u", param, channel, data, bytes);
+
+    assert(priv->receiver[channel/2]->input);
+    priv->receiver[channel/2]->input(priv->receiver[channel/2], channel, data, bytes);
 }
 
-void* rtsp_client_init(const char* url)
+void* rtsp_client_init(const char* url, rtsp_client_callback_t *cb)
 {
     rtsp_client_priv_t* priv = NULL;
 
@@ -198,6 +205,8 @@ void* rtsp_client_init(const char* url)
 
     memset(priv, 0, sizeof(rtsp_client_priv_t));
     priv->transport = RTSP_TRANSPORT_RTP_UDP;
+    priv->cb.param = cb->param;
+    priv->cb.onframe = cb->onframe;
     priv->socket = socket_connect_host(r->host, r->port, -1);
     if (priv->socket == socket_invalid) {
         goto err;
@@ -228,8 +237,11 @@ int rtsp_client_uninit(void* rtsp)
     }
 
     rtsp_client_teardown(priv->rtsp);
+    socket_shutdown(priv->socket, SHUT_RDWR);
+
     rtsp_client_destroy(priv->rtsp);
     socket_close(priv->socket);
+
     thread_destroy(priv->thread);
     free(priv);
 
