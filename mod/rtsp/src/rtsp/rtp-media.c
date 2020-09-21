@@ -1,4 +1,7 @@
 #include "log.h"
+#include "proto.h"
+#include "common.h"
+#include "ufifo.h"
 #include "rtp-media.h"
 #include "rtp-transport.h"
 #include "cstringext.h"
@@ -7,10 +10,6 @@
 #include "librtp/rtp-profile.h"
 #include "librtp/rtp.h"
 #include "librtp/rtp-internal.h"
-#include <unistd.h>
-
-#define container_of(ptr, type, member) \
-    (type*)((char*)(ptr) - (char*)&((type*)0)->member)
 
 enum {
     MEDIA_TRACK_VIDEO = 0,  // a=control:video
@@ -31,12 +30,12 @@ typedef struct {
     struct rtp_transport_t* transport;
     void* rtp;
     void* packer;
-    char packet[2 * 1024];
+    uint8_t packet[2 * 1024];
 } rtp_media_track_t;
 
 typedef struct {
     struct rtp_media_t base;
-    char data[512 * 1024];
+    uint8_t data[512 * 1024];
     pthread_t thread;
     volatile int status;
     rtp_media_track_t track[MEDIA_TRACK_MAX];
@@ -71,12 +70,16 @@ static void __packet(void* param,
 
 static int rtp_send_data(void *arg)
 {
-    size_t nread = 0;
     uint32_t timestamp = 0;
     rtp_media_priv_t* priv = arg;
 
-    char *path = "/mnt/hgfs/WinShare/200frames_count.h264";
-    FILE *fp = fopen(path, "r");
+    ufifo_t *fifo = NULL;
+    ufifo_init_t init = {
+        .lock = UFIFO_LOCK_NONE,
+        .opt = UFIFO_OPT_ATTACH,
+        .hook = {NULL, NULL},
+    };
+    ufifo_open(PROTO_VENC_MEDIA_FIFO, &init, &fifo);
 
     while (1) {
 
@@ -88,16 +91,12 @@ static int rtp_send_data(void *arg)
             continue;
         }
 
-        nread = fread(priv->data, 1, sizeof(priv->data), fp);
-        if (nread <= 0) {
-            break;
-        }
-
-        rtp_payload_encode_input(priv->track[MEDIA_TRACK_VIDEO].packer, priv->data, 1024, timestamp * 90 /*kHz*/);
+        size_t capacity = ufifo_get_block(fifo, priv->data, sizeof(priv->data));
+        rtp_payload_encode_input(priv->track[MEDIA_TRACK_VIDEO].packer, priv->data, capacity, timestamp * 90 /*kHz*/);
         timestamp += 40;
     }
 
-    fclose(fp);
+    ufifo_close(fifo);
     return 0;
 }
 

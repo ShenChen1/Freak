@@ -39,7 +39,7 @@ static int rtsp_client_recv(void *param)
         if (ret <= 0) {
             break;
         }
-        tracef("rtsp_client_input:%s", priv->packet);
+        tracef("[%p]rtsp_client_input:%d", param, ret);
         rtsp_client_input(priv->rtsp, priv->packet, ret);
     };
 
@@ -73,7 +73,7 @@ static int rtpport(void* param,
 
     switch (priv->transport) {
     case RTSP_TRANSPORT_RTP_UDP:
-        sockpair_create(NULL, priv->rtp[media], priv->port[media]);
+        sockpair_create(ip, priv->rtp[media], priv->port[media]);
         port[0] = priv->port[media][0];
         port[1] = priv->port[media][1];
         break;
@@ -88,6 +88,8 @@ static int rtpport(void* param,
         return -1;
     }
 
+    tracef("ip: %s", ip);
+    tracef("port: %u %u", port[0], port[1]);
     return priv->transport;
 }
 
@@ -128,15 +130,16 @@ static int onsetup(void* param, int64_t duration)
                 socket_getpeername(priv->socket, ip, &rtspport);
                 priv->receiver[i] = rtp_udp_receiver_create(priv->rtp[i], ip, port, payload, encoding);
             }
-            priv->receiver[i]->param = priv->cb.param;
-            priv->receiver[i]->frame = priv->cb.onframe;
         } else if (RTSP_TRANSPORT_RTP_TCP == transport->transport) {
-            assert(transport->rtp.u.client_port1 == transport->interleaved1);
-            assert(transport->rtp.u.client_port2 == transport->interleaved2);
+            //assert(transport->rtp.u.client_port1 == transport->interleaved1);
+            //assert(transport->rtp.u.client_port2 == transport->interleaved2);
             priv->receiver[i] = rtp_tcp_receiver_create(transport->interleaved1, transport->interleaved2, payload, encoding);
         } else {
             assert(0);  // TODO
         }
+        // set callback
+        priv->receiver[i]->param = priv->cb.param;
+        priv->receiver[i]->frame = priv->cb.onframe;
     }
 
     return 0;
@@ -179,7 +182,7 @@ static void onrtp(void* param,
     priv->receiver[channel/2]->input(priv->receiver[channel/2], channel, data, bytes);
 }
 
-void* rtsp_client_init(const char* url, rtsp_client_callback_t *cb)
+void* rtsp_client_init(const char* url, rtsp_client_protocol_t protocol, rtsp_client_callback_t *cb)
 {
     rtsp_client_priv_t* priv = NULL;
 
@@ -204,7 +207,7 @@ void* rtsp_client_init(const char* url, rtsp_client_callback_t *cb)
     uri_userinfo(r, usr, sizeof(usr), pwd, sizeof(pwd));
 
     memset(priv, 0, sizeof(rtsp_client_priv_t));
-    priv->transport = RTSP_TRANSPORT_RTP_UDP;
+    priv->transport = protocol == RTSP_PROTOCOL_UDP ? RTSP_TRANSPORT_RTP_UDP : RTSP_TRANSPORT_RTP_TCP;
     priv->cb.param = cb->param;
     priv->cb.onframe = cb->onframe;
     priv->socket = socket_connect_host(r->host, r->port, -1);
@@ -231,11 +234,6 @@ int rtsp_client_uninit(void* rtsp)
     int i;
     rtsp_client_priv_t* priv = rtsp;
 
-    for (i = 0; i < 5; i++) {
-        if (priv->receiver[i])
-            priv->receiver[i]->free(priv->receiver[i]);
-    }
-
     rtsp_client_teardown(priv->rtsp);
     socket_shutdown(priv->socket, SHUT_RDWR);
 
@@ -243,6 +241,11 @@ int rtsp_client_uninit(void* rtsp)
     socket_close(priv->socket);
 
     thread_destroy(priv->thread);
+    for (i = 0; i < 5; i++) {
+        if (priv->receiver[i])
+            priv->receiver[i]->free(priv->receiver[i]);
+    }
+
     free(priv);
 
     return 0;

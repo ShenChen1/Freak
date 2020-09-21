@@ -1,4 +1,5 @@
 #include "log.h"
+#include "utils.h"
 #include "rtp-receiver.h"
 #include "librtp/rtcp-header.h"
 #include "librtp/rtp-demuxer.h"
@@ -8,9 +9,6 @@
 #include "sockutil.h"
 #include "sys/pollfd.h"
 #include "sys/thread.h"
-
-#define container_of(ptr, type, member) \
-    (type*)((char*)(ptr) - (char*)&((type*)0)->member)
 
 typedef struct {
     struct rtp_receiver_t base;
@@ -41,7 +39,7 @@ static int rtp_read(rtp_receiver_priv_t* priv, socket_t s)
     assert(0 == socket_addr_compare((const struct sockaddr*)&ss,
                                     (const struct sockaddr*)&priv->ss[0]));
 
-    tracef("rtp_demuxer_input:%s", priv->rtp_buffer);
+    tracef("rtp_demuxer_input:%zu", len);
     return rtp_demuxer_input(priv->demuxer, priv->rtp_buffer, r);
 }
 
@@ -58,7 +56,7 @@ static int rtcp_read(rtp_receiver_priv_t* priv, socket_t s)
     assert(0 == socket_addr_compare((const struct sockaddr*)&ss,
                                     (const struct sockaddr*)&priv->ss[1]));
 
-    tracef("rtp_demuxer_input:%s", priv->rtp_buffer);
+    tracef("rtp_demuxer_input:%zu", len);
     return rtp_demuxer_input(priv->demuxer, priv->rtcp_buffer, r);
 }
 
@@ -163,6 +161,8 @@ struct rtp_receiver_t* rtp_udp_receiver_create(int rtp[2],
     priv->socket[0] = rtp[0];
     priv->socket[1] = rtp[1];
 
+    tracef("ip: %s", peer);
+    tracef("port: %u %u", peerport[0], peerport[1]);
     thread_create(&priv->thread, rtp_worker, priv);
     return &priv->base;
 }

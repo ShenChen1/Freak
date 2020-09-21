@@ -1,4 +1,5 @@
 #include "log.h"
+#include "utils.h"
 #include "rtp-receiver.h"
 #include "librtp/rtcp-header.h"
 #include "librtp/rtp-demuxer.h"
@@ -9,9 +10,6 @@
 #include "sys/pollfd.h"
 #include "sys/thread.h"
 
-#define container_of(ptr, type, member) \
-    (type *)((char *)(ptr) - (char *) &((type *)0)->member)
-
 typedef struct {
     struct rtp_receiver_t base;
 
@@ -20,6 +18,19 @@ typedef struct {
     struct rtp_demuxer_t* demuxer;
 
 } rtp_receiver_priv_t;
+
+static void rtp_onpacket(void* param,
+                         const void* packet,
+                         int bytes,
+                         uint32_t timestamp,
+                         int flags)
+{
+    rtp_receiver_priv_t* priv = param;
+
+    if (priv->base.frame) {
+        priv->base.frame(priv->base.param, priv->encoding, packet, bytes, timestamp, flags);
+    }
+}
 
 static void rtp_tcp_receiver_free(struct rtp_receiver_t *r)
 {
@@ -50,7 +61,7 @@ struct rtp_receiver_t* rtp_tcp_receiver_create(uint8_t interleave1,
     priv->base.input = rtp_tcp_receiver_input;
     snprintf(priv->encoding, sizeof(priv->encoding), "%s", encoding);
     priv->profile = (void *)rtp_profile_find(payload);
-    priv->demuxer = rtp_demuxer_create(priv->profile ? priv->profile->frequency : 90000, payload, encoding, NULL, NULL);
+    priv->demuxer = rtp_demuxer_create(priv->profile ? priv->profile->frequency : 90000, payload, encoding, rtp_onpacket, priv);
 
     return &priv->base;
 }

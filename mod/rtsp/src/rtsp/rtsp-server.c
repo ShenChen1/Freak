@@ -105,7 +105,7 @@ static int rtsp_onsetup(void* ptr,
             interleaved[1] = transport->interleaved2;
         }
 
-        int ret = priv->media->add_transport(priv->media, NULL, rtp_tcp_transport_new(rtsp, interleaved[0], interleaved[1]));
+        int ret = priv->media->add_transport(priv->media, "video", rtp_tcp_transport_new(rtsp, interleaved[0], interleaved[1]));
         if (ret < 0) {
             // 451 Invalid parameter
             return rtsp_server_reply_setup(rtsp, 451, NULL, NULL);
@@ -141,6 +141,7 @@ static int rtsp_onsetup(void* ptr,
                  transport->destination[0] ? transport->destination : "");
     }
 
+    tracef("%s", rtsp_transport);
     char sessionid[64] = {0};
     sprintf(sessionid, "%p", ptr);
     return rtsp_server_reply_setup(rtsp, 200, sessionid, rtsp_transport);

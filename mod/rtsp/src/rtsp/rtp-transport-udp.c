@@ -1,12 +1,10 @@
 #include "log.h"
+#include "utils.h"
 #include "cstringext.h"
 #include "port/ip-route.h"
 #include "rtp-transport.h"
 #include "sockpair.h"
 #include "sockutil.h"
-
-#define container_of(ptr, type, member) \
-    (type *)((char *)(ptr) - (char *) &((type *)0)->member)
 
 typedef struct {
     struct rtp_transport_t base;
@@ -17,14 +15,19 @@ typedef struct {
 
 static int rtp_udp_transport_recv(struct rtp_transport_t* t, int rtcp, void* data, size_t bytes)
 {
-    tracef("data:%s bytes:%zu", data, bytes);
-    return 0;
+    rtp_udp_transport_t* transport = container_of(t, rtp_udp_transport_t, base);
+    tracef("bytes:%zu", bytes);
+
+    int i = rtcp ? 1 : 0;
+    socklen_t fromlen;
+    struct sockaddr from;
+    return socket_recvfrom(transport->socket[i], data, bytes, 0, &from, &fromlen);
 }
 
 static int rtp_udp_transport_send(struct rtp_transport_t* t, int rtcp, void* data, size_t bytes)
 {
     rtp_udp_transport_t* transport = container_of(t, rtp_udp_transport_t, base);
-    tracef("data:%s bytes:%zu", data, bytes);
+    tracef("bytes:%zu", bytes);
 
     int i = rtcp ? 1 : 0;
     return socket_sendto(transport->socket[i], data, bytes, 0, (void*)&transport->addr[i], transport->addrlen[i]);
@@ -70,6 +73,8 @@ struct rtp_transport_t* rtp_udp_transport_new(const char* ip, uint16_t port[2])
         goto err;
     }
 
+    tracef("ip: %s", ip);
+    tracef("port: %u %u", port[0], port[1]);
     socket_setnonblock(transport->socket[0], 1);
     socket_setnonblock(transport->socket[1], 1);
     return &transport->base;

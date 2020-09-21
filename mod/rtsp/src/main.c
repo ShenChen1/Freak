@@ -22,14 +22,16 @@ static int __frame(void* param,
                    uint32_t time,
                    int flags)
 {
-    tracef("client:%p", param);
+    tracef("client:%p", *(void **)param);
     return 0;
 }
 
 int main()
 {
     void *server = NULL;
-    void *client = NULL;
+    void *client1 = NULL;
+    void *client2 = NULL;
+    rtsp_client_callback_t cb = {&client1, __frame};
     nnm_t rep = NULL;
 
     log_init(PROTO_LOG_COM_NODE, false);
@@ -41,10 +43,13 @@ int main()
 
     if (1) {
         infof("keep alive");
-        rtsp_client_callback_t cb = {&client, __frame};
-        client = rtsp_client_init("rtsp://admin@127.0.0.1:1234/test", &cb);
+        cb.param = &client1;
+        client1 = rtsp_client_init("rtsp://admin@127.0.0.1:1234/test", RTSP_PROTOCOL_TCP, &cb);
+        cb.param = &client2;
+        client2 = rtsp_client_init("rtsp://admin@127.0.0.1:1234/test", RTSP_PROTOCOL_UDP, &cb);
         sleep(5);
-        rtsp_client_uninit(client);
+        rtsp_client_uninit(client1);
+        rtsp_client_uninit(client2);
     }
 
     nnm_rep_destory(rep);
