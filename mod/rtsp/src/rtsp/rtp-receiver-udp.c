@@ -131,6 +131,7 @@ static void rtp_udp_receiver_free(struct rtp_receiver_t* r)
     priv->loop = 0;
     thread_destroy(priv->thread);
     rtp_demuxer_destroy(&priv->demuxer);
+    free(priv);
 }
 
 struct rtp_receiver_t* rtp_udp_receiver_create(int rtp[2],

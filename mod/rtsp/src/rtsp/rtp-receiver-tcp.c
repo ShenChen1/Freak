@@ -36,6 +36,7 @@ static void rtp_tcp_receiver_free(struct rtp_receiver_t *r)
 {
     rtp_receiver_priv_t* priv = container_of(r, rtp_receiver_priv_t, base);
     rtp_demuxer_destroy(&priv->demuxer);
+    free(priv);
 }
 
 static void rtp_tcp_receiver_input(struct rtp_receiver_t *r, uint8_t channel, const void* data, uint16_t bytes)

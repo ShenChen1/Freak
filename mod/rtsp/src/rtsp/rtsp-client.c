@@ -166,7 +166,9 @@ static int onpause(void* param)
 
 static int onteardown(void* param)
 {
+    rtsp_client_priv_t* priv = param;
     tracef("param:%p", param);
+    socket_close(priv->socket);
     return 0;
 }
 
@@ -235,18 +237,14 @@ int rtsp_client_uninit(void* rtsp)
     rtsp_client_priv_t* priv = rtsp;
 
     rtsp_client_teardown(priv->rtsp);
-    socket_shutdown(priv->socket, SHUT_RDWR);
-
-    rtsp_client_destroy(priv->rtsp);
-    socket_close(priv->socket);
-
     thread_destroy(priv->thread);
+    rtsp_client_destroy(priv->rtsp);
+
     for (i = 0; i < 5; i++) {
         if (priv->receiver[i])
             priv->receiver[i]->free(priv->receiver[i]);
+            priv->receiver[i] = NULL;
     }
-
     free(priv);
-
     return 0;
 }

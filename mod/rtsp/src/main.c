@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <assert.h>
 #include <unistd.h>
+#include <pthread.h>
 #include "inc/msgbox.h"
 #include "inc/cfg.h"
 #include "inc/rtsp.h"
 #include "nnm.h"
 #include "log.h"
+#include "ufifo.h"
 
 static int __rep_recv(void *in, size_t isize, void **out, size_t *osize)
 {
@@ -26,6 +28,34 @@ static int __frame(void* param,
     return 0;
 }
 
+static void *test(void *arg)
+{
+    FILE *fp = NULL;
+    char path[] = "/mnt/hgfs/WinShare/1.h264_frame";
+    static uint8_t data[8 * 1024];
+    static size_t len = 0;
+    fp = fopen(path, "r");
+    len = fread(data, 1, sizeof(data), fp);
+    fclose(fp);
+
+    ufifo_t *fifo = NULL;
+    ufifo_init_t init = {
+        .lock = UFIFO_LOCK_NONE,
+        .opt = UFIFO_OPT_ALLOC,
+        .alloc = {512 * 1024},
+        .hook = {NULL, NULL},
+    };
+    ufifo_open(PROTO_VENC_MEDIA_FIFO, &init, &fifo);
+
+    while (1) {
+        ufifo_put_block(fifo, data, len);
+        usleep(40 * 1000);
+    }
+
+    ufifo_close(fifo);
+    return NULL;
+}
+
 int main()
 {
     void *server = NULL;
@@ -41,10 +71,13 @@ int main()
     server = rtsp_server_init("0.0.0.0", 1234);
     nnm_rep_create(PROTO_RTSP_COM_NODE, __rep_recv, &rep);
 
+    pthread_t thread;
+    pthread_create(&thread, NULL, test, NULL);
     if (1) {
         infof("keep alive");
         cb.param = &client1;
         client1 = rtsp_client_init("rtsp://admin@127.0.0.1:1234/test", RTSP_PROTOCOL_TCP, &cb);
+        sleep(1);
         cb.param = &client2;
         client2 = rtsp_client_init("rtsp://admin@127.0.0.1:1234/test", RTSP_PROTOCOL_UDP, &cb);
         sleep(5);

@@ -123,14 +123,19 @@ static int rtp_get_sdp(struct rtp_media_t* m, char* sdp)
         "a=recvonly\n"
         "a=control:video\n"
         "a=fmtp:%d profile-level-id=%02X%02X%02X;packetization-mode=1;sprop-parameter-sets=";
-
     uint32_t ssrc = rtp_ssrc();
-    struct rtp_payload_t func = {__alloc, __free, __packet};
-    priv->track[MEDIA_TRACK_VIDEO].packer = rtp_payload_encode_create(
-        RTP_PAYLOAD_H264, "H264", (uint16_t)ssrc, ssrc, &func, &priv->track[MEDIA_TRACK_VIDEO]);
-    struct rtp_event_t event = {NULL};
-    priv->track[MEDIA_TRACK_VIDEO].rtp = rtp_create(&event, NULL, ssrc, 0, 90000, 4*1024, 1);
-    rtp_set_info(priv->track[MEDIA_TRACK_VIDEO].rtp, "RTSPServer", "live.h264");
+
+    if (!priv->track[MEDIA_TRACK_VIDEO].packer) {
+        struct rtp_payload_t func = {__alloc, __free, __packet};
+        priv->track[MEDIA_TRACK_VIDEO].packer = rtp_payload_encode_create(
+            RTP_PAYLOAD_H264, "H264", (uint16_t)ssrc, ssrc, &func, &priv->track[MEDIA_TRACK_VIDEO]);
+    }
+
+    if (!priv->track[MEDIA_TRACK_VIDEO].rtp) {
+        struct rtp_event_t event = {NULL};
+        priv->track[MEDIA_TRACK_VIDEO].rtp = rtp_create(&event, NULL, ssrc, 0, 90000, 4*1024, 1);
+        rtp_set_info(priv->track[MEDIA_TRACK_VIDEO].rtp, "RTSPServer", "live.h264");
+    }
 
     sprintf(&sdp[strlen(sdp)], pattern_video, RTP_PAYLOAD_H264, RTP_PAYLOAD_H264, RTP_PAYLOAD_H264, 0, 0, 0);
     return 0;
@@ -252,12 +257,15 @@ int rtp_media_live_free(struct rtp_media_t* m)
         list_for_each_safe(pos, tmp, &priv->track[i].head) {
             rtp_media_transport_t* t = list_entry(pos, rtp_media_transport_t, list);
             t->transport->free(t->transport);
+            tracef("transport free");
             free(t);
         }
         if (priv->track[i].packer) {
+            tracef("rtp_payload_encode_destroy");
             rtp_payload_encode_destroy(priv->track[i].packer);
         }
         if (priv->track[i].rtp) {
+            tracef("rtp_destroy");
             rtp_destroy(priv->track[i].rtp);
         }
     }
