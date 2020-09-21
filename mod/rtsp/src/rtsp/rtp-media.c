@@ -27,10 +27,15 @@ enum {
 };
 
 typedef struct {
+    list_t list;
     struct rtp_transport_t* transport;
+} rtp_media_transport_t;
+
+typedef struct {
     void* rtp;
     void* packer;
     uint8_t packet[2 * 1024];
+    list_t head;
 } rtp_media_track_t;
 
 typedef struct {
@@ -63,8 +68,14 @@ static void __packet(void* param,
     int ret;
     rtp_media_track_t* track = param;
     assert(track->packet == packet);
-    ret = track->transport->send(track->transport, 0, (void *)packet, bytes);
-    assert(ret == (int)bytes);
+
+    list_t *pos, *tmp;
+    list_for_each_safe(pos, tmp, &track->head) {
+        rtp_media_transport_t* t = list_entry(pos, rtp_media_transport_t, list);
+        ret = t->transport->send(t->transport, 0, (void *)packet, bytes);
+        assert(ret == (int)bytes);
+    }
+
     rtp_onsend(track->rtp, packet, bytes);
 }
 
@@ -189,7 +200,9 @@ static int rtp_add_transport(struct rtp_media_t* m, const char* track, void* t)
 
     for (i = 0; i < MEDIA_TRACK_MAX; i++) {
         if (strstr(track, key[i])) {
-            priv->track[value[i]].transport = t;
+            rtp_media_transport_t* node = malloc(sizeof(rtp_media_transport_t));
+            node->transport = t;
+            list_add_tail(&node->list, &priv->track[value[i]].head);
             break;
         }
     }
@@ -199,6 +212,7 @@ static int rtp_add_transport(struct rtp_media_t* m, const char* track, void* t)
 
 struct rtp_media_t* rtp_media_live_new()
 {
+    int i;
     rtp_media_priv_t* priv = malloc(sizeof(rtp_media_priv_t));
     if (priv == NULL) {
         return NULL;
@@ -213,6 +227,10 @@ struct rtp_media_t* rtp_media_live_new()
     priv->base.seek = rtp_seek;
     priv->base.get_rtpinfo = rtp_get_rtpinfo;
     priv->base.add_transport = rtp_add_transport;
+
+    for (i = 0; i < MEDIA_TRACK_MAX; i++) {
+        INIT_LIST_HEAD(&priv->track[i].head);
+    }
 
     priv->status = MEDIA_STATUS_SETUP;
     thread_create(&priv->thread, rtp_send_data, priv);
@@ -230,8 +248,11 @@ int rtp_media_live_free(struct rtp_media_t* m)
     thread_destroy(priv->thread);
 
     for (i = 0; i < MEDIA_TRACK_MAX; i++) {
-        if (priv->track[i].transport) {
-            priv->track[i].transport->free(priv->track[i].transport);
+        list_t *pos, *tmp;
+        list_for_each_safe(pos, tmp, &priv->track[i].head) {
+            rtp_media_transport_t* t = list_entry(pos, rtp_media_transport_t, list);
+            t->transport->free(t->transport);
+            free(t);
         }
         if (priv->track[i].packer) {
             rtp_payload_encode_destroy(priv->track[i].packer);
