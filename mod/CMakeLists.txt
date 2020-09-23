@@ -11,4 +11,5 @@ add_subdirectory(proto)
 
 link_libraries(-lrt -lpthread)
 add_subdirectory(bsp)
+add_subdirectory(vsf)
 add_subdirectory(rtsp)

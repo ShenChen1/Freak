@@ -42,6 +42,13 @@ typedef enum {
 } proto_bsp_key_e;
 
 typedef enum {
+    PROTP_VSF_KEY_VI,
+    PROTP_VSF_KEY_VPSS,
+    PROTP_VSF_KEY_VENC,
+    PROTP_VSF_KEY_MAX,
+} proto_vsf_key_e;
+
+typedef enum {
     PROTP_RTSP_KEY_OPEN,
     PROTP_RTSP_KEY_CLOSE,
     PROTP_RTSP_KEY_MAX,

@@ -5,5 +5,6 @@
 #define PROTO_BSP_COM_NODE       "ipc:///tmp/bsp-com.ipc"
 #define PROTO_BSP_PUB_NODE       "ipc:///tmp/bsp-pub.ipc"
 #define PROTO_RTSP_COM_NODE      "ipc:///tmp/rtsp-com.ipc"
+#define PROTO_VSF_COM_NODE       "ipc:///tmp/vsf-com.ipc"
 
 #endif /* __NODE_H__ */

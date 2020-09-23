@@ -24,7 +24,15 @@ static int __frame(void* param,
                    uint32_t time,
                    int flags)
 {
-    tracef("client:%p", *(void **)param);
+    uint8_t *data = (void *)packet;
+    size_t len = bytes;
+    tracef("client:%p len:%zu", *(void **)param, len);
+
+    debugf(">begin: 0x%02x 0x%02x 0x%02x", data[0], data[1], data[2]);
+    debugf(">begin: 0x%02x 0x%02x 0x%02x", data[3], data[4], data[5]);
+    debugf(">end: 0x%02x 0x%02x 0x%02x", data[len - 6], data[len - 5], data[len - 4]);
+    debugf(">end: 0x%02x 0x%02x 0x%02x", data[len - 3], data[len - 2], data[len - 1]);
+
     return 0;
 }
 
@@ -36,6 +44,10 @@ static void *test(void *arg)
     static size_t len = 0;
     fp = fopen(path, "r");
     len = fread(data, 1, sizeof(data), fp);
+    debugf("begin: 0x%02x 0x%02x 0x%02x", data[0], data[1], data[2]);
+    debugf("begin: 0x%02x 0x%02x 0x%02x", data[3], data[4], data[5]);
+    debugf("end: 0x%02x 0x%02x 0x%02x", data[len - 6], data[len - 5], data[len - 4]);
+    debugf("end: 0x%02x 0x%02x 0x%02x", data[len - 3], data[len - 2], data[len - 1]);
     fclose(fp);
 
     ufifo_t *fifo = NULL;
