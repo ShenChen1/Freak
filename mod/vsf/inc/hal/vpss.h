@@ -6,12 +6,12 @@ typedef struct vpss {
     void *priv;
 
     /**
-     * @brief  Destory vpss instance
+     * @brief  Destroy vpss instance
      *
      * @param  self     vpss instance
      * @return 0 on successs, <0 otherwise.
      */
-    int (*destory)(struct vpss *self);
+    int (*destroy)(struct vpss *self);
 
 } vpss_t;
 

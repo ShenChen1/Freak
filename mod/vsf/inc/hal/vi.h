@@ -6,12 +6,12 @@ typedef struct vi {
     void *priv;
 
     /**
-     * @brief  Destory vi instance
+     * @brief  Destroy vi instance
      *
      * @param  self     vi instance
      * @return 0 on successs, <0 otherwise.
      */
-    int (*destory)(struct vi *self);
+    int (*destroy)(struct vi *self);
 
 } vi_t;
 

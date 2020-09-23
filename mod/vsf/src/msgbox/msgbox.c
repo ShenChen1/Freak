@@ -51,7 +51,7 @@ int msgbox_do_handler(void *in, size_t isize, void *out, size_t *osize)
     proto_header_dump(packet_out);
 
     if (packet_in->action == PROTO_ACTION_SET) {
-        cfg_save(PROTO_BSP_CFG_PATH);
+        cfg_save(PROTO_VSF_CFG_PATH);
     }
 
     *osize = packet_out->size + sizeof(proto_header_t);

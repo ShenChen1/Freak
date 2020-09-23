@@ -3,7 +3,11 @@
 #include "jsonb_c_type.h"
 extern void jsonb_opt_proto_vsf_venc_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
-    int value;
+    uint16_t id;
+    bool enable;
+    uint16_t height;
+    uint16_t width;
+    uint16_t fps;
 } proto_vsf_venc_t;
 extern void jsonb_opt_proto_vsf_vpss_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {

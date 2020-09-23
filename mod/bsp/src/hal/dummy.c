@@ -13,6 +13,13 @@ typedef struct {
 
 static dummy_t *s_dummy_obj[DUMMY_RESOURCE_NUM] = {};
 
+static int __dummy_destroy(dummy_t *self)
+{
+    free(self->priv);
+    free(self);
+    return 0;
+}
+
 static int __dummy_set(dummy_t *self, int value)
 {
     dummy_priv_t *priv = self->priv;
@@ -49,6 +56,7 @@ dummy_t *createDummy(int id)
     obj->priv = priv;
     obj->set = __dummy_set;
     obj->get = __dummy_get;
+    obj->destroy = __dummy_destroy;
 
     s_dummy_obj[id] = obj;
     infof("Create dummy %d : %p", id, s_dummy_obj[id]);

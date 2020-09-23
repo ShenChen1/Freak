@@ -6,12 +6,12 @@ typedef struct dummy {
     void *priv;
 
     /**
-     * @brief  Destory dummy instance
+     * @brief  Destroy dummy instance
      *
      * @param  self     dummy instance
      * @return 0 on successs, <0 otherwise.
      */
-    int (*destory)(struct dummy *self);
+    int (*destroy)(struct dummy *self);
 
     /**
      * @brief Set dummy value

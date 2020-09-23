@@ -6,12 +6,12 @@ typedef struct venc {
     void *priv;
 
     /**
-     * @brief  Destory venc instance
+     * @brief  Destroy venc instance
      *
      * @param  self     venc instance
      * @return 0 on successs, <0 otherwise.
      */
-    int (*destory)(struct venc *self);
+    int (*destroy)(struct venc *self);
 
 } venc_t;
 
