@@ -10,7 +10,8 @@
 typedef struct __nnm_reqrep {
     const char         *url;
     int                 socket;
-    nnm_transfer_cb_t   callback;
+    nnm_trans_func_t    callback;
+    void               *arg;
     pthread_t           thread;
 } nnm_reqrep_t;
 
@@ -34,7 +35,7 @@ static void *nnm_rep_routine(void *arg)
 
         void *outbuf = NULL;
         size_t outlen = 0;
-        if (!self->callback(buf, bytes, &outbuf, &outlen)) {
+        if (!self->callback(buf, bytes, &outbuf, &outlen, self->arg)) {
             bytes = nn_send(self->socket, outbuf, outlen, 0);
             if (bytes != outlen) {
                 fatal("nn_send");
@@ -47,12 +48,12 @@ static void *nnm_rep_routine(void *arg)
     return NULL;
 }
 
-int nnm_rep_create(const char* url, nnm_transfer_cb_t callback, nnm_t *handle)
+int nnm_rep_create(const char* url, nnm_rep_init_t *init, nnm_t *handle)
 {
     int sock;
     int ret;
 
-    if (url == NULL || callback == NULL || handle == NULL) {
+    if (url == NULL || init == NULL || handle == NULL) {
         return -EINVAL;
     }
 
@@ -73,7 +74,8 @@ int nnm_rep_create(const char* url, nnm_transfer_cb_t callback, nnm_t *handle)
 
     memset(self, 0, sizeof(nnm_reqrep_t));
     self->socket = sock;
-    self->callback = callback;
+    self->callback = init->func;
+    self->arg = init->arg;
     ret = pthread_create(&self->thread, NULL, nnm_rep_routine, (void *)self);
     if (ret < 0) {
         fatal("pthread_create");

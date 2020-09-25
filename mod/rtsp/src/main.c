@@ -9,11 +9,9 @@
 #include "log.h"
 #include "ufifo.h"
 
-static int __rep_recv(void *in, size_t isize, void **out, size_t *osize)
+static int __rep_recv(void *in, size_t isize, void **out, size_t *osize, void *arg)
 {
-    static uint8_t obuf[PROTO_PACKAGE_MAXSIZE];
-
-    *out = obuf;
+    *out = arg;
     return msgbox_do_handler(in, isize, *out, osize);
 }
 
@@ -81,7 +79,10 @@ int main()
     cfg_load(PROTO_RTSP_CFG_PATH);
     msgbox_init();
     server = rtsp_server_init("0.0.0.0", 1234);
-    nnm_rep_create(PROTO_RTSP_COM_NODE, __rep_recv, &rep);
+
+    static uint8_t obuf[PROTO_PACKAGE_MAXSIZE];
+    nnm_rep_init_t init = {__rep_recv, obuf};
+    nnm_rep_create(PROTO_RTSP_COM_NODE, &init, &rep);
 
     pthread_t thread;
     pthread_create(&thread, NULL, test, NULL);

@@ -9,7 +9,8 @@
 
 typedef struct __nnm_pipeline {
     int             socket;
-    nnm_recv_cb_t   callback;
+    nnm_recv_func_t callback;
+    void           *arg;
     pthread_t       thread;
 } nnm_pipeline_t;
 
@@ -31,19 +32,19 @@ static void *nnm_pull_routine(void *arg)
             break;
         }
 
-        self->callback(buf, bytes);
+        self->callback(buf, bytes, self->arg);
         nn_freemsg(buf);
     }
 
     return NULL;
 }
 
-int nnm_pull_create(const char* url, nnm_recv_cb_t callback, nnm_t *handle)
+int nnm_pull_create(const char* url, nnm_pull_init_t *init, nnm_t *handle)
 {
     int sock;
     int ret;
 
-    if (url == NULL || callback == NULL || handle == NULL) {
+    if (url == NULL || init == NULL || handle == NULL) {
         return -EINVAL;
     }
 
@@ -64,7 +65,8 @@ int nnm_pull_create(const char* url, nnm_recv_cb_t callback, nnm_t *handle)
 
     memset(self, 0, sizeof(nnm_pipeline_t));
     self->socket = sock;
-    self->callback = callback;
+    self->callback = init->func;
+    self->arg = init->arg;
     ret = pthread_create(&self->thread, NULL, nnm_pull_routine, (void *)self);
     if (ret < 0) {
         fatal("pthread_create");

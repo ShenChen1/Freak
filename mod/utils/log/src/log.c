@@ -9,7 +9,7 @@ static log_lv_t s_level = LOG_LV_INFO;
 static nnm_t s_nnm = NULL;
 static nnm_t s_server = NULL;
 
-static int log_callback(void *buf, size_t len)
+static int log_callback(void *buf, size_t len, void *arg)
 {
     puts((char *)buf);
     return len;
@@ -21,7 +21,8 @@ int log_init(const char *url, int server)
 
     if (server) {
         // just keep it on the background
-        ret = nnm_pull_create(url, log_callback, &s_server);
+        nnm_pull_init_t init = {log_callback, NULL};
+        ret = nnm_pull_create(url, &init, &s_server);
         assert(ret == 0);
     }
 
@@ -74,6 +75,5 @@ int log_printf(log_lv_t level, const char *fmt, ...)
     n += vsnprintf(&buf[n], sizeof(buf) - n, fmt, ap);
     va_end(ap);
 
-    printf("%s\n", buf);
-    return 0;//nnm_push_send(s_nnm, buf, n + 1);
+    return nnm_push_send(s_nnm, buf, n + 1);
 }
