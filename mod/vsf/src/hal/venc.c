@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include "common.h"
 #include "inc/hal/venc.h"
 
 venc_t *createVenc(int id)

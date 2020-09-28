@@ -1,6 +1,4 @@
-#include <stdio.h>
-#include <assert.h>
-#include <unistd.h>
+#include "common.h"
 #include "cfg/cfg.h"
 #include "json-cfg.h"
 #include "log.h"

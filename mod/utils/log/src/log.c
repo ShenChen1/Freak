@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include <stdarg.h>
-#include <assert.h>
-#include <time.h>
+#include "common.h"
 #include "nnm.h"
 #include "log.h"
 

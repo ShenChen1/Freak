@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <errno.h>
+#include "common.h"
 #include "json-cfg.h"
 
 int json_cfg_load(const char *filename, void *cfg, size_t size, jsonb_opt_func_t callback)

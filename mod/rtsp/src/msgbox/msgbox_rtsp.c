@@ -1,6 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
+#include "common.h"
 #include "inc/msgbox.h"
 #include "inc/cfg.h"
 

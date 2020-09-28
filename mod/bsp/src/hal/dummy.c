@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <errno.h>
+#include "common.h"
 #include "log.h"
 #include "inc/dummy.h"
 

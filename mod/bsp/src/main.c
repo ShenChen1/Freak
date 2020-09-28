@@ -1,13 +1,9 @@
-#include <stdio.h>
-#include <assert.h>
-#include <unistd.h>
+#include "common.h"
 #include "inc/msgbox.h"
 #include "inc/dummy.h"
 #include "inc/cfg.h"
 #include "nnm.h"
 #include "log.h"
-
-
 
 static int __rep_recv(void *in, size_t isize, void **out, size_t *osize, void *arg)
 {

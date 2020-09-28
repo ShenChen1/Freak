@@ -1,9 +1,7 @@
 #ifndef __PROTO_H__
 #define __PROTO_H__
 
-#include <stdint.h>
-#include <string.h>
-#include <time.h>
+#include "common.h"
 #include "node.h"
 #include "path.h"
 #include "proto_bsp.h"

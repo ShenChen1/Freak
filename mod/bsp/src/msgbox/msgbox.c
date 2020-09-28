@@ -1,6 +1,4 @@
-#include <stdio.h>
-#include <string.h>
-#include <assert.h>
+#include "common.h"
 #include "log.h"
 #include "inc/msgbox.h"
 #include "inc/cfg.h"

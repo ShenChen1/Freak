@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include "common.h"
 #include "inc/hal/vpss.h"
 
 vpss_t *createVpss(int id)

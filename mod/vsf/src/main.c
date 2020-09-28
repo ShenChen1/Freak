@@ -1,6 +1,4 @@
-#include <stdio.h>
-#include <assert.h>
-#include <unistd.h>
+#include "common.h"
 #include "inc/msgbox.h"
 #include "inc/cfg.h"
 #include "nnm.h"
