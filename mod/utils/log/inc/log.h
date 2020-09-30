@@ -24,6 +24,14 @@ typedef enum {
     LOG_LV_MAX
 } log_lv_t;
 
+typedef enum {
+    LOG_DIR_LOCAL       = (1<<0),
+    LOG_DIR_FILE        = (1<<1),
+    LOG_DIR_REMOTE      = (1<<2),
+
+    LOG_DIR_MAX         = (1<<3),
+} log_dir_t;
+
 #define debugf(fmt, ...)                                             \
     do                                                               \
     {                                                                \
@@ -82,6 +90,7 @@ typedef enum {
 int log_init(const char *url, int server);
 int log_deinit();
 int log_setlevel(log_lv_t level);
+int log_setdir(unsigned int mask);
 int log_printf(log_lv_t level, const char *fmt, ...);
 
 #endif //_LOG_H_
