@@ -26,7 +26,7 @@ typedef struct {
     struct rtp_receiver_t* receiver[5];
 
     char packet[2 * 1024 * 1024];
-    int loop;
+    volatile int loop;
 } rtsp_client_priv_t;
 
 static int rtsp_client_recv(void *param)

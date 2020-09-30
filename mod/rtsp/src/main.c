@@ -49,6 +49,9 @@ static void *test_req(void *arg)
     nnm_t req = arg;
     proto_rtsp_url_t rtsp_url = {"rtsp://admin@127.0.0.1:1234/test"};
 
+    //wait for media ready
+    sleep(5);
+
     while (1) {
         proto_package_fill(ibuf, 0, PROTP_RTSP_KEY_OPEN, PROTO_ACTION_SET,
             PROTO_FORMAT_STRUCTE, &rtsp_url, sizeof(proto_rtsp_url_t));

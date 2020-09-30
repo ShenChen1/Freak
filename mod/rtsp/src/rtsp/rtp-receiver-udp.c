@@ -12,7 +12,7 @@
 
 typedef struct {
     struct rtp_receiver_t base;
-    int loop;
+    volatile int loop;
     pthread_t thread;
 
     char encoding[64];
