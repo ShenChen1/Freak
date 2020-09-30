@@ -5,6 +5,7 @@ add_definitions(-DOS_LINUX)
 add_executable(${PROJECT_NAME}
     src/main.c
     src/cfg.c
+    src/rtsp-ctrl.c
     src/msgbox/msgbox.c
     src/msgbox/msgbox_rtsp.c
     src/rtsp/rtp-media.c

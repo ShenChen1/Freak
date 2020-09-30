@@ -15,7 +15,7 @@ struct rtp_media_t {
     int (*add_transport)(struct rtp_media_t* m, const char* track, void* transport);
 };
 
-struct rtp_media_t* rtp_media_live_new();
+struct rtp_media_t* rtp_media_live_new(char *path);
 int rtp_media_live_free(struct rtp_media_t* m);
 
 #endif /* __RTP_MEDIA_H__ */

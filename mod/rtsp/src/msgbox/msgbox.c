@@ -7,7 +7,7 @@ extern int msgbox_rtsp_open(msgbox_param_t *param);
 extern int msgbox_rtsp_close(msgbox_param_t *param);
 static msgbox_handler_t s_msgbox[PROTP_RTSP_KEY_MAX] = {
     [PROTP_RTSP_KEY_OPEN] = msgbox_rtsp_open,
-    [PROTP_RTSP_KEY_CLOSE] = msgbox_rtsp_open,
+    [PROTP_RTSP_KEY_CLOSE] = msgbox_rtsp_close,
 };
 
 int msgbox_init()

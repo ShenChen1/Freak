@@ -1,9 +1,11 @@
 #include "common.h"
 #include "inc/msgbox.h"
 #include "inc/cfg.h"
+#include "inc/rtsp-ctrl.h"
 
 int msgbox_rtsp_open(msgbox_param_t *param)
 {
+    int ret;
     proto_rtsp_url_t *in = param->in;
     proto_rtsp_url_t *out = param->out;
 
@@ -18,8 +20,10 @@ int msgbox_rtsp_open(msgbox_param_t *param)
     }
 
     if (param->action == PROTO_ACTION_SET) {
+        ret = rtsp_ctrl_open(in->url);
         *param->osize = 0;
     } else {
+        ret = EPERM;
         *param->osize = sizeof(proto_rtsp_url_t);
     }
 
@@ -35,11 +39,12 @@ int msgbox_rtsp_open(msgbox_param_t *param)
         free(out);
     }
 
-    return 0;
+    return ret;
 }
 
 int msgbox_rtsp_close(msgbox_param_t *param)
 {
+    int ret;
     proto_rtsp_url_t *in = param->in;
     proto_rtsp_url_t *out = param->out;
 
@@ -54,8 +59,10 @@ int msgbox_rtsp_close(msgbox_param_t *param)
     }
 
     if (param->action == PROTO_ACTION_SET) {
+        ret = rtsp_ctrl_close(in->url);
         *param->osize = 0;
     } else {
+        ret = EPERM;
         *param->osize = sizeof(proto_rtsp_url_t);
     }
 
@@ -71,6 +78,6 @@ int msgbox_rtsp_close(msgbox_param_t *param)
         free(out);
     }
 
-    return 0;
+    return ret;
 }
 

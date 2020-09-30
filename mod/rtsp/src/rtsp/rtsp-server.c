@@ -43,11 +43,10 @@ static int rtsp_ondescribe(void* ptr, rtsp_server_t* rtsp, const char* uri)
     rtsp_server_priv_t* priv = ptr;
     tracef("ptr:%p rtsp:%p uri:%s", ptr, rtsp, uri);
 
-    char filename[256] = {};
-    rtsp_uri_parse(uri, filename);
-
     if (!priv->media) {
-        priv->media = rtp_media_live_new();
+        char path[64] = {};
+        rtsp_uri_parse(uri, path);
+        priv->media = rtp_media_live_new(path);
     }
 
     char sdp[2048] = {};

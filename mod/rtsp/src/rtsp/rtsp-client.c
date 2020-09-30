@@ -26,6 +26,7 @@ typedef struct {
     struct rtp_receiver_t* receiver[5];
 
     char packet[2 * 1024 * 1024];
+    int loop;
 } rtsp_client_priv_t;
 
 static int rtsp_client_recv(void *param)
@@ -33,15 +34,23 @@ static int rtsp_client_recv(void *param)
     int ret;
     rtsp_client_priv_t* priv = param;
 
+    rtsp_client_describe(priv->rtsp);
     socket_setnonblock(priv->socket, 0);
-    while (1) {
-        ret = socket_recv(priv->socket, priv->packet, sizeof(priv->packet), 0);
+
+    while (priv->loop) {
+        tracef("[%p]socket_recv:%d", param, priv->loop);
+        ret = socket_recv_by_time(priv->socket, priv->packet, sizeof(priv->packet), 0, 2000);
         if (ret <= 0) {
             break;
         }
         tracef("[%p]rtsp_client_input:%d", param, ret);
         rtsp_client_input(priv->rtsp, priv->packet, ret);
     };
+
+    if (rtsp_client_media_count(priv->rtsp)) {
+        rtsp_client_teardown(priv->rtsp);
+    }
+    rtsp_client_destroy(priv->rtsp);
 
     return 0;
 }
@@ -166,9 +175,7 @@ static int onpause(void* param)
 
 static int onteardown(void* param)
 {
-    rtsp_client_priv_t* priv = param;
     tracef("param:%p", param);
-    socket_close(priv->socket);
     return 0;
 }
 
@@ -218,9 +225,9 @@ void* rtsp_client_init(const char* url, rtsp_client_protocol_t protocol, rtsp_cl
     }
     socket_setnonblock(priv->socket, 1);
     priv->rtsp = rtsp_client_create(url, usr, pwd, &handler, priv);
-    rtsp_client_describe(priv->rtsp);
     uri_free(r);
 
+    priv->loop = 1;
     thread_create(&priv->thread, rtsp_client_recv, priv);
     tracef("priv:%p", priv);
     return priv;
@@ -235,10 +242,11 @@ int rtsp_client_uninit(void* rtsp)
 {
     int i;
     rtsp_client_priv_t* priv = rtsp;
+    tracef("priv:%p", priv);
 
-    rtsp_client_teardown(priv->rtsp);
+    priv->loop = 0;
     thread_destroy(priv->thread);
-    rtsp_client_destroy(priv->rtsp);
+    socket_close(priv->socket);
 
     for (i = 0; i < 5; i++) {
         if (priv->receiver[i])

@@ -40,6 +40,7 @@ typedef struct {
 
 typedef struct {
     struct rtp_media_t base;
+    char path[64];
     uint8_t data[512 * 1024];
     pthread_t thread;
     volatile int status;
@@ -81,6 +82,7 @@ static void __packet(void* param,
 
 static int rtp_send_data(void *arg)
 {
+    int ret;
     uint32_t timestamp = 0;
     rtp_media_priv_t* priv = arg;
 
@@ -90,7 +92,10 @@ static int rtp_send_data(void *arg)
         .opt = UFIFO_OPT_ATTACH,
         .hook = {NULL, NULL},
     };
-    ufifo_open(PROTO_VENC_MEDIA_FIFO, &init, &fifo);
+    char name[64];
+    snprintf(name, sizeof(name), PROTO_VENC_MEDIA_FIFO, &priv->path[1]);
+    ret = ufifo_open(name, &init, &fifo);
+    assert(!ret);
 
     while (1) {
 
@@ -215,7 +220,7 @@ static int rtp_add_transport(struct rtp_media_t* m, const char* track, void* t)
     return i == MEDIA_TRACK_MAX;
 }
 
-struct rtp_media_t* rtp_media_live_new()
+struct rtp_media_t* rtp_media_live_new(char *path)
 {
     int i;
     rtp_media_priv_t* priv = malloc(sizeof(rtp_media_priv_t));
@@ -238,6 +243,7 @@ struct rtp_media_t* rtp_media_live_new()
     }
 
     priv->status = MEDIA_STATUS_SETUP;
+    strncpy(priv->path, path, sizeof(priv->path));
     thread_create(&priv->thread, rtp_send_data, priv);
     tracef("&priv->base:%p", &priv->base);
     return &priv->base;

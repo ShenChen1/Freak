@@ -6,7 +6,7 @@
 #define PROTO_RTSP_CFG_PATH     "/tmp/rtsp-config.json"
 #define PROTO_VSF_CFG_PATH      "/tmp/vsf-config.json"
 
-#define PROTO_VENC_MEDIA_FIFO   "venc-media-%d"
-#define PROTO_RTSP_MEDIA_FIFO   "rtsp-media-%d"
+#define PROTO_VENC_MEDIA_FIFO   "venc-media-%s"
+#define PROTO_RTSP_MEDIA_FIFO   "rtsp-media-%s"
 
 #endif /* __PATH_H__ */

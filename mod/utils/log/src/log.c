@@ -58,7 +58,7 @@ int log_printf(log_lv_t level, const char *fmt, ...)
 {
     int n;
     va_list ap;
-    char buf[256];
+    char buf[1024];
 
     if (level > s_level) {
         return 0;
@@ -72,5 +72,6 @@ int log_printf(log_lv_t level, const char *fmt, ...)
     n += vsnprintf(&buf[n], sizeof(buf) - n, fmt, ap);
     va_end(ap);
 
+    buf[sizeof(buf)-1] = '\0';
     return nnm_push_send(s_nnm, buf, n + 1);
 }
