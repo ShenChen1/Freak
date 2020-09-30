@@ -277,5 +277,6 @@ int rtp_media_live_free(struct rtp_media_t* m)
     }
 
     free(priv);
+    tracef("m:%p done", m);
     return 0;
 }

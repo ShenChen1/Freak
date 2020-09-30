@@ -45,11 +45,6 @@ int msgbox_do_handler(void *in, size_t isize, void *out, size_t *osize)
     packet_out->size = size;
 
     proto_header_dump(packet_out);
-
-    if (packet_in->action == PROTO_ACTION_SET) {
-        cfg_save(PROTO_RTSP_CFG_PATH);
-    }
-
     *osize = packet_out->size + sizeof(proto_header_t);
     return 0;
 }

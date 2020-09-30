@@ -4,7 +4,7 @@
 #include "log.h"
 
 static rtsp_cfg_t s_cfg = {
-
+    .port = 1234,
 };
 
 int cfg_load(const char *path)

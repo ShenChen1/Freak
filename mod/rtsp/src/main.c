@@ -57,7 +57,7 @@ static void *test_req(void *arg)
         memcpy(ibuf, obuf, osize);
         nnm_free(obuf);
 
-        sleep(2);
+        sleep(1);
 
         proto_package_fill(ibuf, 0, PROTP_RTSP_KEY_CLOSE, PROTO_ACTION_SET,
             PROTO_FORMAT_STRUCTE, &rtsp_url, sizeof(proto_rtsp_url_t));
@@ -66,7 +66,7 @@ static void *test_req(void *arg)
         memcpy(ibuf, obuf, osize);
         nnm_free(obuf);
 
-        sleep(2);
+        sleep(1);
     }
 
     return NULL;
@@ -88,7 +88,7 @@ int main()
     log_setlevel(LOG_LV_DEBUG);
     cfg_load(PROTO_RTSP_CFG_PATH);
     msgbox_init();
-    server = rtsp_server_init("0.0.0.0", 1234);
+    server = rtsp_server_init("0.0.0.0", *cfg_get_member(port));
 
     static uint8_t obuf[PROTO_PACKAGE_MAXSIZE];
     nnm_rep_init_t init = {__rep_recv, obuf};

@@ -254,5 +254,6 @@ int rtsp_client_uninit(void* rtsp)
             priv->receiver[i] = NULL;
     }
     free(priv);
+    tracef("priv:%p done", priv);
     return 0;
 }
