@@ -211,6 +211,7 @@ static int rtp_add_transport(struct rtp_media_t* m, const char* track, void* t)
     for (i = 0; i < MEDIA_TRACK_MAX; i++) {
         if (strstr(track, key[i])) {
             rtp_media_transport_t* node = malloc(sizeof(rtp_media_transport_t));
+            assert(node);
             node->transport = t;
             list_add_tail(&node->list, &priv->track[value[i]].head);
             break;
