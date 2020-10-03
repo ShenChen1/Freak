@@ -18,7 +18,6 @@ typedef struct {
 typedef struct {
     UT_hash_handle hh;
     char url[256];
-    int  refcnt;
     void *client;
     void *fifo;
 } rtsp_ctrl_ctx_t;
@@ -100,17 +99,15 @@ void *rtsp_ctrl_thread(void *arg)
         case RTSP_CTRL_OPEN: {
             HASH_FIND_STR(priv->ctxs, value->data, ctx);
             if (ctx) {
-                ctx->refcnt++;
-                tracef("open refcnt:%d", ctx->refcnt);
                 break;
             }
 
             ctx = malloc(sizeof(rtsp_ctrl_ctx_t));
             assert(ctx);
             memset(ctx, 0, sizeof(rtsp_ctrl_ctx_t));
-            ctx->refcnt = 1;
             rtsp_client_callback_t cb = {ctx, __frame};
             ctx->client = rtsp_client_init(value->data, RTSP_PROTOCOL_UDP, &cb);
+            assert(ctx->client);
             strncpy(ctx->url, value->data, sizeof(ctx->url));
             HASH_ADD_STR(priv->ctxs, url, ctx);
             break;
@@ -121,12 +118,8 @@ void *rtsp_ctrl_thread(void *arg)
                 break;
             }
 
-            tracef("close refcnt:%d", ctx->refcnt);
-            if (--ctx->refcnt) {
-                break;
-            }
-
             HASH_DEL(priv->ctxs, ctx);
+            assert(ctx->client);
             rtsp_client_uninit(ctx->client);
             free(ctx);
             break;

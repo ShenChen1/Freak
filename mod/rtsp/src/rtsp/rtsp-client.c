@@ -1,6 +1,7 @@
 #include "log.h"
 #include "inc/rtsp.h"
 #include "sys/thread.h"
+#include "sys/atomic.h"
 #include "librtsp/rtsp-client.h"
 #include "librtsp/rtsp-header-rtp-info.h"
 #include "librtsp/rtsp-header-transport.h"
@@ -16,6 +17,7 @@
 typedef struct {
     socket_t socket;
     pthread_t thread;
+    int loop;
     rtsp_client_callback_t cb;
 
     int transport;
@@ -26,7 +28,6 @@ typedef struct {
     struct rtp_receiver_t* receiver[5];
 
     char packet[2 * 1024 * 1024];
-    volatile int loop;
 } rtsp_client_priv_t;
 
 static int rtsp_client_recv(void *param)
@@ -37,7 +38,7 @@ static int rtsp_client_recv(void *param)
     rtsp_client_describe(priv->rtsp);
     socket_setnonblock(priv->socket, 0);
 
-    while (priv->loop) {
+    while (atomic_load32(&priv->loop)) {
         tracef("[%p]socket_recv:%d", param, priv->loop);
         ret = socket_recv_by_time(priv->socket, priv->packet, sizeof(priv->packet), 0, 2000);
         if (ret <= 0) {
@@ -227,7 +228,7 @@ void* rtsp_client_init(const char* url, rtsp_client_protocol_t protocol, rtsp_cl
     priv->rtsp = rtsp_client_create(url, usr, pwd, &handler, priv);
     uri_free(r);
 
-    priv->loop = 1;
+    atomic_increment32(&priv->loop);
     thread_create(&priv->thread, rtsp_client_recv, priv);
     tracef("priv:%p", priv);
     return priv;
@@ -244,7 +245,7 @@ int rtsp_client_uninit(void* rtsp)
     rtsp_client_priv_t* priv = rtsp;
     tracef("priv:%p", priv);
 
-    priv->loop = 0;
+    atomic_decrement32(&priv->loop);
     thread_destroy(priv->thread);
     socket_close(priv->socket);
 

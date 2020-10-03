@@ -37,7 +37,7 @@ static void *test_media(void *arg)
         usleep(40 * 1000);
     }
 
-    ufifo_close(fifo);
+    ufifo_destroy(fifo);
     return NULL;
 }
 

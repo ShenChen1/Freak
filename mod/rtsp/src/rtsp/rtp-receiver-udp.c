@@ -9,11 +9,12 @@
 #include "sockutil.h"
 #include "sys/pollfd.h"
 #include "sys/thread.h"
+#include "sys/atomic.h"
 
 typedef struct {
     struct rtp_receiver_t base;
-    volatile int loop;
     pthread_t thread;
+    int loop;
 
     char encoding[64];
     struct rtp_profile_t* profile;
@@ -71,8 +72,7 @@ static int rtp_receiver(rtp_receiver_priv_t* priv, socket_t rtp[2], int timeout)
         fds[i].revents = 0;
     }
 
-    priv->loop = 1;
-    while (priv->loop) {
+    while (atomic_load32(&priv->loop)) {
         // RTCP report
         r = rtp_demuxer_rtcp(priv->demuxer, priv->rtcp_buffer,
                              sizeof(priv->rtcp_buffer));
@@ -128,7 +128,7 @@ static void rtp_udp_receiver_free(struct rtp_receiver_t* r)
 {
     rtp_receiver_priv_t* priv = container_of(r, rtp_receiver_priv_t, base);
 
-    priv->loop = 0;
+    atomic_decrement32(&priv->loop);
     thread_destroy(priv->thread);
     rtp_demuxer_destroy(&priv->demuxer);
     free(priv);
@@ -161,6 +161,7 @@ struct rtp_receiver_t* rtp_udp_receiver_create(int rtp[2],
            NULL, peer, (uint16_t)peerport[1]));
     priv->socket[0] = rtp[0];
     priv->socket[1] = rtp[1];
+    atomic_increment32(&priv->loop);
 
     tracef("ip: %s", peer);
     tracef("port: %u %u", peerport[0], peerport[1]);

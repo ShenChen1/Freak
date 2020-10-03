@@ -16,5 +16,6 @@
 #include "list.h"
 #include "que.h"
 #include "utils.h"
+#include "uthash.h"
 
 #endif /* __COMMON_H__ */

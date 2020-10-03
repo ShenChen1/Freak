@@ -1,5 +1,5 @@
 #include "log.h"
-#include "uthash.h"
+#include "common.h"
 #include "sys/thread.h"
 #include "sys/locker.h"
 #include "cstringext.h"
@@ -362,6 +362,7 @@ int rtsp_server_uninit(void* rtsp)
 
 static void __attribute__((constructor)) __init()
 {
+    signal(SIGPIPE, SIG_IGN);
     aio_worker_init(4);
 }
 

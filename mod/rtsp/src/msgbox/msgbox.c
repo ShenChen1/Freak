@@ -12,7 +12,6 @@ static msgbox_handler_t s_msgbox[PROTP_RTSP_KEY_MAX] = {
 
 int msgbox_init()
 {
-    signal(SIGPIPE, SIG_IGN);
     return 0;
 }
 
