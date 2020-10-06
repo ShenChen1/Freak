@@ -1,6 +1,7 @@
 include(cjson)
 include(nanomsg)
 include(st)
+include(mongoose)
 include(media-server)
 include(uthash)
 include(ufifo)
