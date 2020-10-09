@@ -250,9 +250,10 @@ int rtsp_client_uninit(void* rtsp)
     socket_close(priv->socket);
 
     for (i = 0; i < 5; i++) {
-        if (priv->receiver[i])
+        if (priv->receiver[i]) {
             priv->receiver[i]->free(priv->receiver[i]);
             priv->receiver[i] = NULL;
+        }
     }
     free(priv);
     tracef("priv:%p done", priv);

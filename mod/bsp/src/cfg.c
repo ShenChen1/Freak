@@ -21,7 +21,7 @@ int cfg_load(const char *path)
     return 0;
 }
 
-void *cfg_get(type)
+void *cfg_get()
 {
     return &s_cfg;
 }
