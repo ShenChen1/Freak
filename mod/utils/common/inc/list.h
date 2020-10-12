@@ -40,7 +40,7 @@ list_add(list_t *newp, list_t *head)
 
 /* Add new element at the tail of the list.  */
 static inline void
-list_add_tail (list_t *newp, list_t *head)
+list_add_tail(list_t *newp, list_t *head)
 {
     head->prev->next = newp;
     newp->next = head;

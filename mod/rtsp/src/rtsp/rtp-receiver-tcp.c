@@ -6,7 +6,6 @@
 #include "librtp/rtp-payload.h"
 #include "librtp/rtp-profile.h"
 #include "librtp/rtp.h"
-#include "sockutil.h"
 #include "sys/pollfd.h"
 #include "sys/thread.h"
 
