@@ -15,7 +15,6 @@
 typedef struct {
     UT_hash_handle hh;
     char path[64];
-    int refcnt;
     struct rtp_media_t* media;
 } rtsp_server_media_t;
 
@@ -62,12 +61,9 @@ static int rtsp_ondescribe(void* ptr, rtsp_server_t* rtsp, const char* uri)
         assert(sm);
         memset(sm, 0, sizeof(rtsp_server_media_t));
         strncpy(sm->path, path, sizeof(sm->path));
-        sm->refcnt = 1;
         sm->media = rtp_media_live_new(sm->path);
         assert(sm->media);
         HASH_ADD_STR(priv->sms, path, sm);
-    } else {
-        sm->refcnt++;
     }
     locker_unlock(&priv->locker);
 
@@ -98,7 +94,9 @@ static int rtsp_onsetup(void* ptr,
         *track++ = '\0';
     }
 
+    locker_lock(&priv->locker);
     HASH_FIND_STR(priv->sms, path, sm);
+    locker_unlock(&priv->locker);
     if (sm == NULL) {
         // 454 Session Not Found
         return rtsp_server_reply_setup(rtsp, 454, NULL, NULL);
@@ -191,7 +189,9 @@ static int rtsp_onplay(void* ptr,
     char path[64] = {};
     rtsp_uri_parse(uri, path, sizeof(path));
 
+    locker_lock(&priv->locker);
     HASH_FIND_STR(priv->sms, path, sm);
+    locker_unlock(&priv->locker);
     if (sm == NULL) {
         return rtsp_server_reply_play(rtsp, 454, NULL, NULL, NULL);
     }
@@ -233,12 +233,15 @@ static int rtsp_onteardown(void* ptr,
 
     locker_lock(&priv->locker);
     HASH_FIND_STR(priv->sms, path, sm);
-    if (sm && --sm->refcnt == 0) {
+    if (sm) {
         HASH_DEL(priv->sms, sm);
+    }
+    locker_unlock(&priv->locker);
+
+    if (sm) {
         rtp_media_live_free(sm->media);
         free(sm);
     }
-    locker_unlock(&priv->locker);
 
     return rtsp_server_reply_teardown(rtsp, 200);
 }

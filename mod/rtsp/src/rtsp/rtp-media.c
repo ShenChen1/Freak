@@ -40,9 +40,80 @@ typedef struct {
     uint8_t data[512 * 1024];
     pthread_t thread;
     int status;
-    locker_t locker;
     rtp_media_track_t track[MEDIA_TRACK_MAX];
 } rtp_media_priv_t;
+
+typedef struct {
+    unsigned int size;
+    unsigned int tag;
+    size_t timestamp;
+    unsigned char *buf;
+} record_t;
+
+static unsigned int recsize(unsigned char *p1, unsigned int n1, unsigned char *p2)
+{
+    unsigned int size = sizeof(record_t);
+
+    if (n1 >= size) {
+        record_t *rec = (record_t*)p1;
+        size = rec->size;
+    } else {
+        record_t rec;
+        void *p = (void *)(&rec);
+        memcpy(p, p1, n1);
+        memcpy(p + n1, p2, size - n1);
+        size = rec.size;
+    }
+
+    return sizeof(record_t) + size;
+}
+
+static unsigned int rectag(unsigned char *p1, unsigned int n1, unsigned char *p2)
+{
+    unsigned int tag;
+    unsigned int size = sizeof(record_t);
+
+    if (n1 >= size) {
+        record_t *rec = (record_t*)p1;
+        tag = rec->tag;
+    } else {
+        record_t rec;
+        void *p = (void *)(&rec);
+        memcpy(p, p1, n1);
+        memcpy(p + n1, p2, size - n1);
+        tag = rec.tag;
+    }
+
+    return tag;
+}
+
+static unsigned int recget(unsigned char *p1, unsigned int n1, unsigned char *p2, void *arg)
+{
+    record_t *rec = arg;
+    unsigned int a = 0, l = 0, _n1 = n1;
+    unsigned char *p = NULL, *_p1 = p1, *_p2 = p2;
+
+    // copy header
+    p = (unsigned char *)(rec);
+    a = sizeof(record_t);
+    l = min(a, _n1);
+    memcpy(p, _p1, l);
+    memcpy(p+_n1, _p2, a-l);
+    _n1-=l;_p1+=l;_p2+=a-l;
+
+    // check header
+    assert(rec->tag > (0xdeadbeef << 8));
+
+    // copy data
+    p = (unsigned char *)(rec->buf);
+    a = rec->size;
+    l = min(a, _n1);
+    memcpy(p, _p1, l);
+    memcpy(p+l, _p2, a-l);
+    _n1-=l;_p1+=l;_p2+=a-l;
+
+    return rec->size + sizeof(record_t);
+}
 
 static void* __alloc(void* param, int bytes)
 {
@@ -76,15 +147,10 @@ static void __packet(void* param,
 static int rtp_send_data(void *arg)
 {
     int ret;
-    size_t capacity = 0;
-    uint32_t timestamp = 0;
     rtp_media_priv_t* priv = arg;
 
     while (1) {
-        locker_lock(&priv->locker);
         ret = priv->status;
-        locker_unlock(&priv->locker);
-
         if (ret == MEDIA_STATUS_EXIT) {
             break;
         }
@@ -93,23 +159,19 @@ static int rtp_send_data(void *arg)
             continue;
         }
 
-        locker_lock(&priv->locker);
+        record_t *rec = (record_t *)priv->data;
+        memset(rec, 0, sizeof(record_t));
+        rec->buf = &priv->data[sizeof(record_t)];
+
         if (priv->track[MEDIA_TRACK_VIDEO].fifo) {
-            locker_unlock(&priv->locker);
-            capacity = ufifo_get_block(priv->track[MEDIA_TRACK_VIDEO].fifo, priv->data, sizeof(priv->data));
-            locker_lock(&priv->locker);
-        } else {
-            capacity = 0;
+            ufifo_get_block(priv->track[MEDIA_TRACK_VIDEO].fifo, priv->data, sizeof(priv->data));
+            tracef("bytes:%zu tag:0x%x", rec->size, rec->tag);
         }
 
-        if (capacity && priv->track[MEDIA_TRACK_VIDEO].packer) {
-            rtp_payload_encode_input(priv->track[MEDIA_TRACK_VIDEO].packer, priv->data, capacity, timestamp * 90 /*kHz*/);
+        if (rec->size && priv->track[MEDIA_TRACK_VIDEO].packer) {
+            rtp_payload_encode_input(priv->track[MEDIA_TRACK_VIDEO].packer, rec->buf, rec->size, rec->timestamp * 90 /*kHz*/);
         }
-        locker_unlock(&priv->locker);
-
-        timestamp += 40;
     }
-
 
     return 0;
 }
@@ -128,7 +190,6 @@ static int rtp_get_sdp(struct rtp_media_t* m, char* sdp)
         "a=fmtp:%d profile-level-id=%02X%02X%02X;packetization-mode=1;sprop-parameter-sets=";
     uint32_t ssrc = rtp_ssrc();
 
-    locker_lock(&priv->locker);
     if (!priv->track[MEDIA_TRACK_VIDEO].packer) {
         struct rtp_payload_t func = {__alloc, __free, __packet};
         priv->track[MEDIA_TRACK_VIDEO].packer = rtp_payload_encode_create(
@@ -137,9 +198,9 @@ static int rtp_get_sdp(struct rtp_media_t* m, char* sdp)
 
     if (!priv->track[MEDIA_TRACK_VIDEO].fifo) {
         ufifo_init_t init = {
-            .lock = UFIFO_LOCK_NONE,
+            .lock = UFIFO_LOCK_MUTEX,
             .opt = UFIFO_OPT_ATTACH,
-            .hook = {NULL, NULL},
+            .hook = {recsize, rectag, NULL, recget},
         };
         char name[64];
         snprintf(name, sizeof(name), PROTO_VENC_MEDIA_FIFO, &priv->path[1]);
@@ -149,10 +210,9 @@ static int rtp_get_sdp(struct rtp_media_t* m, char* sdp)
 
     if (!priv->track[MEDIA_TRACK_VIDEO].rtp) {
         struct rtp_event_t event = {NULL};
-        priv->track[MEDIA_TRACK_VIDEO].rtp = rtp_create(&event, NULL, ssrc, 0, 90000, 4*1024, 1);
+        priv->track[MEDIA_TRACK_VIDEO].rtp = rtp_create(&event, NULL, ssrc, ssrc, 90000, 4*1024, 1);
         rtp_set_info(priv->track[MEDIA_TRACK_VIDEO].rtp, "RTSPServer", "live.h264");
     }
-    locker_unlock(&priv->locker);
 
     sprintf(&sdp[strlen(sdp)], pattern_video, RTP_PAYLOAD_H264, RTP_PAYLOAD_H264, RTP_PAYLOAD_H264, 0, 0, 0);
     return 0;
@@ -162,7 +222,6 @@ static int rtp_get_duration(struct rtp_media_t* m, int64_t* duration)
 {
     //rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
     tracef("m:%p duration:%p", m, duration);
-
     return 0;
 }
 
@@ -170,9 +229,10 @@ static int rtp_play(struct rtp_media_t* m)
 {
     rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
     tracef("m:%p", m);
-    locker_lock(&priv->locker);
+    if (priv->track[MEDIA_TRACK_VIDEO].fifo) {
+        ufifo_newest(priv->track[MEDIA_TRACK_VIDEO].fifo, (0xdeadbeef << 8) | 1);
+    }
     priv->status = MEDIA_STATUS_PLAY;
-    locker_unlock(&priv->locker);
     return 0;
 }
 
@@ -180,9 +240,7 @@ static int rtp_pause(struct rtp_media_t* m)
 {
     rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
     tracef("m:%p", m);
-    locker_lock(&priv->locker);
     priv->status = MEDIA_STATUS_PAUSE;
-    locker_unlock(&priv->locker);
     return 0;
 }
 
@@ -224,7 +282,6 @@ static int rtp_add_transport(struct rtp_media_t* m, const char* track, void* t)
     rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
     tracef("m:%p track:%s t:%p", m, track, t);
 
-    locker_lock(&priv->locker);
     for (i = 0; i < MEDIA_TRACK_MAX; i++) {
         if (strstr(track, key[i])) {
             struct rtp_transport_t* tt = priv->track[value[i]].transport;
@@ -235,7 +292,6 @@ static int rtp_add_transport(struct rtp_media_t* m, const char* track, void* t)
             break;
         }
     }
-    locker_unlock(&priv->locker);
 
     return i == MEDIA_TRACK_MAX;
 }
@@ -256,8 +312,6 @@ struct rtp_media_t* rtp_media_live_new(char *path)
     priv->base.seek = rtp_seek;
     priv->base.get_rtpinfo = rtp_get_rtpinfo;
     priv->base.add_transport = rtp_add_transport;
-
-    locker_create(&priv->locker);
     priv->status = MEDIA_STATUS_SETUP;
     strncpy(priv->path, path, sizeof(priv->path));
     thread_create(&priv->thread, rtp_send_data, priv);
@@ -271,13 +325,9 @@ int rtp_media_live_free(struct rtp_media_t* m)
     rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
     tracef("m:%p", m);
 
-    locker_lock(&priv->locker);
     priv->status = MEDIA_STATUS_EXIT;
-    locker_unlock(&priv->locker);
-
     thread_destroy(priv->thread);
 
-    locker_lock(&priv->locker);
     for (i = 0; i < MEDIA_TRACK_MAX; i++) {
         if (priv->track[i].transport) {
             tracef("transport free");
@@ -296,9 +346,7 @@ int rtp_media_live_free(struct rtp_media_t* m)
             ufifo_close(priv->track[i].fifo);
         }
     }
-    locker_unlock(&priv->locker);
 
-    locker_destroy(&priv->locker);
     free(priv);
     tracef("m:%p done", m);
     return 0;

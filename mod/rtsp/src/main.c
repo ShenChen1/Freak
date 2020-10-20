@@ -9,6 +9,76 @@
 
 #define MEDIA (1)
 #if MEDIA
+
+typedef struct {
+    unsigned int size;
+    unsigned int tag;
+    size_t timestamp;
+    unsigned char *buf;
+} record_t;
+
+static unsigned int recsize(unsigned char *p1, unsigned int n1, unsigned char *p2)
+{
+    unsigned int size = sizeof(record_t);
+
+    if (n1 >= size) {
+        record_t *rec = (record_t*)p1;
+        size = rec->size;
+    } else {
+        record_t rec;
+        void *p = (void *)(&rec);
+        memcpy(p, p1, n1);
+        memcpy(p + n1, p2, size - n1);
+        size = rec.size;
+    }
+
+    return sizeof(record_t) + size;
+}
+
+static unsigned int rectag(unsigned char *p1, unsigned int n1, unsigned char *p2)
+{
+    unsigned int tag;
+    unsigned int size = sizeof(record_t);
+
+    if (n1 >= size) {
+        record_t *rec = (record_t*)p1;
+        tag = rec->tag;
+    } else {
+        record_t rec;
+        void *p = (void *)(&rec);
+        memcpy(p, p1, n1);
+        memcpy(p + n1, p2, size - n1);
+        tag = rec.tag;
+    }
+
+    return tag;
+}
+
+static unsigned int recput(unsigned char *p1, unsigned int n1, unsigned char *p2, void *arg)
+{
+    record_t *rec = arg;
+    unsigned int a = 0, l = 0, _n1 = n1;
+    unsigned char *p = NULL, *_p1 = p1, *_p2 = p2;
+
+    // copy header
+    p = (unsigned char *)(rec);
+    a = sizeof(record_t);
+    l = min(a, _n1);
+    memcpy(_p1, p, l);
+    memcpy(_p2, p+l, a-l);
+    _n1-=l;_p1+=l;_p2+=a-l;
+
+    // copy data
+    p = (unsigned char *)(rec->buf);
+    a = rec->size;
+    l = min(a, _n1);
+    memcpy(_p1, p, l);
+    memcpy(_p2, p+l, a-l);
+    _n1-=l;_p1+=l;_p2+=a-l;
+
+    return rec->size + sizeof(record_t);
+}
+
 #define H264_NAL(v) (v & 0x1F)
 enum { NAL_IDR = 5, NAL_SEI = 6, NAL_SPS = 7, NAL_PPS = 8 };
 
@@ -58,6 +128,7 @@ static int h264_nal_new_access(unsigned char* ptr, uint8_t* end)
 
 static void* test_media(void* arg)
 {
+    size_t count = 0;
     FILE* fp = NULL;
     char* path = arg;
     uint8_t* data;
@@ -72,10 +143,10 @@ static void* test_media(void* arg)
 
     ufifo_t* fifo = NULL;
     ufifo_init_t init = {
-        .lock = UFIFO_LOCK_NONE,
+        .lock = UFIFO_LOCK_MUTEX,
         .opt = UFIFO_OPT_ALLOC,
         .alloc = {64 * 1024},
-        .hook = {NULL, NULL},
+        .hook = {recsize, rectag, recput},
     };
     char name[64];
     snprintf(name, sizeof(name), PROTO_VENC_MEDIA_FIFO, "test");
@@ -92,10 +163,16 @@ static void* test_media(void* arg)
             int nal_unit_type = h264_nal_type(p);
             assert(0 != nal_unit_type);
 
-            if (nal_unit_type <= 5 && h264_nal_new_access(pn, end)) {
-                ufifo_put_block(fifo, nalu, bytes);
-                usleep(40 * 1000);
+            if (nal_unit_type <= NAL_IDR && h264_nal_new_access(pn, end)) {
+                record_t rec = {};
+                rec.size = bytes;
+                rec.tag = (0xdeadbeef << 8) | (NAL_IDR == nal_unit_type); // IDR-frame
+                rec.timestamp = 40 * count++;
+                rec.buf = nalu;
+                ufifo_put_block(fifo, &rec, sizeof(record_t) + bytes);
                 nalu = pn;
+                tracef("bytes:%zu tag:0x%x", bytes, rec.tag);
+                usleep(40 * 1000);
             }
             p = pn;
         }
@@ -106,6 +183,7 @@ static void* test_media(void* arg)
 }
 #endif
 
+#define DEBUG (0)
 #if DEBUG
 static void* test_req(void* arg)
 {
@@ -122,8 +200,7 @@ static void* test_req(void* arg)
         proto_package_fill(ibuf, 0, PROTP_RTSP_KEY_OPEN, PROTO_ACTION_SET,
                            PROTO_FORMAT_STRUCTE, &rtsp_url,
                            sizeof(proto_rtsp_url_t));
-        nnm_req_exchange(req, ibuf, proto_package_size(ibuf), (void**)&obuf,
-                         &osize);
+        nnm_req_exchange(req, ibuf, proto_package_size(ibuf), (void**)&obuf, &osize);
         assert(osize == sizeof(proto_header_t));
         memcpy(ibuf, obuf, osize);
         nnm_free(obuf);
@@ -133,8 +210,7 @@ static void* test_req(void* arg)
         proto_package_fill(ibuf, 0, PROTP_RTSP_KEY_CLOSE, PROTO_ACTION_SET,
                            PROTO_FORMAT_STRUCTE, &rtsp_url,
                            sizeof(proto_rtsp_url_t));
-        nnm_req_exchange(req, ibuf, proto_package_size(ibuf), (void**)&obuf,
-                         &osize);
+        nnm_req_exchange(req, ibuf, proto_package_size(ibuf), (void**)&obuf, &osize);
         assert(osize == sizeof(proto_header_t));
         memcpy(ibuf, obuf, osize);
         nnm_free(obuf);
