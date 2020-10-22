@@ -6,6 +6,7 @@
 #include "cstringext.h"
 #include "sys/thread.h"
 #include "sys/locker.h"
+#include "time64.h"
 #include "librtp/rtp-payload.h"
 #include "librtp/rtp-profile.h"
 #include "librtp/rtp.h"
@@ -102,7 +103,7 @@ static unsigned int recget(unsigned char *p1, unsigned int n1, unsigned char *p2
     _n1-=l;_p1+=l;_p2+=a-l;
 
     // check header
-    assert(rec->tag > (0xdeadbeef << 8));
+    assert(rec->tag >= (0xdeadbeef << 8));
 
     // copy data
     p = (unsigned char *)(rec->buf);
@@ -148,6 +149,7 @@ static int rtp_send_data(void *arg)
 {
     int ret;
     rtp_media_priv_t* priv = arg;
+    time64_t clock = time64_now();
 
     while (1) {
         ret = priv->status;
@@ -165,7 +167,9 @@ static int rtp_send_data(void *arg)
 
         if (priv->track[MEDIA_TRACK_VIDEO].fifo) {
             ufifo_get_block(priv->track[MEDIA_TRACK_VIDEO].fifo, priv->data, sizeof(priv->data));
-            tracef("bytes:%zu tag:0x%x", rec->size, rec->tag);
+            time64_t ts = time64_now();
+            rec->timestamp = ts - clock;
+            tracef("bytes:%zu tag:0x%x ts:%zu", rec->size, rec->tag, rec->timestamp);
         }
 
         if (rec->size && priv->track[MEDIA_TRACK_VIDEO].packer) {
@@ -268,7 +272,9 @@ static int rtp_get_rtpinfo(struct rtp_media_t* m,
     rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
     tracef("m:%p uri:%p rtpinfo:%s bytes:%d", m, uri, rtpinfo, bytes);
 
-    rtp_payload_encode_getinfo(priv->track[MEDIA_TRACK_VIDEO].packer, &seq, &timestamp);
+    if (priv->track[MEDIA_TRACK_VIDEO].packer) {
+        rtp_payload_encode_getinfo(priv->track[MEDIA_TRACK_VIDEO].packer, &seq, &timestamp);
+    }
     // url=rtsp://video.example.com/twister/video;seq=12312232;rtptime=78712811
     snprintf(rtpinfo, bytes, "url=%s;seq=%hu;rtptime=%u", uri, seq, timestamp);
     return 0;

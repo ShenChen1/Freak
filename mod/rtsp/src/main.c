@@ -169,7 +169,11 @@ static void* test_media(void* arg)
                 rec.tag = (0xdeadbeef << 8) | (NAL_IDR == nal_unit_type); // IDR-frame
                 rec.timestamp = 40 * count++;
                 rec.buf = nalu;
-                ufifo_put_block(fifo, &rec, sizeof(record_t) + bytes);
+                if (ufifo_len(fifo) + sizeof(record_t) + bytes > ufifo_size(fifo)) {
+                    ufifo_skip(fifo);
+                    ufifo_oldest(fifo, (0xdeadbeef << 8) | 1);
+                }
+                ufifo_put(fifo, &rec, sizeof(record_t) + bytes);
                 nalu = pn;
                 tracef("bytes:%zu tag:0x%x", bytes, rec.tag);
                 usleep(40 * 1000);
