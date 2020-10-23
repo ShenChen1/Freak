@@ -28,6 +28,20 @@ int main()
     ret = nnm_req_create(PROTO_VSF_COM_NODE, &req);
     assert(!ret);
 
+    // init vi
+    int i, total = VSF_CHN_MAX;
+    for (i = 0; i < total; i++) {
+        uint8_t ibuf[PROTO_PACKAGE_MAXSIZE] = {};
+        uint8_t *obuf = NULL;
+        size_t osize = 0;
+        proto_package_fill(ibuf, i, PROTP_VSF_KEY_VI, PROTO_ACTION_SET,
+            PROTO_FORMAT_STRUCTE, cfg_get_member(vi[i]), sizeof(proto_vsf_vi_t));
+        nnm_req_exchange(req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
+        assert(osize == sizeof(proto_header_t));
+        memcpy(ibuf, obuf, osize);
+        nnm_free(obuf);
+    }
+
     // init end
     ret = nnm_req_destory(req);
     assert(!ret);

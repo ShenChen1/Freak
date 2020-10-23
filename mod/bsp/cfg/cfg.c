@@ -25,6 +25,6 @@ void jsonb_opt_bsp_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
         cJSON_AddItemToObject(json, "dummy", json_child);
     }
     const size_t array_size_list[] = {3,0};
-    jsonb_opt_array(opt, json_child, element->dummy, sizeof(proto_bsp_dummy_t) * 3, array_size_list, jsonb_opt_proto_bsp_dummy_t);
+    jsonb_opt_array(opt, json_child, element->dummy, sizeof(proto_bsp_dummy_t) * 1 * 3, array_size_list, jsonb_opt_proto_bsp_dummy_t);
 }
 }

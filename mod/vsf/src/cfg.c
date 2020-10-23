@@ -24,4 +24,3 @@ int cfg_save(const char *path)
     // save to json file
     return json_cfg_save(path, &s_cfg, sizeof(vsf_cfg_t), jsonb_opt_vsf_cfg_t);
 }
-

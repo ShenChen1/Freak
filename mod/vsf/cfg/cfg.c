@@ -13,8 +13,8 @@ void jsonb_opt_vsf_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "vi", json_child);
     }
-    const size_t array_size_list[] = {5,0};
-    jsonb_opt_array(opt, json_child, element->vi, sizeof(proto_vsf_vi_t) * 5, array_size_list, jsonb_opt_proto_vsf_vi_t);
+    const size_t array_size_list[] = {VSF_CHN_MAX,0};
+    jsonb_opt_array(opt, json_child, element->vi, sizeof(proto_vsf_vi_t) * 1 * VSF_CHN_MAX, array_size_list, jsonb_opt_proto_vsf_vi_t);
 }
 {
     cJSON *json_child = NULL;
@@ -25,8 +25,8 @@ void jsonb_opt_vsf_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "vpss", json_child);
     }
-    const size_t array_size_list[] = {5,0};
-    jsonb_opt_array(opt, json_child, element->vpss, sizeof(proto_vsf_vpss_t) * 5, array_size_list, jsonb_opt_proto_vsf_vpss_t);
+    const size_t array_size_list[] = {VSF_CHN_MAX,0};
+    jsonb_opt_array(opt, json_child, element->vpss, sizeof(proto_vsf_vpss_t) * 1 * VSF_CHN_MAX, array_size_list, jsonb_opt_proto_vsf_vpss_t);
 }
 {
     cJSON *json_child = NULL;
@@ -37,7 +37,7 @@ void jsonb_opt_vsf_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "venc", json_child);
     }
-    const size_t array_size_list[] = {5,0};
-    jsonb_opt_array(opt, json_child, element->venc, sizeof(proto_vsf_venc_t) * 5, array_size_list, jsonb_opt_proto_vsf_venc_t);
+    const size_t array_size_list[] = {VSF_CHN_MAX,0};
+    jsonb_opt_array(opt, json_child, element->venc, sizeof(proto_vsf_venc_t) * 1 * VSF_CHN_MAX, array_size_list, jsonb_opt_proto_vsf_venc_t);
 }
 }
