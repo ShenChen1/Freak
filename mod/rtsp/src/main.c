@@ -6,6 +6,7 @@
 #include "log.h"
 #include "nnm.h"
 #include "ufifo.h"
+#include "time64.h"
 
 #define MEDIA (1)
 #if MEDIA
@@ -133,6 +134,8 @@ static void* test_media(void* arg)
     char* path = arg;
     uint8_t* data;
     size_t capacity = 0;
+    time64_t clock = time64_now();
+
     fp = fopen(path, "r");
     fseek(fp, 0, SEEK_END);
     capacity = ftell(fp);
@@ -158,6 +161,15 @@ static void* test_media(void* arg)
         uint8_t* p = nalu;
 
         while (p < end) {
+
+            time64_t ts = time64_now();
+            if (ts - clock < 40 * count) {
+                usleep(5000);
+                continue;
+            } else {
+                count++;
+            }
+
             unsigned char* pn = search_start_code(p + 4, end);
             size_t bytes = pn - nalu;
             int nal_unit_type = h264_nal_type(p);
@@ -167,7 +179,7 @@ static void* test_media(void* arg)
                 record_t rec = {};
                 rec.size = bytes;
                 rec.tag = (0xdeadbeef << 8) | (NAL_IDR == nal_unit_type); // IDR-frame
-                rec.timestamp = 40 * count++;
+                rec.timestamp = ts - clock;
                 rec.buf = nalu;
                 if (ufifo_len(fifo) + sizeof(record_t) + bytes > ufifo_size(fifo)) {
                     ufifo_skip(fifo);
@@ -176,7 +188,6 @@ static void* test_media(void* arg)
                 ufifo_put(fifo, &rec, sizeof(record_t) + bytes);
                 nalu = pn;
                 tracef("bytes:%zu tag:0x%x", bytes, rec.tag);
-                usleep(40 * 1000);
             }
             p = pn;
         }

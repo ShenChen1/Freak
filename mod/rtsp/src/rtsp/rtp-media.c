@@ -6,7 +6,6 @@
 #include "cstringext.h"
 #include "sys/thread.h"
 #include "sys/locker.h"
-#include "time64.h"
 #include "librtp/rtp-payload.h"
 #include "librtp/rtp-profile.h"
 #include "librtp/rtp.h"
@@ -149,7 +148,6 @@ static int rtp_send_data(void *arg)
 {
     int ret;
     rtp_media_priv_t* priv = arg;
-    time64_t clock = time64_now();
 
     while (1) {
         ret = priv->status;
@@ -167,8 +165,6 @@ static int rtp_send_data(void *arg)
 
         if (priv->track[MEDIA_TRACK_VIDEO].fifo) {
             ufifo_get_block(priv->track[MEDIA_TRACK_VIDEO].fifo, priv->data, sizeof(priv->data));
-            time64_t ts = time64_now();
-            rec->timestamp = ts - clock;
             tracef("bytes:%zu tag:0x%x ts:%zu", rec->size, rec->tag, rec->timestamp);
         }
 
