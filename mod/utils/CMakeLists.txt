@@ -21,4 +21,5 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC ${PROJECT_SOURCE_DIR}/nnm/inc)
 
 add_dependencies(${PROJECT_NAME} ${LIB_CJSON_NAME})
+add_dependencies(${PROJECT_NAME} ${LIB_UTHASH_NAME})
 add_dependencies(${PROJECT_NAME} ${LIB_NANOMSG_NAME})

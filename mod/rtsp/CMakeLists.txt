@@ -30,7 +30,6 @@ target_link_libraries(${PROJECT_NAME}
     utils
     proto)
 include_directories(${PROJECT_SOURCE_DIR})
-add_dependencies(${PROJECT_NAME} ${LIB_UTHASH_NAME})
 add_dependencies(${PROJECT_NAME} ${LIB_MEDIA_SRV_NAME})
 
 add_custom_target(cfg-${PROJECT_NAME}

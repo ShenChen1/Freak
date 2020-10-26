@@ -15,7 +15,9 @@ JSONB_FIELD(value, int)
 JSONB_STRUCT_END(proto_vsf_vpss_t)
 
 JSONB_STRUCT_START(proto_vsf_vi_t)
-JSONB_FIELD(value, int)
+JSONB_FIELD(id, uint16_t)
+JSONB_FIELD(enable, bool)
+JSONB_FIELD(rez, rez_t)
 JSONB_STRUCT_END(proto_vsf_vi_t)
 
 JSONB_STRUCT_START(proto_vsf_sensor_t)

@@ -19,7 +19,9 @@ typedef struct {
 } proto_vsf_vpss_t;
 extern void jsonb_opt_proto_vsf_vi_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
-    int value;
+    uint16_t id;
+    bool enable;
+    rez_t rez;
 } proto_vsf_vi_t;
 extern void jsonb_opt_proto_vsf_sensor_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {

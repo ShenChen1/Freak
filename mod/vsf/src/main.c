@@ -12,7 +12,7 @@ static int __rep_recv(void *in, size_t isize, void **out, size_t *osize, void *a
 
 int main()
 {
-    int ret;
+    int ret, i;
     nnm_t rep = NULL;
     nnm_t req = NULL;
 
@@ -29,8 +29,7 @@ int main()
     assert(!ret);
 
     // init vi
-    int i, total = VSF_CHN_MAX;
-    for (i = 0; i < total; i++) {
+    for (i = 0; i < VSF_CHN_MAX; i++) {
         uint8_t ibuf[PROTO_PACKAGE_MAXSIZE] = {};
         uint8_t *obuf = NULL;
         size_t osize = 0;

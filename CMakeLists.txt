@@ -11,6 +11,8 @@ set(FREAK_HOME_PATH ${PROJECT_SOURCE_DIR})
 set(FREAK_BUILD_PATH ${PROJECT_SOURCE_DIR}/build)
 set(FREAK_SYSROOT_PATH ${PROJECT_SOURCE_DIR}/sysroot)
 set(FREAK_TOOLS_PATH ${PROJECT_SOURCE_DIR}/tools)
+set(FREAK_SDK_PATH ${PROJECT_SOURCE_DIR}/sdk)
 
 add_subdirectory(fw)
+add_subdirectory(sdk)
 add_subdirectory(mod)

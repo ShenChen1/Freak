@@ -6,9 +6,9 @@ add_executable(${PROJECT_NAME}
     src/cfg.c
     src/msgbox/msgbox.c
     src/msgbox/msgbox_vsf.c
-    src/hal/vi.c
-    src/hal/vpss.c
-    src/hal/venc.c
+    src/hal/${CMAKE_CHIP_NAME}/vi.c
+    src/hal/${CMAKE_CHIP_NAME}/vpss.c
+    src/hal/${CMAKE_CHIP_NAME}/venc.c
     cfg/cfg.c)
 
 target_link_libraries(${PROJECT_NAME}
@@ -22,3 +22,7 @@ add_custom_target(cfg-${PROJECT_NAME}
     COMMAND python ${FREAK_TOOLS_PATH}/jsonb-c/src/jsonb_c.py --source=${PROJECT_SOURCE_DIR}/cfg/cfg.jsonb --installdir=${PROJECT_SOURCE_DIR}/cfg)
 include_directories(${FREAK_TOOLS_PATH}/jsonb-c/inc/)
 add_dependencies(${PROJECT_NAME} cfg-${PROJECT_NAME})
+
+# SDK
+include(sdk-${CMAKE_CHIP_NAME})
+add_dependencies(${PROJECT_NAME} sdk-${CMAKE_CHIP_NAME})

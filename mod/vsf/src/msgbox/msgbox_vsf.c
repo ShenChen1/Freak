@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include "inc/hal/vi.h"
 #include "inc/msgbox.h"
 #include "inc/cfg.h"
 
 int msgbox_vsf_vi(msgbox_param_t *param)
 {
+    //int ret;
+    vi_t *obj = NULL;
     proto_vsf_vi_t *in = param->in;
     proto_vsf_vi_t *out = param->out;
 
@@ -19,8 +22,15 @@ int msgbox_vsf_vi(msgbox_param_t *param)
         }
     }
 
+    obj = createVi(param->chn);
+    if (obj == NULL) {
+        return -EINVAL;
+    }
+
     if (param->action == PROTO_ACTION_SET) {
+        //ret = obj->set(obj, in->value);
         *param->osize = 0;
+        *cfg_get_member(vi[param->chn]) = *in;
     } else {
         *param->osize = sizeof(proto_vsf_vi_t);
     }
