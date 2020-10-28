@@ -5,8 +5,10 @@ ExternalProject_Add(build-${PROJECT_NAME}
     CONFIGURE_COMMAND true
     BUILD_COMMAND ./sdk.unpack
     INSTALL_COMMAND true
-    COMMAND mkdir -p ${FREAK_SYSROOT_PATH}/usr/local/lib/
-    COMMAND cmake -E copy_directory ${PROJECT_BINARY_DIR}/build-${PROJECT_NAME}-prefix/src/build-${PROJECT_NAME}/smp/a7_linux/mpp/lib/ ${FREAK_SYSROOT_PATH}/usr/local/lib/
+    COMMAND mkdir -p ${FREAK_SYSROOT_PATH}/usr/local/lib/mpp/
+    COMMAND cmake -E copy_directory ${PROJECT_BINARY_DIR}/build-${PROJECT_NAME}-prefix/src/build-${PROJECT_NAME}/smp/a7_linux/mpp/lib/ ${FREAK_SYSROOT_PATH}/usr/local/lib/mpp/
     COMMAND mkdir -p ${FREAK_SYSROOT_PATH}/usr/local/include/mpp/
     COMMAND cmake -E copy_directory ${PROJECT_BINARY_DIR}/build-${PROJECT_NAME}-prefix/src/build-${PROJECT_NAME}/smp/a7_linux/mpp/include/ ${FREAK_SYSROOT_PATH}/usr/local/include/mpp/
+    COMMAND mkdir -p ${FREAK_SYSROOT_PATH}/usr/local/ko/
+    COMMAND cmake -E copy_directory ${PROJECT_BINARY_DIR}/build-${PROJECT_NAME}-prefix/src/build-${PROJECT_NAME}/smp/a7_linux/mpp/ko/ ${FREAK_SYSROOT_PATH}/usr/local/ko/
     BUILD_IN_SOURCE 1)

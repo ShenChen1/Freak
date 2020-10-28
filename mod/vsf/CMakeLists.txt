@@ -1,5 +1,8 @@
 project(vsf)
 
+# SDK
+include(sdk-${CMAKE_CHIP_NAME})
+
 add_definitions(-DMODULE_NAME="${PROJECT_NAME}")
 add_executable(${PROJECT_NAME}
     src/main.c
@@ -14,6 +17,7 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     ${LIB_CJSON_NAME}
     ${LIB_NANOMSG_NAME}
+    ${LIB_SDK_NAME}
     utils
     proto)
 include_directories(${PROJECT_SOURCE_DIR})
@@ -23,6 +27,4 @@ add_custom_target(cfg-${PROJECT_NAME}
 include_directories(${FREAK_TOOLS_PATH}/jsonb-c/inc/)
 add_dependencies(${PROJECT_NAME} cfg-${PROJECT_NAME})
 
-# SDK
-include(sdk-${CMAKE_CHIP_NAME})
 add_dependencies(${PROJECT_NAME} sdk-${CMAKE_CHIP_NAME})

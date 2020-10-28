@@ -1,30 +1,20 @@
-JSONB_STRUCT_START(rez_t)
-JSONB_FIELD(height, uint16_t)
-JSONB_FIELD(width, uint16_t)
-JSONB_FIELD(fps, uint16_t)
-JSONB_STRUCT_END(rez_t)
+JSONB_STRUCT_START(pic_size_t)
+JSONB_FIELD(w, uint16_t)
+JSONB_FIELD(h, uint16_t)
+JSONB_STRUCT_END(pic_size_t)
 
-JSONB_STRUCT_START(proto_vsf_venc_t)
+JSONB_STRUCT_START(proto_vsf_vi_t)
 JSONB_FIELD(id, uint16_t)
 JSONB_FIELD(enable, bool)
-JSONB_FIELD(rez, rez_t)
+JSONB_FIELD(rez, pic_size_t)
+JSONB_STRUCT_END(proto_vsf_vi_t)
+
+
+
+JSONB_STRUCT_START(proto_vsf_venc_t)
+JSONB_FIELD(value, int)
 JSONB_STRUCT_END(proto_vsf_venc_t)
 
 JSONB_STRUCT_START(proto_vsf_vpss_t)
 JSONB_FIELD(value, int)
 JSONB_STRUCT_END(proto_vsf_vpss_t)
-
-JSONB_STRUCT_START(proto_vsf_vi_t)
-JSONB_FIELD(id, uint16_t)
-JSONB_FIELD(enable, bool)
-JSONB_FIELD(rez, rez_t)
-JSONB_STRUCT_END(proto_vsf_vi_t)
-
-JSONB_STRUCT_START(proto_vsf_sensor_t)
-JSONB_FIELD(id, uint16_t)
-JSONB_FIELD(enable, bool)
-JSONB_STRING(sensor, 32)
-JSONB_FIELD(lane, uint16_t)
-JSONB_FIELD(wdr, uint16_t)
-JSONB_FIELD(rez, rez_t)
-JSONB_STRUCT_END(proto_vsf_sensor_t)

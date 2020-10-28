@@ -2,12 +2,14 @@
 #include <stdlib.h>
 #include <errno.h>
 #include "inc/hal/vi.h"
+#include "inc/hal/vpss.h"
+#include "inc/hal/venc.h"
 #include "inc/msgbox.h"
 #include "inc/cfg.h"
 
 int msgbox_vsf_vi(msgbox_param_t *param)
 {
-    //int ret;
+    int ret = 0;
     vi_t *obj = NULL;
     proto_vsf_vi_t *in = param->in;
     proto_vsf_vi_t *out = param->out;
@@ -28,10 +30,15 @@ int msgbox_vsf_vi(msgbox_param_t *param)
     }
 
     if (param->action == PROTO_ACTION_SET) {
-        //ret = obj->set(obj, in->value);
+        ret |= obj->stop(obj);
+        if (in->enable) {
+            ret |= obj->set(obj, in, sizeof(proto_vsf_vi_t));
+            ret |= obj->start(obj);
+        }
         *param->osize = 0;
         *cfg_get_member(vi[param->chn]) = *in;
     } else {
+        ret |= obj->get(obj, in, sizeof(proto_vsf_vi_t));
         *param->osize = sizeof(proto_vsf_vi_t);
     }
 
@@ -47,7 +54,7 @@ int msgbox_vsf_vi(msgbox_param_t *param)
         free(out);
     }
 
-    return 0;
+    return ret;
 }
 
 int msgbox_vsf_vpss(msgbox_param_t *param)

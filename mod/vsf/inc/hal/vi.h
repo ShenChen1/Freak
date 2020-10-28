@@ -5,6 +5,12 @@ typedef struct vi {
     /* Private date */
     void *priv;
 
+    int (*start)(struct vi *self);
+    int (*stop)(struct vi *self);
+
+    int (*set)(struct vi *self, void *param, size_t size);
+    int (*get)(struct vi *self, void *param, size_t size);
+
     /**
      * @brief  Destroy vi instance
      *
