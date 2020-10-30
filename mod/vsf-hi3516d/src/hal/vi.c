@@ -1,11 +1,10 @@
 #include "log.h"
 #include "common.h"
-#include "sdk.h"
+#include "inc/sdk_cfg.h"
 #include "inc/hal/vi.h"
-#include "inc/cfg.h"
 
 typedef struct {
-    proto_vsf_vi_t cfg;
+    proto_vsf_vi_t usr_cfg;
 } vi_priv_t;
 
 static int __vi_set_param()
@@ -51,42 +50,18 @@ static int __vi_set_ctrl_param()
     return HI_SUCCESS;
 }
 
-static int vi_start(vi_t * self)
+vsf_vi_t *VSF_createVi(int id)
 {
-    __vi_set_param();
-    return 0;
-}
-
-static int vi_stop(vi_t * self)
-{
-    return 0;
-}
-
-static int vi_set(vi_t *self, void *param, size_t size)
-{
-    return 0;
-}
-
-static int vi_get(vi_t *self, void *param, size_t size)
-{
-    return 0;
-}
-
-vi_t *createVi(int id)
-{
-    vi_t *obj = NULL;
+    vsf_vi_t *obj = NULL;
     vi_priv_t *priv = NULL;
 
     priv = malloc(sizeof(vi_priv_t));
     memset(priv, 0, sizeof(vi_priv_t));
 
-    obj = malloc(sizeof(vi_t));
-    memset(obj, 0, sizeof(vi_t));
+    obj = malloc(sizeof(vsf_vi_t));
+    memset(obj, 0, sizeof(vsf_vi_t));
     obj->priv = priv;
-    obj->start = vi_start;
-    obj->stop = vi_stop;
-    obj->set = vi_set;
-    obj->get = vi_get;
 
+    __vi_set_param();
     return obj;
 }

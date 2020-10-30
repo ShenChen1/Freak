@@ -29,7 +29,7 @@ int main()
     assert(!ret);
 
     // init vi
-    for (i = 0; i < VSF_CHN_MAX; i++) {
+    for (i = 0; i < *cfg_get_member(vi_num); i++) {
         uint8_t ibuf[PROTO_PACKAGE_MAXSIZE] = {};
         uint8_t *obuf = NULL;
         size_t osize = 0;

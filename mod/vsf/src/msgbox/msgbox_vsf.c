@@ -10,7 +10,7 @@
 int msgbox_vsf_vi(msgbox_param_t *param)
 {
     int ret = 0;
-    vi_t *obj = NULL;
+    vsf_vi_t *obj = NULL;
     proto_vsf_vi_t *in = param->in;
     proto_vsf_vi_t *out = param->out;
 
@@ -23,22 +23,16 @@ int msgbox_vsf_vi(msgbox_param_t *param)
             cJSON_Delete(json);
         }
     }
-
-    obj = createVi(param->chn);
+    
+    ret = VSF_getViNum();
+    obj = VSF_createVi(param->chn);
     if (obj == NULL) {
         return -EINVAL;
     }
 
     if (param->action == PROTO_ACTION_SET) {
-        ret |= obj->stop(obj);
-        if (in->enable) {
-            ret |= obj->set(obj, in, sizeof(proto_vsf_vi_t));
-            ret |= obj->start(obj);
-        }
         *param->osize = 0;
-        *cfg_get_member(vi[param->chn]) = *in;
     } else {
-        ret |= obj->get(obj, in, sizeof(proto_vsf_vi_t));
         *param->osize = sizeof(proto_vsf_vi_t);
     }
 

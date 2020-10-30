@@ -1,27 +1,12 @@
-#ifndef __VENC_H__
-#define __VENC_H__
+#ifndef __VSF_VENC_H__
+#define __VSF_VENC_H__
 
 typedef struct venc {
-    /* Private date */
     void *priv;
-
-    /**
-     * @brief  Destroy venc instance
-     *
-     * @param  self     venc instance
-     * @return 0 on successs, <0 otherwise.
-     */
     int (*destroy)(struct venc *self);
+} vsf_venc_t;
 
-} venc_t;
+vsf_venc_t *VSF_createVenc(int id);
+int VSF_getVencNum(void);
 
-/**
- * @brief  Create venc instance
- *
- * @param  id           venc instance id
- * @return venc         created instance on success,
- *                      NULL on error
- */
-venc_t *createVenc(int id);
-
-#endif //__VENC_H__
+#endif //__VSF_VENC_H__

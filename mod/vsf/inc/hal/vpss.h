@@ -1,27 +1,12 @@
-#ifndef __VPSS_H__
-#define __VPSS_H__
+#ifndef __VSF_VPSS_H__
+#define __VSF_VPSS_H__
 
 typedef struct vpss {
-    /* Private date */
     void *priv;
-
-    /**
-     * @brief  Destroy vpss instance
-     *
-     * @param  self     vpss instance
-     * @return 0 on successs, <0 otherwise.
-     */
     int (*destroy)(struct vpss *self);
+} vsf_vpss_t;
 
-} vpss_t;
+vsf_vpss_t *createVpss(int id);
+int VSF_getViNum(void);
 
-/**
- * @brief  Create vpss instance
- *
- * @param  id           vpss instance id
- * @return vpss         created instance on success,
- *                      NULL on error
- */
-vpss_t *createVpss(int id);
-
-#endif //__VPSS_H__
+#endif //__VSF_VPSS_H__

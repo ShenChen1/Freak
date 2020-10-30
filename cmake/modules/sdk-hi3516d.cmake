@@ -1,6 +1,3 @@
-set(SDK_NAME sdk-hi3516d)
-
-add_custom_target(${SDK_NAME})
 include_directories(${FREAK_SYSROOT_PATH}/usr/local/include/mpp)
 link_directories(${FREAK_SYSROOT_PATH}/usr/local/lib/mpp)
 
@@ -39,5 +36,3 @@ list(APPEND LIB_SDK_NAME "securec")
 list(APPEND LIB_SDK_NAME "tde")
 list(APPEND LIB_SDK_NAME "upvqe")
 list(APPEND LIB_SDK_NAME "VoiceEngine")
-
-add_dependencies(${SDK_NAME} build-${SDK_NAME})

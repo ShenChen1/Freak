@@ -8,6 +8,17 @@ void jsonb_opt_vsf_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
         if (cJSON_IsNull(json)) assert(0);
+        json_child = cJSON_GetObjectItem(json, "vi_num");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "vi_num", json_child);
+    }
+    jsonb_opt_int(opt, json_child, &element->vi_num, sizeof(int));
+}
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) assert(0);
         json_child = cJSON_GetObjectItem(json, "vi");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateArray();
@@ -20,6 +31,17 @@ void jsonb_opt_vsf_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
         if (cJSON_IsNull(json)) assert(0);
+        json_child = cJSON_GetObjectItem(json, "vpss_num");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "vpss_num", json_child);
+    }
+    jsonb_opt_int(opt, json_child, &element->vpss_num, sizeof(int));
+}
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) assert(0);
         json_child = cJSON_GetObjectItem(json, "vpss");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateArray();
@@ -27,6 +49,17 @@ void jsonb_opt_vsf_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
     }
     const size_t array_size_list[] = {VSF_CHN_MAX,0};
     jsonb_opt_array(opt, json_child, element->vpss, sizeof(proto_vsf_vpss_t) * 1 * VSF_CHN_MAX, array_size_list, jsonb_opt_proto_vsf_vpss_t);
+}
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) assert(0);
+        json_child = cJSON_GetObjectItem(json, "venc_num");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "venc_num", json_child);
+    }
+    jsonb_opt_int(opt, json_child, &element->venc_num, sizeof(int));
 }
 {
     cJSON *json_child = NULL;

@@ -1,0 +1,6 @@
+JSONB_INCLUDE_HEADER(inc/sdk_common.h)
+JSONB_INCLUDE_HEADER(proto_vsf.h)
+
+JSONB_STRUCT_START(sdk_cfg_t)
+JSONB_FIELD(value, int)
+JSONB_STRUCT_END(sdk_cfg_t)

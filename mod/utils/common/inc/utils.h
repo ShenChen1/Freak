@@ -1,6 +1,8 @@
 #ifndef __UTILS_H__
 #define __UTILS_H__
 
+#define __weak __attribute__((weak))
+
 #define ARRAY_SIZE(ary) (sizeof((ary))/sizeof(*(ary)))
 
 #define container_of(ptr, type, member) \
