@@ -3,11 +3,11 @@
 
 #include "cfg/cfg.h"
 
-#define cfg_get_member(member) \
-({ \
-    bsp_cfg_t *cfg = cfg_get(); \
-    &cfg->member; \
-})
+#define cfg_get_member(member)      \
+    ({                              \
+        bsp_cfg_t *cfg = cfg_get(); \
+        &cfg->member;               \
+    })
 
 int cfg_load(const char *path);
 int cfg_save(const char *path);

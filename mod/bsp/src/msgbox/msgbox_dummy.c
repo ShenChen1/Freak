@@ -1,17 +1,17 @@
 #include "common.h"
+#include "inc/cfg.h"
 #include "inc/dummy.h"
 #include "inc/msgbox.h"
-#include "inc/cfg.h"
 
 int msgbox_dummy(msgbox_param_t *param)
 {
     int ret;
-    dummy_t *obj = NULL;
-    proto_bsp_dummy_t *in = param->in;
+    dummy_t *obj           = NULL;
+    proto_bsp_dummy_t *in  = param->in;
     proto_bsp_dummy_t *out = param->out;
 
     if (param->format == PROTO_FORMAT_JSON) {
-        in = malloc(sizeof(proto_bsp_dummy_t));
+        in  = malloc(sizeof(proto_bsp_dummy_t));
         out = malloc(sizeof(proto_bsp_dummy_t));
         if (param->isize) {
             cJSON *json = cJSON_Parse(param->in);

@@ -1,7 +1,7 @@
 #include "common.h"
-#include "cfg/cfg.h"
 #include "json-cfg.h"
 #include "log.h"
+#include "cfg/cfg.h"
 
 static bsp_cfg_t s_cfg = {
     .board = {
@@ -31,4 +31,3 @@ int cfg_save(const char *path)
     // save to json file
     return json_cfg_save(path, &s_cfg, sizeof(bsp_cfg_t), jsonb_opt_bsp_cfg_t);
 }
-

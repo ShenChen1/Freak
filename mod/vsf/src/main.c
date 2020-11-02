@@ -1,8 +1,8 @@
 #include "common.h"
-#include "inc/msgbox.h"
-#include "inc/cfg.h"
 #include "nnm.h"
 #include "log.h"
+#include "inc/msgbox.h"
+#include "inc/cfg.h"
 
 static int __rep_recv(void *in, size_t isize, void **out, size_t *osize, void *arg)
 {
@@ -20,8 +20,9 @@ int main()
     cfg_load(PROTO_VSF_CFG_PATH);
     msgbox_init();
 
+    static uint8_t ibuf[PROTO_PACKAGE_MAXSIZE];
     static uint8_t obuf[PROTO_PACKAGE_MAXSIZE];
-    nnm_rep_init_t init = {__rep_recv, obuf};
+    nnm_rep_init_t init = { __rep_recv, obuf };
     nnm_rep_create(PROTO_VSF_COM_NODE, &init, &rep);
 
     // init start
@@ -30,11 +31,9 @@ int main()
 
     // init vi
     for (i = 0; i < *cfg_get_member(vi_num); i++) {
-        uint8_t ibuf[PROTO_PACKAGE_MAXSIZE] = {};
         uint8_t *obuf = NULL;
-        size_t osize = 0;
-        proto_package_fill(ibuf, i, PROTP_VSF_KEY_VI, PROTO_ACTION_SET,
-            PROTO_FORMAT_STRUCTE, cfg_get_member(vi[i]), sizeof(proto_vsf_vi_t));
+        size_t osize  = 0;
+        proto_package_fill(ibuf, i, PROTP_VSF_KEY_VI, PROTO_ACTION_SET, PROTO_FORMAT_STRUCTE, cfg_get_member(vi[i]), sizeof(proto_vsf_vi_t));
         nnm_req_exchange(req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
         assert(osize == sizeof(proto_header_t));
         memcpy(ibuf, obuf, osize);

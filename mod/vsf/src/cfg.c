@@ -1,7 +1,7 @@
 #include "common.h"
-#include "cfg/cfg.h"
 #include "json-cfg.h"
 #include "log.h"
+#include "cfg/cfg.h"
 
 static vsf_cfg_t s_cfg = {
 

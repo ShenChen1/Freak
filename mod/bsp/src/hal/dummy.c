@@ -2,7 +2,7 @@
 #include "log.h"
 #include "inc/dummy.h"
 
-#define DUMMY_RESOURCE_NUM  (3)
+#define DUMMY_RESOURCE_NUM (3)
 
 typedef struct {
     int value;
@@ -20,19 +20,21 @@ static int __dummy_destroy(dummy_t *self)
 static int __dummy_set(dummy_t *self, int value)
 {
     dummy_priv_t *priv = self->priv;
+
     priv->value = value;
     return 0;
 }
 static int __dummy_get(dummy_t *self, int *value)
 {
     dummy_priv_t *priv = self->priv;
+
     *value = priv->value;
     return 0;
 }
 
 dummy_t *createDummy(int id)
 {
-    dummy_t *obj = NULL;
+    dummy_t *obj       = NULL;
     dummy_priv_t *priv = NULL;
 
     if (id >= getDummyResourceNum()) {
@@ -50,9 +52,9 @@ dummy_t *createDummy(int id)
 
     obj = malloc(sizeof(dummy_t));
     assert(obj);
-    obj->priv = priv;
-    obj->set = __dummy_set;
-    obj->get = __dummy_get;
+    obj->priv    = priv;
+    obj->set     = __dummy_set;
+    obj->get     = __dummy_get;
     obj->destroy = __dummy_destroy;
 
     s_dummy_obj[id] = obj;

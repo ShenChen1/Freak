@@ -1,9 +1,9 @@
 #include "common.h"
-#include "inc/msgbox.h"
-#include "inc/dummy.h"
-#include "inc/cfg.h"
-#include "nnm.h"
 #include "log.h"
+#include "nnm.h"
+#include "inc/cfg.h"
+#include "inc/dummy.h"
+#include "inc/msgbox.h"
 
 static int __rep_recv(void *in, size_t isize, void **out, size_t *osize, void *arg)
 {
@@ -23,8 +23,9 @@ int main()
     cfg_load(PROTO_BSP_CFG_PATH);
     msgbox_init();
 
+    static uint8_t ibuf[PROTO_PACKAGE_MAXSIZE];
     static uint8_t obuf[PROTO_PACKAGE_MAXSIZE];
-    nnm_rep_init_t init = {__rep_recv, obuf};
+    nnm_rep_init_t init = { __rep_recv, obuf };
     nnm_rep_create(PROTO_BSP_COM_NODE, &init, &rep);
     nnm_pub_create(PROTO_BSP_PUB_NODE, &pub);
 
@@ -34,25 +35,21 @@ int main()
     // init dummy
     total = getDummyResourceNum();
     for (i = 0; i < total; i++) {
-        uint8_t ibuf[PROTO_PACKAGE_MAXSIZE] = {};
         uint8_t *obuf = NULL;
-        size_t osize = 0;
-        proto_package_fill(ibuf, i, PROTP_BSP_KEY_DUMMY, PROTO_ACTION_SET,
-            PROTO_FORMAT_STRUCTE, cfg_get_member(dummy[i]), sizeof(proto_bsp_dummy_t));
+        size_t osize  = 0;
+        proto_package_fill(ibuf, i, PROTP_BSP_KEY_DUMMY, PROTO_ACTION_SET, PROTO_FORMAT_STRUCTE, cfg_get_member(dummy[i]), sizeof(proto_bsp_dummy_t));
         nnm_req_exchange(req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
         assert(osize == sizeof(proto_header_t));
         memcpy(ibuf, obuf, osize);
         nnm_free(obuf);
 
-        proto_package_fill(ibuf, i, PROTP_BSP_KEY_DUMMY, PROTO_ACTION_GET,
-            PROTO_FORMAT_STRUCTE, cfg_get_member(dummy[i]), 0);
+        proto_package_fill(ibuf, i, PROTP_BSP_KEY_DUMMY, PROTO_ACTION_GET, PROTO_FORMAT_STRUCTE, cfg_get_member(dummy[i]), 0);
         nnm_req_exchange(req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
         assert(osize == sizeof(proto_header_t) + sizeof(proto_bsp_dummy_t));
         infof("value = %d", ((proto_bsp_dummy_t *)proto_package_data(obuf))->value);
         nnm_free(obuf);
 
-        proto_package_fill(ibuf, i, PROTP_BSP_KEY_DUMMY, PROTO_ACTION_GET,
-            PROTO_FORMAT_JSON, cfg_get_member(dummy[i]), 0);
+        proto_package_fill(ibuf, i, PROTP_BSP_KEY_DUMMY, PROTO_ACTION_GET, PROTO_FORMAT_JSON, cfg_get_member(dummy[i]), 0);
         nnm_req_exchange(req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
         assert(osize > sizeof(proto_header_t));
         infof("%s", proto_package_data(obuf));

@@ -4,18 +4,18 @@
 #include <assert.h>
 #include <errno.h>
 #include <pthread.h>
+#include <signal.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <signal.h>
 #include <time.h>
 #include <unistd.h>
 
 #include "list.h"
 #include "que.h"
-#include "utils.h"
 #include "uthash.h"
+#include "utils.h"
 
 #endif /* __COMMON_H__ */

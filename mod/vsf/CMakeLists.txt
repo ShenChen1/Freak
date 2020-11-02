@@ -9,7 +9,6 @@ add_executable(${PROJECT_NAME}
     src/cfg.c
     src/msgbox/msgbox.c
     src/msgbox/msgbox_vsf.c
-    src/hal/sensor.c
     src/hal/sys.c
     src/hal/vi.c
     src/hal/vpss.c

@@ -23,7 +23,7 @@ int msgbox_vsf_vi(msgbox_param_t *param)
             cJSON_Delete(json);
         }
     }
-    
+
     ret = VSF_getViNum();
     obj = VSF_createVi(param->chn);
     if (obj == NULL) {

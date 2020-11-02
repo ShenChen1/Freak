@@ -9,8 +9,6 @@
     &cfg->member; \
 })
 
-int sdk_cfg_load(const char *path);
-int sdk_cfg_save(const char *path);
 void *sdk_cfg_get();
 
 #endif /* __SDK_CFG_H__ */

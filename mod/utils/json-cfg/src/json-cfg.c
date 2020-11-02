@@ -1,13 +1,13 @@
-#include "common.h"
 #include "json-cfg.h"
+#include "common.h"
 
 int json_cfg_load(const char *filename, void *cfg, size_t size, jsonb_opt_func_t callback)
 {
-    int ret = 0;
-    char *data = NULL;
+    int ret     = 0;
+    char *data  = NULL;
     cJSON *json = NULL;
-    FILE *fp = NULL;
-    size_t len = 0;
+    FILE *fp    = NULL;
+    size_t len  = 0;
 
     fp = fopen(filename, "rb");
     if (fp == NULL) {
@@ -49,10 +49,10 @@ end1:
 
 int json_cfg_save(const char *filename, void *cfg, size_t size, jsonb_opt_func_t callback)
 {
-    int ret = 0;
-    char *data = NULL;
+    int ret     = 0;
+    char *data  = NULL;
     cJSON *json = NULL;
-    FILE *fp = NULL;
+    FILE *fp    = NULL;
 
     fp = fopen(filename, "wb");
     if (fp == NULL) {
