@@ -38,4 +38,8 @@
 #include "mpi_vo.h"
 #include "mpi_vpss.h"
 
+#define SDK_CFG_PRIORITY        (101)
+#define VSF_SYS_PRIORITY        (102)
+
+
 #endif /* __SDK_COMMON_H__ */

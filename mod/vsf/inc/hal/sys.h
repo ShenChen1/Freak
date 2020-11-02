@@ -3,6 +3,7 @@
 
 typedef struct sys {
     void *priv;
+    int (*init)(struct sys *self);
     int (*destroy)(struct sys *self);
 } vsf_sys_t;
 

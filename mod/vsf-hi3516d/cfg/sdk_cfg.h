@@ -20,6 +20,8 @@ typedef struct {
 } sdk_sys_info_t;
 extern void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
-    sdk_sys_info_t astSysInfo;
+    int32_t s32SysNum;
+    int32_t as32SysId[1];
+    sdk_sys_info_t astSysInfo[1];
 } sdk_cfg_t;
 #endif /* __SDK_CFG_JSONB_C_API_H__ */

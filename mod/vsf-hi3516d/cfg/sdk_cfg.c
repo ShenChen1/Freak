@@ -87,11 +87,35 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
         if (cJSON_IsNull(json)) assert(0);
-        json_child = cJSON_GetObjectItem(json, "astSysInfo");
+        json_child = cJSON_GetObjectItem(json, "s32SysNum");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "s32SysNum", json_child);
+    }
+    jsonb_opt_int32_t(opt, json_child, &element->s32SysNum, sizeof(int32_t));
+}
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) assert(0);
+        json_child = cJSON_GetObjectItem(json, "as32SysId");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateArray();
+        cJSON_AddItemToObject(json, "as32SysId", json_child);
+    }
+    const size_t array_size_list[] = {1,0};
+    jsonb_opt_array(opt, json_child, element->as32SysId, sizeof(int32_t) * 1 * 1, array_size_list, jsonb_opt_int32_t);
+}
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) assert(0);
+        json_child = cJSON_GetObjectItem(json, "astSysInfo");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "astSysInfo", json_child);
     }
-    jsonb_opt_sdk_sys_info_t(opt, json_child, &element->astSysInfo, sizeof(sdk_sys_info_t));
+    const size_t array_size_list[] = {1,0};
+    jsonb_opt_array(opt, json_child, element->astSysInfo, sizeof(sdk_sys_info_t) * 1 * 1, array_size_list, jsonb_opt_sdk_sys_info_t);
 }
 }

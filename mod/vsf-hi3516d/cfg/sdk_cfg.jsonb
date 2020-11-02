@@ -17,5 +17,7 @@ JSONB_FIELD(stVbConf, sdk_sys_vb_info_t)
 JSONB_STRUCT_END(sdk_sys_info_t)
 
 JSONB_STRUCT_START(sdk_cfg_t)
-JSONB_FIELD(astSysInfo, sdk_sys_info_t)
+JSONB_FIELD(s32SysNum, int32_t)
+JSONB_FIELD_ARRAY(as32SysId, 1, int32_t)
+JSONB_FIELD_ARRAY(astSysInfo, 1, sdk_sys_info_t)
 JSONB_STRUCT_END(sdk_cfg_t)
