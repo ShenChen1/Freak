@@ -3,6 +3,7 @@
 
 typedef struct vpss {
     void *priv;
+    int (*init)(struct vpss *self);
     int (*destroy)(struct vpss *self);
 } vsf_vpss_t;
 

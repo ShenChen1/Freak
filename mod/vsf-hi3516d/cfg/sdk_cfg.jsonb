@@ -1,10 +1,11 @@
 JSONB_INCLUDE_HEADER(inc/sdk_common.h)
 JSONB_INCLUDE_HEADER(proto_vsf.h)
 
+//////////////////////////////////////////////////////////////////////////////////
+
 JSONB_STRUCT_START(sdk_sys_vb_pool_info_t)
 JSONB_FIELD(u32BlkCnt, uint32_t)
-JSONB_FIELD(u32Width, uint32_t)
-JSONB_FIELD(u32Height, uint32_t)
+JSONB_FIELD(enSize, int32_t)
 JSONB_STRUCT_END(sdk_sys_vb_pool_info_t)
 
 JSONB_STRUCT_START(sdk_sys_vb_info_t)
@@ -16,8 +17,70 @@ JSONB_STRUCT_START(sdk_sys_info_t)
 JSONB_FIELD(stVbConf, sdk_sys_vb_info_t)
 JSONB_STRUCT_END(sdk_sys_info_t)
 
+//////////////////////////////////////////////////////////////////////////////////
+
+JSONB_STRUCT_START(sdk_vi_sensor_info_t)
+JSONB_FIELD(enSnsType, int32_t)
+JSONB_FIELD(s32SnsId, int32_t)
+JSONB_FIELD(s32BusId, int32_t)
+JSONB_FIELD(MipiDev, int32_t)
+JSONB_STRUCT_END(sdk_vi_sensor_info_t)
+
+JSONB_STRUCT_START(sdk_vi_dev_info_t)
+JSONB_FIELD(ViDev, int32_t)
+JSONB_FIELD(enWDRMode, int32_t)
+JSONB_STRUCT_END(sdk_vi_dev_info_t)
+
+JSONB_STRUCT_START(sdk_vi_pipe_info_t)
+JSONB_FIELD_ARRAY(aPipe, WDR_MAX_PIPE_NUM, int32_t)
+JSONB_FIELD(enMastPipeMode, int32_t)
+JSONB_FIELD(bMultiPipe, bool)
+JSONB_FIELD(bVcNumCfged, bool)
+JSONB_FIELD(bIspBypass, bool)
+JSONB_FIELD(enPixFmt, int32_t)
+JSONB_FIELD_ARRAY(u32VCNum, WDR_MAX_PIPE_NUM, uint32_t)
+JSONB_STRUCT_END(sdk_vi_pipe_info_t)
+
+JSONB_STRUCT_START(sdk_vi_chn_info_t)
+JSONB_FIELD(ViChn, int32_t)
+JSONB_FIELD(enPixFormat, int32_t)
+JSONB_FIELD(enDynamicRange, int32_t)
+JSONB_FIELD(enVideoFormat, int32_t)
+JSONB_FIELD(enCompressMode, int32_t)
+JSONB_STRUCT_END(sdk_vi_chn_info_t)
+
+JSONB_STRUCT_START(sdk_vi_info_t)
+JSONB_FIELD(stSnsInfo, sdk_vi_sensor_info_t)
+JSONB_FIELD(stDevInfo, sdk_vi_dev_info_t)
+JSONB_FIELD(stPipeInfo, sdk_vi_pipe_info_t)
+JSONB_FIELD(stChnInfo, sdk_vi_chn_info_t)
+JSONB_STRUCT_END(sdk_vi_info_t)
+
+//////////////////////////////////////////////////////////////////////////////////
+
+JSONB_STRUCT_START(sdk_vpss_info_t)
+JSONB_FIELD(VpssGrp, int32_t)
+JSONB_FIELD(ViPipe, int32_t)
+JSONB_FIELD(ViChn, int32_t)
+JSONB_FIELD_ARRAY(abChnEnable, VPSS_MAX_PHY_CHN_NUM, bool)
+JSONB_FIELD_ARRAY(aenSize, VPSS_MAX_PHY_CHN_NUM, int32_t)
+JSONB_FIELD(enSnsType, int32_t)
+JSONB_STRUCT_END(sdk_vpss_info_t)
+
+//////////////////////////////////////////////////////////////////////////////////
+
 JSONB_STRUCT_START(sdk_cfg_t)
+
 JSONB_FIELD(s32SysNum, int32_t)
 JSONB_FIELD_ARRAY(as32SysId, 1, int32_t)
 JSONB_FIELD_ARRAY(astSysInfo, 1, sdk_sys_info_t)
+
+JSONB_FIELD(s32ViNum, int32_t)
+JSONB_FIELD_ARRAY(as32ViId, VI_MAX_DEV_NUM, int32_t)
+JSONB_FIELD_ARRAY(astViInfo, VI_MAX_DEV_NUM, sdk_vi_info_t)
+
+JSONB_FIELD(s32VpssNum, int32_t)
+JSONB_FIELD_ARRAY(as32VpssId, 1, int32_t)
+JSONB_FIELD_ARRAY(astVpssInfo, 1, sdk_vpss_info_t)
+
 JSONB_STRUCT_END(sdk_cfg_t)

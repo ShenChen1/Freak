@@ -11,6 +11,6 @@ ExternalProject_Add(${PROJECT_NAME}
     COMMAND cmake -E copy_directory ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-prefix/src/${PROJECT_NAME}/smp/a7_linux/mpp/include/ ${FREAK_SYSROOT_PATH}/usr/local/include/mpp/
     COMMAND mkdir -p ${FREAK_SYSROOT_PATH}/usr/local/ko/
     COMMAND cmake -E copy_directory ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-prefix/src/${PROJECT_NAME}/smp/a7_linux/mpp/ko/ ${FREAK_SYSROOT_PATH}/usr/local/ko/
-    #COMMAND mkdir -p ${FREAK_HOME_PATH}/mod/vsf-hi3516d/sample/
-    #COMMAND cmake -E copy_directory ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-prefix/src/${PROJECT_NAME}/smp/a7_linux/mpp/sample/common ${FREAK_HOME_PATH}/mod/vsf-hi3516d/sample/
+    COMMAND mkdir -p ${FREAK_HOME_PATH}/mod/vsf-hi3516d/sample/
+    COMMAND cmake -E copy_directory ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-prefix/src/${PROJECT_NAME}/smp/a7_linux/mpp/sample/common ${FREAK_HOME_PATH}/mod/vsf-hi3516d/sample/
     BUILD_IN_SOURCE 1)

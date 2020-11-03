@@ -17,51 +17,24 @@ typedef struct {
 
 static vsf_sys_mod_t s_mod;
 
-static HI_S32 __sys_vb_init(VB_CONFIG_S *pstVbConfig)
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+static int __sys_init(vsf_sys_t *self)
 {
-    HI_S32 s32Ret = HI_FAILURE;
+    vsf_sys_t *obj = self;
+    vsf_sys_priv_t *priv = obj->priv;
 
-    HI_MPI_SYS_Exit();
-    HI_MPI_VB_Exit();
-
-    if (NULL == pstVbConfig) {
-        errorf("input parameter is null, it is invaild!\n");
-        return HI_FAILURE;
-    }
-
-    s32Ret = HI_MPI_VB_SetConfig(pstVbConfig);
-    if (HI_SUCCESS != s32Ret) {
-        errorf("HI_MPI_VB_SetConfig failed!\n");
-        return HI_FAILURE;
-    }
-
-    s32Ret = HI_MPI_VB_Init();
-    if (HI_SUCCESS != s32Ret) {
-        errorf("HI_MPI_VB_Init failed!\n");
-        return HI_FAILURE;
-    }
-
-    s32Ret = HI_MPI_SYS_Init();
-    if (HI_SUCCESS != s32Ret) {
-        errorf("HI_MPI_SYS_Init failed!\n");
-        HI_MPI_VB_Exit();
-        return HI_FAILURE;
-    }
-
-    return HI_SUCCESS;
-}
-
-static int __sys_set_param(sdk_sys_info_t *info)
-{
-    int i, ret = 0;
+    int i, s32Ret;
     HI_U64 u64BlkSize;
+    SIZE_S stSize = {};
     VB_CONFIG_S stVbConf = {};
-    sdk_sys_vb_info_t *vb_info = &info->stVbConf;
+    sdk_sys_vb_info_t *vb_info = &priv->info->stVbConf;
 
     stVbConf.u32MaxPoolCnt = vb_info->u32MaxPoolCnt;
     for (i = 0; i < vb_info->u32MaxPoolCnt; i++) {
-        u64BlkSize = COMMON_GetPicBufferSize(vb_info->astCommPool[i].u32Width,
-                                             vb_info->astCommPool[i].u32Height,
+        SAMPLE_COMM_SYS_GetPicSize(vb_info->astCommPool[i].enSize, &stSize);
+        u64BlkSize = COMMON_GetPicBufferSize(stSize.u32Width,
+                                             stSize.u32Height,
                                              PIXEL_FORMAT_YVU_SEMIPLANAR_422,
                                              DATA_BITWIDTH_8,
                                              COMPRESS_MODE_SEG,
@@ -70,26 +43,13 @@ static int __sys_set_param(sdk_sys_info_t *info)
         stVbConf.astCommPool[i].u32BlkCnt  = vb_info->astCommPool[i].u32BlkCnt;
     }
 
-    ret |= __sys_vb_init(&stVbConf);
+    s32Ret = SAMPLE_COMM_SYS_Init(&stVbConf);
+    if (s32Ret != HI_SUCCESS) {
+        errorf("SAMPLE_COMM_SYS_Init failed with %d!", s32Ret);
+        return s32Ret;
+    }
 
-    return ret;
-}
-
-static HI_VOID __sys_exit(void)
-{
-    HI_MPI_SYS_Exit();
-    HI_MPI_VB_ExitModCommPool(VB_UID_VDEC);
-    HI_MPI_VB_Exit();
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-static int __sys_init(vsf_sys_t *self)
-{
-    vsf_sys_t *obj = self;
-    vsf_sys_priv_t *priv = obj->priv;
-
-    return __sys_set_param(priv->info);
+    return s32Ret;
 }
 
 static int __sys_destroy(vsf_sys_t *self)
@@ -98,7 +58,7 @@ static int __sys_destroy(vsf_sys_t *self)
     vsf_sys_t *obj = self;
     vsf_sys_priv_t *priv = obj->priv;
 
-    __sys_exit();
+    SAMPLE_COMM_SYS_Exit();
     mod->objs[priv->virtid] = NULL;
     free(priv);
     free(obj);
@@ -125,7 +85,7 @@ vsf_sys_t *VSF_createSys(int id)
     assert(priv);
     memset(priv, 0, sizeof(vsf_sys_priv_t));
     priv->virtid = id;
-    priv->phyid = sdk_cfg_get_member(as32SysId[0])[id];
+    priv->phyid = *sdk_cfg_get_member(as32SysId[id]);
     priv->info = sdk_cfg_get_member(astSysInfo[id]);
 
     obj = malloc(sizeof(vsf_sys_priv_t));

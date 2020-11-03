@@ -1,6 +1,6 @@
+#include "cfg/sdk_cfg.h"
 #include "common.h"
 #include "json-cfg.h"
-#include "cfg/sdk_cfg.h"
 
 static const char s_path[] = "/tmp/sdk-config.json";
 static sdk_cfg_t s_cfg = {
@@ -11,16 +11,53 @@ static sdk_cfg_t s_cfg = {
             .u32MaxPoolCnt = 2,
             .astCommPool[0] = {
                 .u32BlkCnt = 10,
-                .u32Width = 1920,
-                .u32Height = 1080,
+                .enSize = PIC_1080P,
             },
             .astCommPool[1] = {
                 .u32BlkCnt = 10,
-                .u32Width = 1280,
-                .u32Height = 720,
+                .enSize = PIC_720P,
             },
         },
     },
+    .s32ViNum = 1,
+    .as32ViId = {0},
+    .astViInfo[0] = {
+        .stSnsInfo = {
+            .enSnsType = SENSOR0_TYPE,
+            .s32SnsId = 0,
+            .s32BusId = 0,
+            .MipiDev = 0,
+        },
+        .stPipeInfo = {
+            .aPipe = {0, -1, -1, -1},
+            .enMastPipeMode = VI_OFFLINE_VPSS_OFFLINE,
+            .bMultiPipe = HI_FALSE,
+            .bVcNumCfged = HI_FALSE,
+            .bIspBypass = HI_FALSE,
+            .enPixFmt = PIXEL_FORMAT_YVU_SEMIPLANAR_420,
+        },
+        .stDevInfo = {
+            .ViDev = 0,
+            .enWDRMode = WDR_MODE_NONE,
+        },
+        .stChnInfo = {
+            .ViChn = 0,
+            .enPixFormat = PIXEL_FORMAT_YVU_SEMIPLANAR_420,
+            .enDynamicRange = DYNAMIC_RANGE_SDR8,
+            .enVideoFormat = VIDEO_FORMAT_LINEAR,
+            .enCompressMode = COMPRESS_MODE_SEG,
+        },
+    },
+    .s32VpssNum = 1,
+    .as32VpssId = {0},
+    .astVpssInfo[0] = {
+        .VpssGrp = 0,
+        .ViPipe = 0,
+        .ViChn = 0,
+        .abChnEnable = {1, 1},
+        .aenSize = {PIC_1080P, PIC_720P},
+        .enSnsType = SENSOR0_TYPE,
+    }
 };
 
 static int sdk_cfg_load(const char *path)

@@ -3,6 +3,7 @@
 
 typedef struct vi {
     void *priv;
+    int (*init)(struct vi *self);
     int (*destroy)(struct vi *self);
 } vsf_vi_t;
 

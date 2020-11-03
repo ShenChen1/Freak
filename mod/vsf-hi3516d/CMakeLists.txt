@@ -1,6 +1,8 @@
 project(vsf-hi3516d)
 
 add_definitions(-DMODULE_NAME="${PROJECT_NAME}")
+add_definitions(-DSENSOR0_TYPE=SONY_IMX327_MIPI_2M_30FPS_12BIT)
+add_definitions(-DSENSOR1_TYPE=SONY_IMX327_MIPI_2M_30FPS_12BIT)
 add_compile_options(-ffunction-sections -fdata-sections)
 add_link_options(-Wl,--gc-sections)
 
@@ -8,7 +10,11 @@ add_library(${PROJECT_NAME} STATIC
     src/hal/sys.c
     src/hal/vi.c
     src/sdk_cfg.c
-    cfg/sdk_cfg.c)
+    cfg/sdk_cfg.c
+    sample/sample_comm_sys.c
+    sample/sample_comm_vi.c
+    sample/sample_comm_vo.c
+    sample/sample_comm_isp.c)
 
 target_link_libraries(${PROJECT_NAME}
     utils
