@@ -9,11 +9,15 @@ add_link_options(-Wl,--gc-sections)
 add_library(${PROJECT_NAME} STATIC
     src/hal/sys.c
     src/hal/vi.c
+    src/hal/vpss.c
+    src/hal/venc.c
     src/sdk_cfg.c
     cfg/sdk_cfg.c
     sample/sample_comm_sys.c
     sample/sample_comm_vi.c
     sample/sample_comm_vo.c
+    sample/sample_comm_vpss.c
+    sample/sample_comm_venc.c
     sample/sample_comm_isp.c)
 
 target_link_libraries(${PROJECT_NAME}

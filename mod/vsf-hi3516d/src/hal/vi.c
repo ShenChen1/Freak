@@ -63,7 +63,7 @@ static int __vi_destroy(vsf_vi_t *self)
     vsf_vi_t *obj       = self;
     vsf_vi_priv_t *priv = obj->priv;
 
-    SAMPLE_COMM_SYS_Exit();
+    SAMPLE_COMM_VI_StopVi(priv->pstViConfig);
     mod->objs[priv->virtid] = NULL;
     free(priv);
     free(obj);

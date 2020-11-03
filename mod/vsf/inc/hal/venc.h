@@ -3,6 +3,7 @@
 
 typedef struct venc {
     void *priv;
+    int (*init)(struct venc *self);
     int (*destroy)(struct venc *self);
 } vsf_venc_t;
 

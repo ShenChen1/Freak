@@ -57,7 +57,20 @@ static sdk_cfg_t s_cfg = {
         .abChnEnable = {1, 1},
         .aenSize = {PIC_1080P, PIC_720P},
         .enSnsType = SENSOR0_TYPE,
-    }
+    },
+    .s32VencNum = 1,
+    .as32VencId = {0},
+    .astVencInfo[0] = {
+        .VencChn = 0,
+        .VpssGrp = 0,
+        .VpssChn = 0,
+        .u32Profile = 0,
+        .enPayLoad = PT_H264,
+        .enSize = PIC_1080P,
+        .bRcnRefShareBuf = HI_TRUE,
+        .enRcMode = SAMPLE_RC_CBR,
+        .enGopMode = VENC_GOPMODE_NORMALP,
+    },
 };
 
 static int sdk_cfg_load(const char *path)
