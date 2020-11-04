@@ -1,16 +1,16 @@
 #include "common.h"
-#include "inc/msgbox.h"
 #include "inc/cfg.h"
+#include "inc/msgbox.h"
 #include "inc/rtsp-ctrl.h"
 
 int msgbox_rtsp_open(msgbox_param_t *param)
 {
     int ret;
-    proto_rtsp_url_t *in = param->in;
+    proto_rtsp_url_t *in  = param->in;
     proto_rtsp_url_t *out = param->out;
 
     if (param->format == PROTO_FORMAT_JSON) {
-        in = malloc(sizeof(proto_rtsp_url_t));
+        in  = malloc(sizeof(proto_rtsp_url_t));
         out = malloc(sizeof(proto_rtsp_url_t));
         if (param->isize) {
             cJSON *json = cJSON_Parse(param->in);
@@ -45,11 +45,11 @@ int msgbox_rtsp_open(msgbox_param_t *param)
 int msgbox_rtsp_close(msgbox_param_t *param)
 {
     int ret;
-    proto_rtsp_url_t *in = param->in;
+    proto_rtsp_url_t *in  = param->in;
     proto_rtsp_url_t *out = param->out;
 
     if (param->format == PROTO_FORMAT_JSON) {
-        in = malloc(sizeof(proto_rtsp_url_t));
+        in  = malloc(sizeof(proto_rtsp_url_t));
         out = malloc(sizeof(proto_rtsp_url_t));
         if (param->isize) {
             cJSON *json = cJSON_Parse(param->in);
@@ -80,4 +80,3 @@ int msgbox_rtsp_close(msgbox_param_t *param)
 
     return ret;
 }
-

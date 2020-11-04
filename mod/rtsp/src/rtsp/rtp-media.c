@@ -1,37 +1,37 @@
-#include "log.h"
-#include "proto.h"
-#include "ufifo.h"
 #include "rtp-media.h"
-#include "rtp-transport.h"
 #include "cstringext.h"
-#include "sys/thread.h"
-#include "sys/locker.h"
+#include "librtp/rtp-internal.h"
 #include "librtp/rtp-payload.h"
 #include "librtp/rtp-profile.h"
 #include "librtp/rtp.h"
-#include "librtp/rtp-internal.h"
+#include "log.h"
+#include "proto.h"
+#include "rtp-transport.h"
+#include "sys/locker.h"
+#include "sys/thread.h"
+#include "ufifo.h"
 
 enum {
-    MEDIA_TRACK_VIDEO = 0,  // a=control:video
-    MEDIA_TRACK_AUDIO = 1,  // a=control:audio
-    MEDIA_TRACK_META = 2,   // a=control:meta
+    MEDIA_TRACK_VIDEO = 0, // a=control:video
+    MEDIA_TRACK_AUDIO = 1, // a=control:audio
+    MEDIA_TRACK_META  = 2, // a=control:meta
     MEDIA_TRACK_MAX,
 };
 
 enum {
     MEDIA_STATUS_SETUP = 0,
-    MEDIA_STATUS_PLAY = 1,
+    MEDIA_STATUS_PLAY  = 1,
     MEDIA_STATUS_PAUSE = 2,
-    MEDIA_STATUS_EXIT = 3,
+    MEDIA_STATUS_EXIT  = 3,
     MEDIA_STATUS_MAX,
 };
 
 typedef struct {
-    void* rtp;
-    void* packer;
-    ufifo_t* fifo;
+    void *rtp;
+    void *packer;
+    ufifo_t *fifo;
     uint8_t packet[2 * 1024];
-    struct rtp_transport_t* transport;
+    struct rtp_transport_t *transport;
 } rtp_media_track_t;
 
 typedef struct {
@@ -55,7 +55,7 @@ static unsigned int recsize(unsigned char *p1, unsigned int n1, unsigned char *p
     unsigned int size = sizeof(record_t);
 
     if (n1 >= size) {
-        record_t *rec = (record_t*)p1;
+        record_t *rec = (record_t *)p1;
         size = rec->size;
     } else {
         record_t rec;
@@ -74,7 +74,7 @@ static unsigned int rectag(unsigned char *p1, unsigned int n1, unsigned char *p2
     unsigned int size = sizeof(record_t);
 
     if (n1 >= size) {
-        record_t *rec = (record_t*)p1;
+        record_t *rec = (record_t *)p1;
         tag = rec->tag;
     } else {
         record_t rec;
@@ -89,7 +89,7 @@ static unsigned int rectag(unsigned char *p1, unsigned int n1, unsigned char *p2
 
 static unsigned int recget(unsigned char *p1, unsigned int n1, unsigned char *p2, void *arg)
 {
-    record_t *rec = arg;
+    record_t *rec  = arg;
     unsigned int a = 0, l = 0, _n1 = n1;
     unsigned char *p = NULL, *_p1 = p1, *_p2 = p2;
 
@@ -98,8 +98,10 @@ static unsigned int recget(unsigned char *p1, unsigned int n1, unsigned char *p2
     a = sizeof(record_t);
     l = min(a, _n1);
     memcpy(p, _p1, l);
-    memcpy(p+_n1, _p2, a-l);
-    _n1-=l;_p1+=l;_p2+=a-l;
+    memcpy(p + _n1, _p2, a - l);
+    _n1 -= l;
+    _p1 += l;
+    _p2 += a - l;
 
     // check header
     assert(rec->tag >= (0xdeadbeef << 8));
@@ -109,33 +111,31 @@ static unsigned int recget(unsigned char *p1, unsigned int n1, unsigned char *p2
     a = rec->size;
     l = min(a, _n1);
     memcpy(p, _p1, l);
-    memcpy(p+l, _p2, a-l);
-    _n1-=l;_p1+=l;_p2+=a-l;
+    memcpy(p + l, _p2, a - l);
+    _n1 -= l;
+    _p1 += l;
+    _p2 += a - l;
 
     return rec->size + sizeof(record_t);
 }
 
-static void* __alloc(void* param, int bytes)
+static void *__alloc(void *param, int bytes)
 {
-    rtp_media_track_t* track = param;
+    rtp_media_track_t *track = param;
     assert(bytes < sizeof(track->packet));
     return track->packet;
 }
 
-static void __free(void* param, void* packet)
+static void __free(void *param, void *packet)
 {
-    rtp_media_track_t* track = param;
+    rtp_media_track_t *track = param;
     assert(track->packet == packet);
 }
 
-static void __packet(void* param,
-                     const void* packet,
-                     int bytes,
-                     uint32_t timestamp,
-                     int flags)
+static void __packet(void *param, const void *packet, int bytes, uint32_t timestamp, int flags)
 {
     int ret;
-    rtp_media_track_t* track = param;
+    rtp_media_track_t *track = param;
     assert(track->packet == packet);
 
     ret = track->transport->send(track->transport, 0, (void *)packet, bytes);
@@ -147,7 +147,7 @@ static void __packet(void* param,
 static int rtp_send_data(void *arg)
 {
     int ret;
-    rtp_media_priv_t* priv = arg;
+    rtp_media_priv_t *priv = arg;
 
     while (1) {
         ret = priv->status;
@@ -169,19 +169,20 @@ static int rtp_send_data(void *arg)
         }
 
         if (rec->size && priv->track[MEDIA_TRACK_VIDEO].packer) {
-            rtp_payload_encode_input(priv->track[MEDIA_TRACK_VIDEO].packer, rec->buf, rec->size, rec->timestamp * 90 /*kHz*/);
+            rtp_payload_encode_input(
+                priv->track[MEDIA_TRACK_VIDEO].packer, rec->buf, rec->size, rec->timestamp * 90 /*kHz*/);
         }
     }
 
     return 0;
 }
 
-static int rtp_get_sdp(struct rtp_media_t* m, char* sdp)
+static int rtp_get_sdp(struct rtp_media_t *m, char *sdp)
 {
-    rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
+    rtp_media_priv_t *priv = container_of(m, rtp_media_priv_t, base);
     tracef("m:%p sdp:%s", m, sdp);
 
-    static const char* pattern_video =
+    static const char *pattern_video =
         "m=video 0 RTP/AVP %d\n"
         "a=rtpmap:%d H264/90000\n"
         "a=range:npt=now-\n"
@@ -191,7 +192,7 @@ static int rtp_get_sdp(struct rtp_media_t* m, char* sdp)
     uint32_t ssrc = rtp_ssrc();
 
     if (!priv->track[MEDIA_TRACK_VIDEO].packer) {
-        struct rtp_payload_t func = {__alloc, __free, __packet};
+        struct rtp_payload_t func = { __alloc, __free, __packet };
         priv->track[MEDIA_TRACK_VIDEO].packer = rtp_payload_encode_create(
             RTP_PAYLOAD_H264, "H264", (uint16_t)ssrc, ssrc, &func, &priv->track[MEDIA_TRACK_VIDEO]);
     }
@@ -199,8 +200,8 @@ static int rtp_get_sdp(struct rtp_media_t* m, char* sdp)
     if (!priv->track[MEDIA_TRACK_VIDEO].fifo) {
         ufifo_init_t init = {
             .lock = UFIFO_LOCK_MUTEX,
-            .opt = UFIFO_OPT_ATTACH,
-            .hook = {recsize, rectag, NULL, recget},
+            .opt  = UFIFO_OPT_ATTACH,
+            .hook = { recsize, rectag, NULL, recget },
         };
         char name[64];
         snprintf(name, sizeof(name), PROTO_VENC_MEDIA_FIFO, &priv->path[1]);
@@ -209,8 +210,8 @@ static int rtp_get_sdp(struct rtp_media_t* m, char* sdp)
     }
 
     if (!priv->track[MEDIA_TRACK_VIDEO].rtp) {
-        struct rtp_event_t event = {NULL};
-        priv->track[MEDIA_TRACK_VIDEO].rtp = rtp_create(&event, NULL, ssrc, ssrc, 90000, 4*1024, 1);
+        struct rtp_event_t event           = { NULL };
+        priv->track[MEDIA_TRACK_VIDEO].rtp = rtp_create(&event, NULL, ssrc, ssrc, 90000, 4 * 1024, 1);
         rtp_set_info(priv->track[MEDIA_TRACK_VIDEO].rtp, "RTSPServer", "live.h264");
     }
 
@@ -218,16 +219,16 @@ static int rtp_get_sdp(struct rtp_media_t* m, char* sdp)
     return 0;
 }
 
-static int rtp_get_duration(struct rtp_media_t* m, int64_t* duration)
+static int rtp_get_duration(struct rtp_media_t *m, int64_t *duration)
 {
-    //rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
+    // rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
     tracef("m:%p duration:%p", m, duration);
     return 0;
 }
 
-static int rtp_play(struct rtp_media_t* m)
+static int rtp_play(struct rtp_media_t *m)
 {
-    rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
+    rtp_media_priv_t *priv = container_of(m, rtp_media_priv_t, base);
     tracef("m:%p", m);
     if (priv->track[MEDIA_TRACK_VIDEO].fifo) {
         ufifo_newest(priv->track[MEDIA_TRACK_VIDEO].fifo, (0xdeadbeef << 8) | 1);
@@ -236,36 +237,33 @@ static int rtp_play(struct rtp_media_t* m)
     return 0;
 }
 
-static int rtp_pause(struct rtp_media_t* m)
+static int rtp_pause(struct rtp_media_t *m)
 {
-    rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
+    rtp_media_priv_t *priv = container_of(m, rtp_media_priv_t, base);
     tracef("m:%p", m);
     priv->status = MEDIA_STATUS_PAUSE;
     return 0;
 }
 
-static int rtp_set_speed(struct rtp_media_t* m, double speed)
+static int rtp_set_speed(struct rtp_media_t *m, double speed)
 {
     // rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
     tracef("m:%p speed:%g", m, speed);
     return 0;
 }
 
-static int rtp_seek(struct rtp_media_t* m, int64_t pos)
+static int rtp_seek(struct rtp_media_t *m, int64_t pos)
 {
     // rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
     tracef("m:%p pos:%ld", m, pos);
     return 0;
 }
 
-static int rtp_get_rtpinfo(struct rtp_media_t* m,
-                           const char* uri,
-                           char* rtpinfo,
-                           size_t bytes)
+static int rtp_get_rtpinfo(struct rtp_media_t *m, const char *uri, char *rtpinfo, size_t bytes)
 {
     uint16_t seq;
     uint32_t timestamp;
-    rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
+    rtp_media_priv_t *priv = container_of(m, rtp_media_priv_t, base);
     tracef("m:%p uri:%p rtpinfo:%s bytes:%d", m, uri, rtpinfo, bytes);
 
     if (priv->track[MEDIA_TRACK_VIDEO].packer) {
@@ -276,17 +274,17 @@ static int rtp_get_rtpinfo(struct rtp_media_t* m,
     return 0;
 }
 
-static int rtp_add_transport(struct rtp_media_t* m, const char* track, void* t)
+static int rtp_add_transport(struct rtp_media_t *m, const char *track, void *t)
 {
     int i;
-    const char *key[] = {"video", "audio", "meta"};
-    const int value[] = {MEDIA_TRACK_VIDEO, MEDIA_TRACK_AUDIO, MEDIA_TRACK_META};
-    rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
+    const char *key[]      = { "video", "audio", "meta" };
+    const int value[]      = { MEDIA_TRACK_VIDEO, MEDIA_TRACK_AUDIO, MEDIA_TRACK_META };
+    rtp_media_priv_t *priv = container_of(m, rtp_media_priv_t, base);
     tracef("m:%p track:%s t:%p", m, track, t);
 
     for (i = 0; i < MEDIA_TRACK_MAX; i++) {
         if (strstr(track, key[i])) {
-            struct rtp_transport_t* tt = priv->track[value[i]].transport;
+            struct rtp_transport_t *tt      = priv->track[value[i]].transport;
             priv->track[value[i]].transport = t;
             if (tt) {
                 tt->free(tt);
@@ -298,33 +296,33 @@ static int rtp_add_transport(struct rtp_media_t* m, const char* track, void* t)
     return i == MEDIA_TRACK_MAX;
 }
 
-struct rtp_media_t* rtp_media_live_new(char *path)
+struct rtp_media_t *rtp_media_live_new(char *path)
 {
-    rtp_media_priv_t* priv = malloc(sizeof(rtp_media_priv_t));
+    rtp_media_priv_t *priv = malloc(sizeof(rtp_media_priv_t));
     if (priv == NULL) {
         return NULL;
     }
 
     memset(priv, 0, sizeof(rtp_media_priv_t));
-    priv->base.get_sdp = rtp_get_sdp;
-    priv->base.get_duration = rtp_get_duration;
-    priv->base.play = rtp_play;
-    priv->base.pause = rtp_pause;
-    priv->base.set_speed = rtp_set_speed;
-    priv->base.seek = rtp_seek;
-    priv->base.get_rtpinfo = rtp_get_rtpinfo;
+    priv->base.get_sdp       = rtp_get_sdp;
+    priv->base.get_duration  = rtp_get_duration;
+    priv->base.play          = rtp_play;
+    priv->base.pause         = rtp_pause;
+    priv->base.set_speed     = rtp_set_speed;
+    priv->base.seek          = rtp_seek;
+    priv->base.get_rtpinfo   = rtp_get_rtpinfo;
     priv->base.add_transport = rtp_add_transport;
-    priv->status = MEDIA_STATUS_SETUP;
+    priv->status             = MEDIA_STATUS_SETUP;
     strncpy(priv->path, path, sizeof(priv->path));
     thread_create(&priv->thread, rtp_send_data, priv);
     tracef("&priv->base:%p", &priv->base);
     return &priv->base;
 }
 
-int rtp_media_live_free(struct rtp_media_t* m)
+int rtp_media_live_free(struct rtp_media_t *m)
 {
     int i;
-    rtp_media_priv_t* priv = container_of(m, rtp_media_priv_t, base);
+    rtp_media_priv_t *priv = container_of(m, rtp_media_priv_t, base);
     tracef("m:%p", m);
 
     priv->status = MEDIA_STATUS_EXIT;

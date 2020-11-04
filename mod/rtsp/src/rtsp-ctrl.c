@@ -1,13 +1,13 @@
 #include "common.h"
 #include "log.h"
 #include "proto.h"
-#include "uthash.h"
 #include "ufifo.h"
+#include "uthash.h"
 #include "inc/rtsp.h"
 
-#define RTSP_CTRL_DATA_NUM  (8)
-#define RTSP_CTRL_OPEN      (1<<8|1)
-#define RTSP_CTRL_CLOSE     (1<<8|2)
+#define RTSP_CTRL_DATA_NUM (8)
+#define RTSP_CTRL_OPEN (1 << 8 | 1)
+#define RTSP_CTRL_CLOSE (1 << 8 | 2)
 
 typedef struct {
     int ctrl;
@@ -32,7 +32,7 @@ static rtsp_ctrl_t g_rtsp_ctrl = {};
 static int rtsp_ctrl_req(int ctrl, char *data, int size)
 {
     int ret;
-    rtsp_ctrl_t *priv = &g_rtsp_ctrl;
+    rtsp_ctrl_t *priv       = &g_rtsp_ctrl;
     rtsp_ctrl_data_t *value = malloc(sizeof(rtsp_ctrl_data_t));
     if (value == NULL) {
         return -ENOMEM;
@@ -60,15 +60,10 @@ int rtsp_ctrl_close(char *url)
     return rtsp_ctrl_req(RTSP_CTRL_CLOSE, url, strlen(url) + 1);
 }
 
-static int __frame(void* param,
-                   const char* encoding,
-                   const void* packet,
-                   int bytes,
-                   uint32_t time,
-                   int flags)
+static int __frame(void *param, const char *encoding, const void *packet, int bytes, uint32_t time, int flags)
 {
-    uint8_t *data = (void *)packet;
-    size_t len = bytes;
+    uint8_t *data        = (void *)packet;
+    size_t len           = bytes;
     rtsp_ctrl_ctx_t *ctx = param;
     tracef("client:%p len:%zu", ctx->client, len);
 
@@ -83,9 +78,9 @@ static int __frame(void* param,
 void *rtsp_ctrl_thread(void *arg)
 {
     int ret;
-    rtsp_ctrl_t *priv = &g_rtsp_ctrl;
+    rtsp_ctrl_t *priv       = &g_rtsp_ctrl;
     rtsp_ctrl_data_t *value = NULL;
-    rtsp_ctrl_ctx_t *ctx = NULL;
+    rtsp_ctrl_ctx_t *ctx    = NULL;
 
     ret = que_get(priv->que, (ptr_t *)&value, 1);
     if (ret || value == NULL) {
@@ -105,7 +100,7 @@ void *rtsp_ctrl_thread(void *arg)
             ctx = malloc(sizeof(rtsp_ctrl_ctx_t));
             assert(ctx);
             memset(ctx, 0, sizeof(rtsp_ctrl_ctx_t));
-            rtsp_client_callback_t cb = {ctx, __frame};
+            rtsp_client_callback_t cb = { ctx, __frame };
             ctx->client = rtsp_client_init(value->data, RTSP_PROTOCOL_UDP, &cb);
             assert(ctx->client);
             strncpy(ctx->url, value->data, sizeof(ctx->url));
@@ -139,7 +134,7 @@ int rtsp_ctrl_init()
 
 int rtsp_ctrl_uninit()
 {
-    rtsp_ctrl_t *priv = &g_rtsp_ctrl;
+    rtsp_ctrl_t *priv       = &g_rtsp_ctrl;
     rtsp_ctrl_data_t *value = NULL;
 
     while (!que_get(priv->que, (ptr_t *)&value, 0)) {

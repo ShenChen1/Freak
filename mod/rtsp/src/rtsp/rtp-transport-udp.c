@@ -1,6 +1,6 @@
-#include "log.h"
 #include "common.h"
 #include "cstringext.h"
+#include "log.h"
 #include "port/ip-route.h"
 #include "rtp-transport.h"
 #include "sockpair.h"
@@ -13,9 +13,9 @@ typedef struct {
     struct sockaddr_storage addr[2];
 } rtp_udp_transport_t;
 
-static int rtp_udp_transport_recv(struct rtp_transport_t* t, int rtcp, void* data, size_t bytes)
+static int rtp_udp_transport_recv(struct rtp_transport_t *t, int rtcp, void *data, size_t bytes)
 {
-    rtp_udp_transport_t* transport = container_of(t, rtp_udp_transport_t, base);
+    rtp_udp_transport_t *transport = container_of(t, rtp_udp_transport_t, base);
     tracef("bytes:%zu", bytes);
 
     int i = rtcp ? 1 : 0;
@@ -24,19 +24,19 @@ static int rtp_udp_transport_recv(struct rtp_transport_t* t, int rtcp, void* dat
     return socket_recvfrom(transport->socket[i], data, bytes, 0, &from, &fromlen);
 }
 
-static int rtp_udp_transport_send(struct rtp_transport_t* t, int rtcp, void* data, size_t bytes)
+static int rtp_udp_transport_send(struct rtp_transport_t *t, int rtcp, void *data, size_t bytes)
 {
-    rtp_udp_transport_t* transport = container_of(t, rtp_udp_transport_t, base);
+    rtp_udp_transport_t *transport = container_of(t, rtp_udp_transport_t, base);
     tracef("bytes:%zu", bytes);
 
     int i = rtcp ? 1 : 0;
-    return socket_sendto(transport->socket[i], data, bytes, 0, (void*)&transport->addr[i], transport->addrlen[i]);
+    return socket_sendto(transport->socket[i], data, bytes, 0, (void *)&transport->addr[i], transport->addrlen[i]);
 }
 
-static void rtp_udp_transport_free(struct rtp_transport_t* t)
+static void rtp_udp_transport_free(struct rtp_transport_t *t)
 {
     int i;
-    rtp_udp_transport_t* transport = container_of(t, rtp_udp_transport_t, base);
+    rtp_udp_transport_t *transport = container_of(t, rtp_udp_transport_t, base);
 
     for (i = 0; i < 2; i++) {
         if (transport->socket[i])
@@ -45,10 +45,10 @@ static void rtp_udp_transport_free(struct rtp_transport_t* t)
     }
     free(transport);
 }
-struct rtp_transport_t* rtp_udp_transport_new(const char* ip, uint16_t port[2])
+struct rtp_transport_t *rtp_udp_transport_new(const char *ip, uint16_t port[2])
 {
-    int ret = 0;
-    rtp_udp_transport_t* transport = NULL;
+    int ret                        = 0;
+    rtp_udp_transport_t *transport = NULL;
 
     transport = malloc(sizeof(rtp_udp_transport_t));
     if (transport == NULL) {
