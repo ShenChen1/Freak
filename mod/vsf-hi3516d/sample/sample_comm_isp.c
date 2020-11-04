@@ -137,26 +137,6 @@ ISP_PUB_ATTR_S ISP_PUB_ATTR_IMX458_MIPI_8M_30FPS =
     0,
 };
 
-ISP_PUB_ATTR_S ISP_PUB_ATTR_SC4210_MIPI_3M_30FPS =
-{
-    {0, 0, 2560, 1440},
-    {2560, 1440},
-    30,
-    BAYER_BGGR,
-    WDR_MODE_NONE,
-    0,
-};
-
-ISP_PUB_ATTR_S ISP_PUB_ATTR_SC4210_MIPI_3M_30FPS_WDR2TO1 =
-{
-    {0, 0, 2560, 1440},
-    {2560, 1440},
-    30,
-    BAYER_BGGR,
-    WDR_MODE_2To1_LINE,
-    0,
-};
-
 ISP_PUB_ATTR_S ISP_PUB_ATTR_IMX458_MIPI_12M_20FPS =
 {
     {0, 0, 4000, 3000},
@@ -207,16 +187,6 @@ ISP_PUB_ATTR_S ISP_PUB_ATTR_IMX458_MIPI_1M_129FPS =
     0,
 };
 
-ISP_PUB_ATTR_S ISP_PUB_ATTR_OS04B10_MIPI_4M_30FPS =
-{
-    {0, 0, 2560, 1440},
-    {2560, 1440},
-    30,
-    BAYER_GBRG,
-    WDR_MODE_NONE,
-    0,
-};
-
 ISP_PUB_ATTR_S ISP_PUB_ATTR_OS05A_MIPI_4M_30FPS =
 {
     {0, 0, 2688, 1536},
@@ -237,86 +207,6 @@ ISP_PUB_ATTR_S ISP_PUB_ATTR_OS05A_MIPI_4M_30FPS_WDR2TO1 =
     0,
 };
 
-ISP_PUB_ATTR_S ISP_PUB_ATTR_OS08A10_MIPI_8M_30FPS =
-{
-    {0, 0, 3840, 2160},
-    {3840, 2160},
-    30,
-    BAYER_BGGR,
-    WDR_MODE_NONE,
-    0,
-};
-
-ISP_PUB_ATTR_S ISP_PUB_ATTR_GC2053_MIPI_2M_30FPS =
-{
-    {0, 0, 1920, 1080},
-    {1920, 1080},
-    30,
-    BAYER_RGGB,
-    WDR_MODE_NONE,
-    0,
-};
-
-ISP_PUB_ATTR_S ISP_PUB_ATTR_OV12870_MIPI_1M_240FPS =
-{
-    {0, 0, 1280, 720},
-    {1280, 720},
-    240,
-    BAYER_BGGR,
-    WDR_MODE_NONE,
-    0,
-};
-
-ISP_PUB_ATTR_S ISP_PUB_ATTR_OV12870_MIPI_2M_120FPS =
-{
-    {0, 0, 1920, 1080},
-    {1920, 1080},
-    120,
-    BAYER_BGGR,
-    WDR_MODE_NONE,
-    0,
-};
-
-ISP_PUB_ATTR_S ISP_PUB_ATTR_OV12870_MIPI_8M_30FPS =
-{
-    {0, 0, 3840, 2160},
-    {3840, 2160},
-    30,
-    BAYER_BGGR,
-    WDR_MODE_NONE,
-    0,
-};
-
-ISP_PUB_ATTR_S ISP_PUB_ATTR_OV12870_MIPI_12M_30FPS =
-{
-    {0, 0, 4000, 3000},
-    {4000, 3000},
-    30,
-    BAYER_BGGR,
-    WDR_MODE_NONE,
-    0,
-};
-
-ISP_PUB_ATTR_S ISP_PUB_ATTR_IMX415_MIPI_8M_30FPS =
-{
-    {0, 0, 3840, 2160},
-    {3840, 2160},
-    30,
-    BAYER_GBRG,
-    WDR_MODE_NONE,
-    0,
-};
-
-ISP_PUB_ATTR_S ISP_PUB_ATTR_IMX415_MIPI_8M_20FPS =
-{
-    {0, 0, 3840, 2160},
-    {3840, 2160},
-    20,
-    BAYER_GBRG,
-    WDR_MODE_NONE,
-    1,
-};
-
 HI_S32 SAMPLE_COMM_ISP_GetIspAttrBySns(SAMPLE_SNS_TYPE_E enSnsType, ISP_PUB_ATTR_S* pstPubAttr)
 {
     switch (enSnsType)
@@ -332,12 +222,10 @@ HI_S32 SAMPLE_COMM_ISP_GetIspAttrBySns(SAMPLE_SNS_TYPE_E enSnsType, ISP_PUB_ATTR
             break;
 
         case SONY_IMX307_MIPI_2M_30FPS_12BIT:
-        case SONY_IMX307_2L_MIPI_2M_30FPS_12BIT:
             memcpy(pstPubAttr, &ISP_PUB_ATTR_IMX307_MIPI_2M_30FPS, sizeof(ISP_PUB_ATTR_S));
             break;
 
         case SONY_IMX307_MIPI_2M_30FPS_12BIT_WDR2TO1:
-        case SONY_IMX307_2L_MIPI_2M_30FPS_12BIT_WDR2TO1:
             memcpy(pstPubAttr, &ISP_PUB_ATTR_IMX307_MIPI_2M_30FPS_WDR2TO1_LINE, sizeof(ISP_PUB_ATTR_S));
             break;
 
@@ -356,15 +244,6 @@ HI_S32 SAMPLE_COMM_ISP_GetIspAttrBySns(SAMPLE_SNS_TYPE_E enSnsType, ISP_PUB_ATTR
         case SONY_IMX335_MIPI_4M_30FPS_10BIT_WDR2TO1:
             memcpy(pstPubAttr, &ISP_PUB_ATTR_IMX335_MIPI_4M_30FPS_WDR2TO1, sizeof(ISP_PUB_ATTR_S));
             break;
-
-        case SMART_SC4210_MIPI_3M_30FPS_12BIT:
-            memcpy(pstPubAttr, &ISP_PUB_ATTR_SC4210_MIPI_3M_30FPS, sizeof(ISP_PUB_ATTR_S));
-            break;
-
-        case SMART_SC4210_MIPI_3M_30FPS_10BIT_WDR2TO1:
-            memcpy(pstPubAttr, &ISP_PUB_ATTR_SC4210_MIPI_3M_30FPS_WDR2TO1, sizeof(ISP_PUB_ATTR_S));
-            break;
-
         case SONY_IMX458_MIPI_8M_30FPS_10BIT:
             memcpy(pstPubAttr, &ISP_PUB_ATTR_IMX458_MIPI_8M_30FPS, sizeof(ISP_PUB_ATTR_S));
             break;
@@ -393,43 +272,12 @@ HI_S32 SAMPLE_COMM_ISP_GetIspAttrBySns(SAMPLE_SNS_TYPE_E enSnsType, ISP_PUB_ATTR
             memcpy(pstPubAttr, &ISP_PUB_ATTR_MN34220_LVDS_2M_30FPS, sizeof(ISP_PUB_ATTR_S));
             break;
 
-        case OMNIVISION_OS04B10_MIPI_4M_30FPS_10BIT:
-            memcpy(pstPubAttr, &ISP_PUB_ATTR_OS04B10_MIPI_4M_30FPS, sizeof(ISP_PUB_ATTR_S));
-            break;
-
         case OMNIVISION_OS05A_MIPI_4M_30FPS_12BIT:
             memcpy(pstPubAttr, &ISP_PUB_ATTR_OS05A_MIPI_4M_30FPS, sizeof(ISP_PUB_ATTR_S));
             break;
 
         case OMNIVISION_OS05A_MIPI_4M_30FPS_10BIT_WDR2TO1:
             memcpy(pstPubAttr, &ISP_PUB_ATTR_OS05A_MIPI_4M_30FPS_WDR2TO1, sizeof(ISP_PUB_ATTR_S));
-            break;
-
-        case OMNIVISION_OS08A10_MIPI_8M_30FPS_10BIT:
-            memcpy(pstPubAttr, &ISP_PUB_ATTR_OS08A10_MIPI_8M_30FPS, sizeof(ISP_PUB_ATTR_S));
-            break;
-
-        case GALAXYCORE_GC2053_MIPI_2M_30FPS_10BIT:
-            memcpy(pstPubAttr, &ISP_PUB_ATTR_GC2053_MIPI_2M_30FPS, sizeof(ISP_PUB_ATTR_S));
-            break;
-        case OMNIVISION_OV12870_MIPI_1M_240FPS_10BIT:
-            memcpy(pstPubAttr, &ISP_PUB_ATTR_OV12870_MIPI_1M_240FPS, sizeof(ISP_PUB_ATTR_S));
-            break;
-        case OMNIVISION_OV12870_MIPI_2M_120FPS_10BIT:
-            memcpy(pstPubAttr, &ISP_PUB_ATTR_OV12870_MIPI_2M_120FPS, sizeof(ISP_PUB_ATTR_S));
-            break;
-        case OMNIVISION_OV12870_MIPI_8M_30FPS_10BIT:
-            memcpy(pstPubAttr, &ISP_PUB_ATTR_OV12870_MIPI_8M_30FPS, sizeof(ISP_PUB_ATTR_S));
-            break;
-        case OMNIVISION_OV12870_MIPI_12M_30FPS_10BIT:
-            memcpy(pstPubAttr, &ISP_PUB_ATTR_OV12870_MIPI_12M_30FPS, sizeof(ISP_PUB_ATTR_S));
-            break;
-
-        case SONY_IMX415_MIPI_8M_30FPS_12BIT:
-            memcpy(pstPubAttr, &ISP_PUB_ATTR_IMX415_MIPI_8M_30FPS, sizeof(ISP_PUB_ATTR_S));
-            break;
-        case SONY_IMX415_MIPI_8M_20FPS_12BIT:
-            memcpy(pstPubAttr, &ISP_PUB_ATTR_IMX415_MIPI_8M_20FPS, sizeof(ISP_PUB_ATTR_S));
             break;
 
         default:
@@ -460,19 +308,11 @@ ISP_SNS_OBJ_S* SAMPLE_COMM_ISP_GetSnsObj(HI_U32 u32SnsId)
         case SONY_IMX307_MIPI_2M_30FPS_12BIT_WDR2TO1:
             return &stSnsImx307Obj;
 
-        case SONY_IMX307_2L_MIPI_2M_30FPS_12BIT:
-        case SONY_IMX307_2L_MIPI_2M_30FPS_12BIT_WDR2TO1:
-            return &stSnsImx307_2l_Obj;
-
         case SONY_IMX335_MIPI_5M_30FPS_12BIT:
         case SONY_IMX335_MIPI_5M_30FPS_10BIT_WDR2TO1:
         case SONY_IMX335_MIPI_4M_30FPS_12BIT:
         case SONY_IMX335_MIPI_4M_30FPS_10BIT_WDR2TO1:
             return &stSnsImx335Obj;
-
-        case SMART_SC4210_MIPI_3M_30FPS_12BIT:
-        case SMART_SC4210_MIPI_3M_30FPS_10BIT_WDR2TO1:
-            return &stSnsSc4210Obj;
 
         case SONY_IMX458_MIPI_8M_30FPS_10BIT:
         case SONY_IMX458_MIPI_12M_20FPS_10BIT:
@@ -485,27 +325,9 @@ ISP_SNS_OBJ_S* SAMPLE_COMM_ISP_GetSnsObj(HI_U32 u32SnsId)
         case PANASONIC_MN34220_LVDS_2M_30FPS_12BIT:
             return &stSnsMn34220Obj;
 
-        case OMNIVISION_OS04B10_MIPI_4M_30FPS_10BIT:
-            return &stSnsOs04b10_2lObj;
-
         case OMNIVISION_OS05A_MIPI_4M_30FPS_12BIT:
         case OMNIVISION_OS05A_MIPI_4M_30FPS_10BIT_WDR2TO1:
             return &stSnsOs05aObj;
-
-        case OMNIVISION_OS08A10_MIPI_8M_30FPS_10BIT:
-            return &stSnsOS08A10Obj;
-
-        case GALAXYCORE_GC2053_MIPI_2M_30FPS_10BIT:
-            return &stSnsGc2053Obj;
-        case OMNIVISION_OV12870_MIPI_1M_240FPS_10BIT:
-        case OMNIVISION_OV12870_MIPI_2M_120FPS_10BIT:
-        case OMNIVISION_OV12870_MIPI_8M_30FPS_10BIT:
-        case OMNIVISION_OV12870_MIPI_12M_30FPS_10BIT:
-            return &stSnsOv12870Obj;
-
-        case SONY_IMX415_MIPI_8M_30FPS_12BIT:
-        case SONY_IMX415_MIPI_8M_20FPS_12BIT:
-            return &stSnsImx415Obj;
 
         default:
             return HI_NULL;

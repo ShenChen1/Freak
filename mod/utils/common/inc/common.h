@@ -13,6 +13,10 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <sys/select.h>
+#include <sys/time.h>
+#include <sys/types.h>
+
 #include "list.h"
 #include "que.h"
 #include "uthash.h"

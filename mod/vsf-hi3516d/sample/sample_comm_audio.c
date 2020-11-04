@@ -1397,13 +1397,6 @@ HI_S32 SAMPLE_COMM_AUDIO_StopAo(AUDIO_DEV AoDevId, HI_S32 s32AoChnCnt, HI_BOOL b
         }
     }
 
-    s32Ret = HI_MPI_AO_DisableChn(AoDevId, AO_SYSCHN_CHNID);
-    if (HI_SUCCESS != s32Ret)
-    {
-        printf("%s: HI_MPI_AO_DisableChn(%d) failed with %#x!\n", __FUNCTION__, i, s32Ret);
-        return s32Ret;
-    }
-
     s32Ret = HI_MPI_AO_Disable(AoDevId);
     if (HI_SUCCESS != s32Ret)
     {

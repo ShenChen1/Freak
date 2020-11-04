@@ -1,8 +1,8 @@
 project(vsf-hi3516d)
 
 add_definitions(-DMODULE_NAME="${PROJECT_NAME}")
-add_definitions(-DSENSOR0_TYPE=SONY_IMX327_MIPI_2M_30FPS_12BIT)
-add_definitions(-DSENSOR1_TYPE=SONY_IMX327_MIPI_2M_30FPS_12BIT)
+add_definitions(-DSENSOR0_TYPE=SONY_IMX327_2L_MIPI_2M_30FPS_12BIT)
+add_definitions(-DSENSOR1_TYPE=SONY_IMX327_2L_MIPI_2M_30FPS_12BIT)
 add_compile_options(-ffunction-sections -fdata-sections)
 add_link_options(-Wl,--gc-sections)
 
