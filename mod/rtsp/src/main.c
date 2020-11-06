@@ -149,13 +149,13 @@ static void *test_media(void *arg)
 
     ufifo_t *fifo     = NULL;
     ufifo_init_t init = {
-        .lock  = UFIFO_LOCK_MUTEX,
+        .lock  = UFIFO_LOCK_NONE,
         .opt   = UFIFO_OPT_ALLOC,
         .alloc = { 64 * 1024 },
         .hook  = { recsize, rectag, recput },
     };
     char name[64];
-    snprintf(name, sizeof(name), PROTO_VENC_MEDIA_FIFO, "test");
+    snprintf(name, sizeof(name), PROTO_VSF_MEDIA_FIFO, "test");
     ufifo_open(name, &init, &fifo);
 
     while (1) {

@@ -12,6 +12,7 @@ add_library(${PROJECT_NAME} STATIC
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC ${PROJECT_SOURCE_DIR}/inc
+    PUBLIC ${PROJECT_SOURCE_DIR}/media
     PUBLIC ${PROJECT_SOURCE_DIR}/jsonb)
 
 add_dependencies(${PROJECT_NAME} ${LIB_CJSON_NAME})

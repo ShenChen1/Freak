@@ -8,7 +8,8 @@ add_executable(${PROJECT_NAME}
     src/main.c
     src/cfg.c
     src/msgbox/msgbox.c
-    src/msgbox/msgbox_vsf.c
+    src/msgbox/msgbox_vsf_stream.c
+    src/interface/stream_mgr.c
     src/hal/sys.c
     src/hal/vi.c
     src/hal/vpss.c
@@ -19,6 +20,7 @@ target_link_libraries(${PROJECT_NAME}
     ${LIB_CJSON_NAME}
     ${LIB_NANOMSG_NAME}
     ${LIB_SDK_NAME}
+    ${LIB_UFIFO_NAME}
     -Wl,--whole-archive
     vsf-${CMAKE_CHIP_NAME}
     -Wl,--no-whole-archive

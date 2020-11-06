@@ -1,18 +1,18 @@
 #ifndef __VSF_VENC_H__
 #define __VSF_VENC_H__
 
-typedef int (*VSF_getVenStreamProc)(int id, int type, void *stream, void *args);
+typedef int (*vsf_stream_proc_t)(int id, int type, void *stream, void *args);
 typedef struct {
     void *args;
-    VSF_getVenStreamProc func;
-} VSF_getVenStreamCb;
+    vsf_stream_proc_t func;
+} vsf_stream_cb_t;
 
 typedef struct venc {
     void *priv;
     int (*init)(struct venc *self);
     int (*destroy)(struct venc *self);
 
-    int (*regCallback)(struct venc *self, VSF_getVenStreamCb *cb);
+    int (*regcallback)(struct venc *self, vsf_stream_cb_t *cb);
 } vsf_venc_t;
 
 vsf_venc_t *VSF_createVenc(int id);

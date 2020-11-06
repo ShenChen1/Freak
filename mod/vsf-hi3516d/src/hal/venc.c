@@ -1,13 +1,14 @@
-#include "inc/hal/venc.h"
 #include "common.h"
-#include "inc/sdk_cfg.h"
 #include "log.h"
+#include "media.h"
+#include "inc/hal/venc.h"
+#include "inc/sdk_cfg.h"
 
 typedef struct {
     int virtid;
     int phyid;
     sdk_venc_info_t *info;
-    VSF_getVenStreamCb cb;
+    vsf_stream_cb_t cb;
 } vsf_venc_priv_t;
 
 typedef struct {
@@ -20,6 +21,45 @@ static vsf_venc_mod_t s_mod;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+static int __transfor_encode_format(PAYLOAD_TYPE_E pt)
+{
+    int i;
+    const int convert[][2] = {
+        {PT_H264, VIDEO_ENCODE_TYPE_H264},
+        {PT_H265, VIDEO_ENCODE_TYPE_H265},
+        {PT_JPEG, VIDEO_ENCODE_TYPE_JPEG},
+        {PT_MJPEG, VIDEO_ENCODE_TYPE_MJPEG},
+    };
+
+    for (i = 0; i < ARRAY_SIZE(convert); i++) {
+        if (convert[i][0] == pt) {
+            return convert[i][1];
+        }
+    }
+
+    assert(i == ARRAY_SIZE(convert));
+    return VIDEO_ENCODE_TYPE_H264;
+}
+
+static void __transfor_stream_format(VENC_STREAM_S *src, video_stream_t *dst)
+{
+    uint i;
+
+    dst->u32Seq       = src->u32Seq;
+    dst->u32PackCount = src->u32PackCount;
+    dst->pstPack      = realloc(dst->pstPack, dst->u32PackCount * sizeof(video_pack_t));
+    assert(dst->pstPack);
+
+    for (i = 0; i < src->u32PackCount; i++) {
+        dst->pstPack[i].u64PhyAddr  = src->pstPack[i].u64PhyAddr;
+        dst->pstPack[i].pu8Addr     = src->pstPack[i].pu8Addr;
+        dst->pstPack[i].u32Len      = src->pstPack[i].u32Len;
+        dst->pstPack[i].u32Offset   = src->pstPack[i].u32Offset;
+        dst->pstPack[i].u64PTS      = src->pstPack[i].u64PTS;
+        dst->pstPack[i].u32PackType = (uint32_t)src->pstPack[i].DataType.enH264EType;
+    }
+}
+
 static HI_VOID *SAMPLE_COMM_VENC_GetVencStreamProc(HI_VOID *p)
 {
     HI_S32 i, s32Ret, maxfd = -1;
@@ -29,16 +69,17 @@ static HI_VOID *SAMPLE_COMM_VENC_GetVencStreamProc(HI_VOID *p)
     HI_U32 u32PictureCnt[VENC_MAX_CHN_NUM] = { 0 };
     HI_S32 VencFd[VENC_MAX_CHN_NUM];
     PAYLOAD_TYPE_E enPayLoadType[VENC_MAX_CHN_NUM];
-    VENC_STREAM_BUF_INFO_S stStreamBufInfo[VENC_MAX_CHN_NUM];
-    vsf_venc_mod_t *mod = p;
+    vsf_venc_mod_t *mod   = p;
     vsf_venc_priv_t *priv = NULL;
+    video_encode_type_e encode = VIDEO_ENCODE_TYPE_H264;
+    video_stream_t stream = { NULL };
 
     /******************************************
      step 1:  check & prepare venc-fd
     ******************************************/
     for (i = 0; i < mod->num; i++) {
         priv = mod->objs[i]->priv;
-        /* decide the stream file name, and open file to save stream */
+
         s32Ret = HI_MPI_VENC_GetChnAttr(priv->phyid, &stVencChnAttr);
         if (s32Ret != HI_SUCCESS) {
             errorf("HI_MPI_VENC_GetChnAttr chn[%d] failed with %#x!", priv->phyid, s32Ret);
@@ -53,12 +94,6 @@ static HI_VOID *SAMPLE_COMM_VENC_GetVencStreamProc(HI_VOID *p)
             return NULL;
         }
         maxfd = max(VencFd[i], maxfd);
-
-        s32Ret = HI_MPI_VENC_GetStreamBufInfo(i, &stStreamBufInfo[i]);
-        if (HI_SUCCESS != s32Ret) {
-            errorf("HI_MPI_VENC_GetStreamBufInfo failed with %#x!\n", s32Ret);
-            return (void *)HI_FAILURE;
-        }
     }
 
     /******************************************
@@ -129,7 +164,9 @@ static HI_VOID *SAMPLE_COMM_VENC_GetVencStreamProc(HI_VOID *p)
                 *******************************************************/
                 priv = mod->objs[i]->priv;
                 if (priv->cb.func) {
-                    s32Ret = priv->cb.func(i, enPayLoadType[i], &stStream, priv->cb.args);
+                    __transfor_stream_format(&stStream, &stream);
+                    encode = __transfor_encode_format(enPayLoadType[i]);
+                    s32Ret = priv->cb.func(i, encode, &stream, priv->cb.args);
                     if (HI_SUCCESS != s32Ret) {
                         free(stStream.pstPack);
                         stStream.pstPack = NULL;
@@ -212,6 +249,22 @@ static int __venc_destroy(vsf_venc_t *self)
     return 0;
 }
 
+static int __venc_regcallback(vsf_venc_t *self, vsf_stream_cb_t *cb)
+{
+    vsf_venc_t *obj       = self;
+    vsf_venc_priv_t *priv = obj->priv;
+
+    if (cb == NULL) {
+        priv->cb.args = NULL;
+        priv->cb.func = NULL;
+    } else {
+        priv->cb.args = cb->args;
+        priv->cb.func = cb->func;
+    }
+
+    return 0;
+}
+
 vsf_venc_t *VSF_createVenc(int id)
 {
     vsf_venc_mod_t *mod   = &s_mod;
@@ -235,13 +288,14 @@ vsf_venc_t *VSF_createVenc(int id)
     priv->info   = sdk_cfg_get_member(astVencInfo[id]);
 
     obj = malloc(sizeof(vsf_venc_priv_t));
-    if (priv == NULL) {
+    if (obj == NULL) {
         return NULL;
     }
 
     obj->priv    = priv;
     obj->init    = __venc_init;
     obj->destroy = __venc_destroy;
+    obj->regcallback = __venc_regcallback;
 
     mod->objs[id] = obj;
     return obj;

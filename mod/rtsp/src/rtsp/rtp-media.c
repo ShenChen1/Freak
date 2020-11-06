@@ -199,12 +199,12 @@ static int rtp_get_sdp(struct rtp_media_t *m, char *sdp)
 
     if (!priv->track[MEDIA_TRACK_VIDEO].fifo) {
         ufifo_init_t init = {
-            .lock = UFIFO_LOCK_MUTEX,
+            .lock = UFIFO_LOCK_NONE,
             .opt  = UFIFO_OPT_ATTACH,
             .hook = { recsize, rectag, NULL, recget },
         };
         char name[64];
-        snprintf(name, sizeof(name), PROTO_VENC_MEDIA_FIFO, &priv->path[1]);
+        snprintf(name, sizeof(name), PROTO_VSF_MEDIA_FIFO, &priv->path[1]);
         ufifo_open(name, &init, &priv->track[MEDIA_TRACK_VIDEO].fifo);
         assert(priv->track[MEDIA_TRACK_VIDEO].fifo);
     }

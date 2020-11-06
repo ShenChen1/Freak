@@ -2,10 +2,12 @@
 #define __PROTO_H__
 
 #include "common.h"
+#include "media.h"
 #include "node.h"
 #include "path.h"
 #include "proto_bsp.h"
 #include "proto_rtsp.h"
+#include "proto_vsf.h"
 
 #define PROTO_PACKAGE_MAXSIZE (1024)
 
@@ -40,10 +42,9 @@ typedef enum {
 } proto_bsp_key_e;
 
 typedef enum {
-    PROTP_VSF_KEY_VI,
-    PROTP_VSF_KEY_VPSS,
-    PROTP_VSF_KEY_VENC,
-    PROTP_VSF_KEY_SENSOR,
+    PROTP_VSF_KEY_CAPS,
+    PROTP_VSF_KEY_STREAM,
+    PROTP_VSF_KEY_OSD,
     PROTP_VSF_KEY_MAX,
 } proto_vsf_key_e;
 

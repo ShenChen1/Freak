@@ -94,7 +94,7 @@ vsf_vi_t *VSF_createVi(int id)
     priv->pstViConfig = &mod->stViConfig;
 
     obj = malloc(sizeof(vsf_vi_priv_t));
-    if (priv == NULL) {
+    if (obj == NULL) {
         return NULL;
     }
 

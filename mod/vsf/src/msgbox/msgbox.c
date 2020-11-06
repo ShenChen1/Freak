@@ -5,13 +5,9 @@
 #include "inc/msgbox.h"
 #include "inc/cfg.h"
 
-extern int msgbox_vsf_vi(msgbox_param_t *param);
-extern int msgbox_vsf_vpss(msgbox_param_t *param);
-extern int msgbox_vsf_venc(msgbox_param_t *param);
+extern int msgbox_vsf_stream(msgbox_param_t *param);
 static msgbox_handler_t s_msgbox[PROTP_VSF_KEY_MAX] = {
-    [PROTP_VSF_KEY_VI] = msgbox_vsf_vi,
-    [PROTP_VSF_KEY_VPSS] = msgbox_vsf_vpss,
-    [PROTP_VSF_KEY_VENC] = msgbox_vsf_venc,
+    [PROTP_VSF_KEY_STREAM] = msgbox_vsf_stream,
 };
 
 int msgbox_init()

@@ -159,7 +159,7 @@ vsf_vpss_t *VSF_createVpss(int id)
     priv->info   = sdk_cfg_get_member(astVpssInfo[id]);
 
     obj = malloc(sizeof(vsf_vpss_priv_t));
-    if (priv == NULL) {
+    if (obj == NULL) {
         return NULL;
     }
 

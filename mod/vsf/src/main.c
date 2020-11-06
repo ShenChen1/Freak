@@ -29,11 +29,11 @@ int main()
     ret = nnm_req_create(PROTO_VSF_COM_NODE, &req);
     assert(!ret);
 
-    // init vi
-    for (i = 0; i < *cfg_get_member(vi_num); i++) {
+    // init
+    for (i = 0; i < cfg_get_member(stream)->num; i++) {
         uint8_t *obuf = NULL;
         size_t osize  = 0;
-        proto_package_fill(ibuf, i, PROTP_VSF_KEY_VI, PROTO_ACTION_SET, PROTO_FORMAT_STRUCTE, cfg_get_member(vi[i]), sizeof(proto_vsf_vi_t));
+        proto_package_fill(ibuf, i, PROTP_VSF_KEY_STREAM, PROTO_ACTION_SET, PROTO_FORMAT_STRUCTE, cfg_get_member(stream)->streams + i, sizeof(proto_vsf_stream_t));
         nnm_req_exchange(req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
         assert(osize == sizeof(proto_header_t));
         memcpy(ibuf, obuf, osize);
