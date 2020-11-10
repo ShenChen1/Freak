@@ -43,6 +43,7 @@ typedef enum {
 
 typedef enum {
     PROTP_VSF_KEY_CAPS,
+    PROTP_VSF_KEY_FRAME,
     PROTP_VSF_KEY_STREAM,
     PROTP_VSF_KEY_OSD,
     PROTP_VSF_KEY_MAX,
@@ -84,6 +85,22 @@ typedef enum {
         p->format  = (_format);                                                  \
         p->size    = (_size);                                                    \
         memcpy(p->data, (_data), (_size));                                       \
+    })
+
+#define proto_package_fill_header(_package, _chn, _key, _action, _format, _size) \
+    (void)({                                                                     \
+        proto_header_t *p = (void *)(_package);                                  \
+        struct timespec _ts;                                                     \
+        clock_gettime(CLOCK_MONOTONIC, &_ts);                                    \
+        p->version = 1;                                                          \
+        p->format  = 1;                                                          \
+        p->ts      = _ts.tv_sec * 1000 + _ts.tv_nsec / 1000000;                  \
+        p->chn     = (_chn);                                                     \
+        p->key     = (_key);                                                     \
+        p->action  = (_action);                                                  \
+        p->errcode = 0;                                                          \
+        p->format  = (_format);                                                  \
+        p->size    = (_size);                                                    \
     })
 
 #define proto_package_size(_package)            \

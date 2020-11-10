@@ -75,8 +75,6 @@ struct rtp_transport_t *rtp_udp_transport_new(const char *ip, uint16_t port[2])
 
     tracef("ip: %s", ip);
     tracef("port: %u %u", port[0], port[1]);
-    socket_setnonblock(transport->socket[0], 1);
-    socket_setnonblock(transport->socket[1], 1);
     return &transport->base;
 
 err:

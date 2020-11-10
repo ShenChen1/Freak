@@ -1,5 +1,6 @@
 #include "inc/cfg.h"
 #include "inc/msgbox.h"
+#include "inc/interface/stream_mgr.h"
 
 int msgbox_vsf_stream(msgbox_param_t *param)
 {
@@ -18,6 +19,8 @@ int msgbox_vsf_stream(msgbox_param_t *param)
     }
 
     if (param->action == PROTO_ACTION_SET) {
+        vsf_stream_mgr_t *mgr = VSF_createStreamMgr();
+        mgr->ctrl(mgr, in);
         *param->osize = 0;
     } else {
         *param->osize = sizeof(proto_vsf_stream_t);

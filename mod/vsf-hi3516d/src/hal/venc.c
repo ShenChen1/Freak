@@ -71,8 +71,6 @@ static HI_VOID *SAMPLE_COMM_VENC_GetVencStreamProc(HI_VOID *p)
     PAYLOAD_TYPE_E enPayLoadType[VENC_MAX_CHN_NUM];
     vsf_venc_mod_t *mod   = p;
     vsf_venc_priv_t *priv = NULL;
-    video_encode_type_e encode = VIDEO_ENCODE_TYPE_H264;
-    video_stream_t stream = { NULL };
 
     /******************************************
      step 1:  check & prepare venc-fd
@@ -142,6 +140,7 @@ static HI_VOID *SAMPLE_COMM_VENC_GetVencStreamProc(HI_VOID *p)
                 /*******************************************************
                  step 2.3 : malloc corresponding number of pack nodes.
                 *******************************************************/
+                memset(&stStream, 0, sizeof(stStream));
                 stStream.pstPack = (VENC_PACK_S *)malloc(sizeof(VENC_PACK_S) * stStat.u32CurPacks);
                 if (NULL == stStream.pstPack) {
                     errorf("malloc stream pack failed!");
@@ -151,7 +150,6 @@ static HI_VOID *SAMPLE_COMM_VENC_GetVencStreamProc(HI_VOID *p)
                  step 2.4 : call mpi to get one-frame stream
                 *******************************************************/
                 stStream.u32PackCount = stStat.u32CurPacks;
-                memset(&stStream, 0, sizeof(stStream));
                 s32Ret = HI_MPI_VENC_GetStream(i, &stStream, HI_TRUE);
                 if (HI_SUCCESS != s32Ret) {
                     free(stStream.pstPack);
@@ -164,14 +162,12 @@ static HI_VOID *SAMPLE_COMM_VENC_GetVencStreamProc(HI_VOID *p)
                 *******************************************************/
                 priv = mod->objs[i]->priv;
                 if (priv->cb.func) {
+                    video_stream_t stream = { NULL };
                     __transfor_stream_format(&stStream, &stream);
-                    encode = __transfor_encode_format(enPayLoadType[i]);
+                    video_encode_type_e encode = __transfor_encode_format(enPayLoadType[i]);
                     s32Ret = priv->cb.func(i, encode, &stream, priv->cb.args);
                     if (HI_SUCCESS != s32Ret) {
-                        free(stStream.pstPack);
-                        stStream.pstPack = NULL;
                         errorf("proc stream failed!");
-                        break;
                     }
                 }
                 /*******************************************************

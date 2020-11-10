@@ -1,61 +1,193 @@
-#include "inc/interface/stream_mgr.h"
 #include "cfg/cfg.h"
 #include "common.h"
+#include "log.h"
+#include "ufifo.h"
 #include "inc/hal/sys.h"
 #include "inc/hal/venc.h"
 #include "inc/hal/vi.h"
 #include "inc/hal/vpss.h"
-#include "ufifo.h"
+#include "inc/interface/stream_mgr.h"
 
 typedef struct {
     ufifo_t *fifo[VSF_STREAM_MAX];
-    proto_vsf_stream_t stream[VSF_STREAM_MAX];
+    proto_vsf_stream_t info[VSF_STREAM_MAX];
 } vsf_stream_mgr_priv_t;
 
 static vsf_stream_mgr_t *s_mgr = NULL;
 
-static int __vsf_stream_proc(int id, int type, void *stream, void *args)
+static unsigned int recsize(unsigned char *p1, unsigned int n1, unsigned char *p2)
 {
+    unsigned int size = sizeof(media_record_t);
+
+    if (n1 >= size) {
+        media_record_t *rec = (media_record_t *)p1;
+        size = rec->size;
+    } else {
+        media_record_t rec;
+        void *p = (void *)(&rec);
+        memcpy(p, p1, n1);
+        memcpy(p + n1, p2, size - n1);
+        size = rec.size;
+    }
+
+    tracef("size:%u", size);
+    return size;
+}
+
+static unsigned int rectag(unsigned char *p1, unsigned int n1, unsigned char *p2)
+{
+    unsigned int tag;
+    unsigned int size = sizeof(media_record_t);
+
+    if (n1 >= size) {
+        media_record_t *rec = (media_record_t *)p1;
+        tag = rec->tag;
+    } else {
+        media_record_t rec;
+        void *p = (void *)(&rec);
+        memcpy(p, p1, n1);
+        memcpy(p + n1, p2, size - n1);
+        tag = rec.tag;
+    }
+
+    tracef("tag:%x", tag);
+    return tag;
+}
+
+static unsigned int recput(unsigned char *p1, unsigned int n1, unsigned char *p2, void *arg)
+{
+    int i;
+    size_t totalsize = sizeof(media_record_t) + sizeof(video_stream_t);
+    media_record_t rec = {};
+    video_stream_t *stream = arg;
+    unsigned int a = 0, l = 0, _n1 = n1;
+    unsigned char *p = NULL, *_p1 = p1, *_p2 = p2;
+
+    for (i = 0; i < stream->u32PackCount; i++) {
+        totalsize += sizeof(video_pack_t);
+        totalsize += stream->pstPack[i].u32Len - stream->pstPack[i].u32Offset;
+    }
+    rec.size = totalsize;
+    rec.tag = (0xdeadbeef << 8 | (stream->u32PackCount > 1));
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    rec.ts = ts.tv_sec * 1000 + ts.tv_nsec / 1000000;
+
+    // copy header
+    p = (unsigned char *)(&rec);
+    a = sizeof(media_record_t);
+    l = min(a, _n1);
+    memcpy(_p1, p, l);
+    memcpy(_p2, p + l, a - l);
+    _n1 -= l;
+    _p1 += l;
+    _p2 += a - l;
+
+    // copy data
+    p = (unsigned char *)(stream);
+    a = sizeof(video_stream_t);
+    l = min(a, _n1);
+    memcpy(_p1, p, l);
+    memcpy(_p2, p + l, a - l);
+    _n1 -= l;
+    _p1 += l;
+    _p2 += a - l;
+
+    for (i = 0; i < stream->u32PackCount; i++) {
+        // copy data
+        p = (unsigned char *)(&stream->pstPack[i]);
+        a = sizeof(video_pack_t);
+        l = min(a, _n1);
+        memcpy(_p1, p, l);
+        memcpy(_p2, p + l, a - l);
+        _n1 -= l;
+        _p1 += l;
+        _p2 += a - l;
+    }
+
+    for (i = 0; i < stream->u32PackCount; i++) {
+        // copy data
+        p = (unsigned char *)(stream->pstPack[i].pu8Addr);
+        a = stream->pstPack[i].u32Len - stream->pstPack[i].u32Offset;
+        l = min(a, _n1);
+        memcpy(_p1, p, l);
+        memcpy(_p2, p + l, a - l);
+        _n1 -= l;
+        _p1 += l;
+        _p2 += a - l;
+    }
+
+    tracef("totalsize:%u", totalsize);
+    return totalsize;
+}
+
+static int __vsf_stream_h264_proc(int id, void *data, void *args)
+{
+    int i;
+    size_t totalsize = sizeof(media_record_t) + sizeof(video_stream_t);
+    video_stream_t *stream = data;
+    vsf_stream_mgr_priv_t *priv = s_mgr->priv;
+
+    for (i = 0; i < stream->u32PackCount; i++) {
+        totalsize += sizeof(video_pack_t);
+        totalsize += stream->pstPack[i].u32Len - stream->pstPack[i].u32Offset;
+    }
+
+    if (ufifo_len(priv->fifo[id]) + totalsize > ufifo_size(priv->fifo[id])) {
+        ufifo_skip(priv->fifo[id]);
+        ufifo_oldest(priv->fifo[id], (0xdeadbeef << 8) | 1);
+    }
+
+    return ufifo_put(priv->fifo[id], stream, totalsize) != totalsize;
+}
+
+static int __vsf_stream_proc(int id, int type, void *data, void *args)
+{
+    switch (type) {
+        case VIDEO_ENCODE_TYPE_H264:
+            return __vsf_stream_h264_proc(id, data, args);
+    }
+
     return 0;
 }
 
-static int __vsf_stream_ctrl(vsf_stream_mgr_t *self, proto_vsf_stream_t *stream)
+static int __vsf_stream_ctrl(vsf_stream_mgr_t *self, proto_vsf_stream_t *info)
 {
     vsf_stream_mgr_t *mgr       = self;
     vsf_stream_mgr_priv_t *priv = mgr->priv;
 
     char name[64];
-    snprintf(name, sizeof(name), "%d-%d", stream->chn, stream->subchn);
-    snprintf(name, sizeof(name), PROTO_VSF_MEDIA_FIFO, name);
+    snprintf(name, sizeof(name), PROTO_VSF_MEDIA_FIFO"%d-%d-%d",
+        info->chn, info->subchn, info->encode);
 
-    if (stream->enable) {
-        if (!priv->fifo[stream->id]) {
+    if (info->enable) {
+        if (!priv->fifo[info->id]) {
             ufifo_init_t init = {
                 .lock  = UFIFO_LOCK_NONE,
                 .opt   = UFIFO_OPT_ALLOC,
                 .alloc = { 1024 * 1024 },
-                //.hook  = { recsize, rectag, recput },
+                .hook  = { recsize, rectag, recput },
             };
-            ufifo_open(name, &init, &priv->fifo[stream->id]);
+            ufifo_open(name, &init, &priv->fifo[info->id]);
         }
     } else {
-        if (priv->fifo[stream->id]) {
-            ufifo_close(priv->fifo[stream->id]);
-            priv->fifo[stream->id] = NULL;
+        if (priv->fifo[info->id]) {
+            ufifo_close(priv->fifo[info->id]);
+            priv->fifo[info->id] = NULL;
         }
     }
 
-    memcpy(&priv->stream[stream->id], stream, sizeof(proto_vsf_stream_t));
+    memcpy(&priv->info[info->id], info, sizeof(proto_vsf_stream_t));
 
     vsf_stream_cb_t cb = { NULL, NULL };
-    vsf_venc_t *venc = VSF_createVenc(stream->id);
-    assert(venc);
-    if (stream->enable) {
-        cb.args = &priv->stream[stream->id];
+    if (info->enable) {
+        cb.args = &priv->info[info->id];
         cb.func = __vsf_stream_proc;
     }
-    venc->regcallback(venc, &cb);
 
+    vsf_venc_t *venc = VSF_createVenc(info->id);
+    assert(venc);
+    venc->regcallback(venc, &cb);
     return 0;
 }
 
