@@ -157,8 +157,7 @@ static int __vsf_stream_ctrl(vsf_stream_mgr_t *self, proto_vsf_stream_t *info)
     vsf_stream_mgr_priv_t *priv = mgr->priv;
 
     char name[64];
-    snprintf(name, sizeof(name), PROTO_VSF_MEDIA_FIFO"%d-%d-%d",
-        info->chn, info->subchn, info->encode);
+    snprintf(name, sizeof(name), PROTO_VSF_MEDIA_FIFO"%d-%d", info->chn, info->subchn);
 
     if (info->enable) {
         if (!priv->fifo[info->id]) {

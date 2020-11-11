@@ -6,7 +6,7 @@
 
 static vsf_cfg_t s_cfg = {
     .stream = {
-        .num = 1,
+        .num = 3,
         .streams[0] = {
             .id = 0,
             .enable = 1,
@@ -16,6 +16,26 @@ static vsf_cfg_t s_cfg = {
             .width = 1920,
             .height = 1080,
             .fps = 25,
+        },
+        .streams[1] = {
+            .id = 1,
+            .enable = 1,
+            .chn = 0,
+            .subchn = 1,
+            .encode = VIDEO_ENCODE_TYPE_H264,
+            .width = 1280,
+            .height = 720,
+            .fps = 25,
+        },
+        .streams[2] = {
+            .id = 2,
+            .enable = 0,
+            .chn = 0,
+            .subchn = 2,
+            .encode = VIDEO_ENCODE_TYPE_JPEG,
+            .width = 1920,
+            .height = 1080,
+            .fps = -1,
         },
     },
 };

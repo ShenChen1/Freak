@@ -176,7 +176,7 @@ static int rtp_send_data(void *arg)
                     priv->track[MEDIA_TRACK_VIDEO].packer,
                     stream->pstPack[i].pu8Addr,
                     stream->pstPack[i].u32Len - stream->pstPack[i].u32Offset,
-                    rec->ts * 90 /*kHz*/);
+                    stream->pstPack[i].u64PTS * 90 / 1000 /*kHz*/);
             }
         }
     }
