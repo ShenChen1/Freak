@@ -208,6 +208,7 @@ static int rtp_get_sdp(struct rtp_media_t *m, char *sdp)
         ufifo_init_t init = {
             .lock = UFIFO_LOCK_NONE,
             .opt  = UFIFO_OPT_ATTACH,
+            .attach = { .shared = 1, },
             .hook = { recsize, rectag, NULL, recget },
         };
         char name[64];

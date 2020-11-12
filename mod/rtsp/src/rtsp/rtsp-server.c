@@ -14,6 +14,7 @@
 
 typedef struct {
     UT_hash_handle hh;
+    char key[128];
     char path[64];
     struct rtp_media_t *media;
 } rtsp_server_media_t;
@@ -50,19 +51,22 @@ static int rtsp_ondescribe(void *ptr, rtsp_server_t *rtsp, const char *uri)
     rtsp_server_priv_t *priv = ptr;
     tracef("ptr:%p rtsp:%p uri:%s", ptr, rtsp, uri);
 
-    char path[64] = {};
-    rtsp_uri_parse(uri, path, sizeof(path));
+    char key[128] = {};
+    uint16_t port = 0;
+    rtsp_server_get_client(rtsp, &port);
+    snprintf(key, sizeof(key), "%s:%u", rtsp_server_get_client(rtsp, NULL), port);
 
     locker_lock(&priv->locker);
-    HASH_FIND_STR(priv->sms, path, sm);
+    HASH_FIND_STR(priv->sms, key, sm);
     if (sm == NULL) {
         sm = malloc(sizeof(rtsp_server_media_t));
         assert(sm);
         memset(sm, 0, sizeof(rtsp_server_media_t));
-        strncpy(sm->path, path, sizeof(sm->path));
+        strncpy(sm->key, key, sizeof(key));
+        rtsp_uri_parse(uri, sm->path, sizeof(sm->path));
         sm->media = rtp_media_live_new(sm->path);
         assert(sm->media);
-        HASH_ADD_STR(priv->sms, path, sm);
+        HASH_ADD_STR(priv->sms, key, sm);
     }
     locker_unlock(&priv->locker);
 
@@ -85,15 +89,13 @@ static int rtsp_onsetup(void *ptr,
     rtsp_server_priv_t *priv = ptr;
     tracef("ptr:%p rtsp:%p uri:%s session:%s transports:%p num:%d", ptr, rtsp, uri, session, transports, num);
 
-    char path[64] = {};
-    rtsp_uri_parse(uri, path, sizeof(path));
-    char *track = strrchr(path, '/');
-    if (track) {
-        *track++ = '\0';
-    }
+    char key[128] = {};
+    uint16_t port = 0;
+    rtsp_server_get_client(rtsp, &port);
+    snprintf(key, sizeof(key), "%s:%u", rtsp_server_get_client(rtsp, NULL), port);
 
     locker_lock(&priv->locker);
-    HASH_FIND_STR(priv->sms, path, sm);
+    HASH_FIND_STR(priv->sms, key, sm);
     locker_unlock(&priv->locker);
     if (sm == NULL) {
         // 454 Session Not Found
@@ -115,6 +117,13 @@ static int rtsp_onsetup(void *ptr,
     if (!transport) {
         // 461 Unsupported Transport
         return rtsp_server_reply_setup(rtsp, 461, NULL, NULL);
+    }
+
+    char path[64] = {};
+    rtsp_uri_parse(uri, path, sizeof(path));
+    char *track = strrchr(path, '/');
+    if (track) {
+        *track++ = '\0';
     }
 
     if (RTSP_TRANSPORT_RTP_TCP == transport->transport) {
@@ -186,11 +195,13 @@ static int rtsp_onplay(void *ptr,
     rtsp_server_priv_t *priv = ptr;
     tracef("ptr:%p rtsp:%p uri:%s session:%s npt:%p scale:%p", ptr, rtsp, uri, session, npt, scale);
 
-    char path[64] = {};
-    rtsp_uri_parse(uri, path, sizeof(path));
+    char key[128] = {};
+    uint16_t port = 0;
+    rtsp_server_get_client(rtsp, &port);
+    snprintf(key, sizeof(key), "%s:%u", rtsp_server_get_client(rtsp, NULL), port);
 
     locker_lock(&priv->locker);
-    HASH_FIND_STR(priv->sms, path, sm);
+    HASH_FIND_STR(priv->sms, key, sm);
     locker_unlock(&priv->locker);
     if (sm == NULL) {
         return rtsp_server_reply_play(rtsp, 454, NULL, NULL, NULL);
@@ -221,11 +232,13 @@ static int rtsp_onteardown(void *ptr, rtsp_server_t *rtsp, const char *uri, cons
     rtsp_server_priv_t *priv = ptr;
     tracef("ptr:%p rtsp:%p uri:%s session:%s", ptr, rtsp, uri, session);
 
-    char path[64] = {};
-    rtsp_uri_parse(uri, path, sizeof(path));
+    char key[128] = {};
+    uint16_t port = 0;
+    rtsp_server_get_client(rtsp, &port);
+    snprintf(key, sizeof(key), "%s:%u", rtsp_server_get_client(rtsp, NULL), port);
 
     locker_lock(&priv->locker);
-    HASH_FIND_STR(priv->sms, path, sm);
+    HASH_FIND_STR(priv->sms, key, sm);
     if (sm) {
         HASH_DEL(priv->sms, sm);
     }
