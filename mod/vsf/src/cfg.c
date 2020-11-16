@@ -35,7 +35,7 @@ static vsf_cfg_t s_cfg = {
             .encode = VIDEO_ENCODE_TYPE_JPEG,
             .width = 1920,
             .height = 1080,
-            .fps = -1,
+            .fps = 1,
         },
     },
 };

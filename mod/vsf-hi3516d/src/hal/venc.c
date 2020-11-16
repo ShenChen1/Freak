@@ -47,7 +47,7 @@ static void __transfor_stream_format(VENC_STREAM_S *src, video_stream_t *dst)
 
     dst->u32Seq       = src->u32Seq;
     dst->u32PackCount = src->u32PackCount;
-    dst->pstPack      = realloc(dst->pstPack, dst->u32PackCount * sizeof(video_pack_t));
+    dst->pstPack      = realloc(dst->pstPack, dst->u32PackCount * sizeof(video_stream_pack_t));
     assert(dst->pstPack);
 
     for (i = 0; i < src->u32PackCount; i++) {
