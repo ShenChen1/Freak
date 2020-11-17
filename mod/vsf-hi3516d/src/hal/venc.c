@@ -41,7 +41,7 @@ static int __transfor_encode_format(PAYLOAD_TYPE_E pt)
     return -1;
 }
 
-static void __transfor_stream_format(VENC_STREAM_S *src, video_stream_t *dst)
+static void __transfor_stream_info(VENC_STREAM_S *src, video_stream_t *dst)
 {
     int i;
 
@@ -71,6 +71,7 @@ static HI_VOID *SAMPLE_COMM_VENC_GetVencStreamProc(HI_VOID *p)
     PAYLOAD_TYPE_E enPayLoadType[VENC_MAX_CHN_NUM];
     vsf_venc_mod_t *mod   = p;
     vsf_venc_priv_t *priv = NULL;
+    video_stream_t stream = { NULL };
 
     /******************************************
      step 1:  check & prepare venc-fd
@@ -162,8 +163,7 @@ static HI_VOID *SAMPLE_COMM_VENC_GetVencStreamProc(HI_VOID *p)
                 *******************************************************/
                 priv = mod->objs[i]->priv;
                 if (priv->cb.func) {
-                    video_stream_t stream = { NULL };
-                    __transfor_stream_format(&stStream, &stream);
+                    __transfor_stream_info(&stStream, &stream);
                     video_encode_type_e encode = VIDEO_ENCODE_TYPE_H264;
                     encode = __transfor_encode_format(enPayLoadType[i]);
                     s32Ret = priv->cb.func(i, encode, &stream, priv->cb.args);

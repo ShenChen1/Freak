@@ -1,5 +1,6 @@
 #include "common.h"
 #include "log.h"
+#include "media.h"
 #include "inc/hal/vpss.h"
 #include "inc/sdk_cfg.h"
 
@@ -16,12 +17,46 @@ typedef struct {
 
 static vsf_vpss_mod_t s_mod;
 
-HI_S32 SAMPLE_VENC_VPSS_Init(VPSS_GRP VpssGrp,
-                             HI_BOOL *pabChnEnable,
-                             DYNAMIC_RANGE_E enDynamicRange,
-                             PIXEL_FORMAT_E enPixelFormat,
-                             SIZE_S stSize[],
-                             SAMPLE_SNS_TYPE_E enSnsType)
+static int __transfor_pixel_format(int type)
+{
+    assert(type == PIXEL_FORMAT_YVU_SEMIPLANAR_420);
+    return VIDEO_FRAME_FORMAT_YUV420P_YVU;
+}
+
+static void __transfor_frame_info(VIDEO_FRAME_S *src, video_frame_t *dst)
+{
+    int i;
+
+    dst->u32Width        = src->u32Height;
+    dst->u32Height       = src->u32Height;
+    dst->enPixelFormat   = __transfor_pixel_format(src->enPixelFormat);
+    dst->s16OffsetTop    = src->s16OffsetTop;
+    dst->s16OffsetBottom = src->s16OffsetBottom;
+    dst->s16OffsetLeft   = src->s16OffsetLeft;
+    dst->s16OffsetRight  = src->s16OffsetRight;
+    dst->u32TimeRef      = src->u32TimeRef;
+    dst->u64PTS          = src->u64PTS;
+    dst->u64PrivateData  = (size_t)src;
+
+    for (i = 0; i < 3; i++) {
+        dst->u32HeaderStride[i]  = src->u32HeaderStride[i];
+        dst->u32Stride[i]        = src->u32Stride[i];
+        dst->u32ExtStride[i]     = src->u32ExtStride[i];
+        dst->u64HeaderPhyAddr[i] = src->u64HeaderPhyAddr[i];
+        dst->u64HeaderVirAddr[i] = src->u64HeaderVirAddr[i];
+        dst->u64PhyAddr[i]       = src->u64PhyAddr[i];
+        dst->u64VirAddr[i]       = src->u64VirAddr[i];
+        dst->u64ExtPhyAddr[i]    = src->u64ExtPhyAddr[i];
+        dst->u64ExtVirAddr[i]    = src->u64ExtVirAddr[i];
+    }
+}
+
+static HI_S32 SAMPLE_VENC_VPSS_Init(VPSS_GRP VpssGrp,
+                                    HI_BOOL *pabChnEnable,
+                                    DYNAMIC_RANGE_E enDynamicRange,
+                                    PIXEL_FORMAT_E enPixelFormat,
+                                    SIZE_S stSize[],
+                                    SAMPLE_SNS_TYPE_E enSnsType)
 {
     HI_S32 i;
     HI_S32 s32Ret;
@@ -136,6 +171,29 @@ static int __vpss_destroy(vsf_vpss_t *self)
     return 0;
 }
 
+static int __vpss_get_chn_frame(vsf_vpss_t *self, int chn, void *frame, int timeout)
+{
+    vsf_vpss_t *obj       = self;
+    vsf_vpss_priv_t *priv = obj->priv;
+
+    HI_S32 s32Ret;
+    VIDEO_FRAME_INFO_S stExtFrmInfo;
+    s32Ret = HI_MPI_VPSS_GetChnFrame(priv->info->VpssGrp, chn, &stExtFrmInfo, timeout);
+    if (s32Ret == HI_SUCCESS) {
+        __transfor_frame_info(&stExtFrmInfo.stVFrame, frame);
+    }
+
+    return s32Ret;
+}
+
+static int __vpss_free_chn_frame(vsf_vpss_t *self, int chn, void *frame)
+{
+    vsf_vpss_t *obj       = self;
+    vsf_vpss_priv_t *priv = obj->priv;
+    video_frame_t *pFrame = frame;
+    return HI_MPI_VPSS_ReleaseChnFrame(priv->info->VpssGrp, chn, (void *)(size_t)pFrame->u64PrivateData);
+}
+
 vsf_vpss_t *VSF_createVpss(int id)
 {
     vsf_vpss_mod_t *mod   = &s_mod;
@@ -166,6 +224,8 @@ vsf_vpss_t *VSF_createVpss(int id)
     obj->priv    = priv;
     obj->init    = __vpss_init;
     obj->destroy = __vpss_destroy;
+    obj->getChnFrame = __vpss_get_chn_frame;
+    obj->freeChnFrame = __vpss_free_chn_frame;
 
     mod->objs[id] = obj;
     return obj;

@@ -54,7 +54,7 @@ static sdk_cfg_t s_cfg = {
         .VpssGrp = 0,
         .ViPipe = 0,
         .ViChn = 0,
-        .abChnEnable = {1, 0},
+        .abChnEnable = {1, 1},
         .aenSize = {PIC_1080P, PIC_720P},
         .enSnsType = SENSOR0_TYPE,
     },

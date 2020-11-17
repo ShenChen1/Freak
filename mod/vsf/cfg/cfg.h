@@ -4,6 +4,7 @@
 #include "proto_vsf.h"
 extern void jsonb_opt_vsf_cfg_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
+    proto_vsf_frame_cfg_t frame;
     proto_vsf_stream_cfg_t stream;
     proto_vsf_osd_cfg_t osd;
 } vsf_cfg_t;

@@ -11,6 +11,7 @@ add_executable(${PROJECT_NAME}
     src/msgbox/msgbox_vsf_stream.c
     src/interface/stream_mgr.c
     src/interface/frame_mgr.c
+    src/interface/chn_mgr.c
     src/hal/sys.c
     src/hal/vi.c
     src/hal/vpss.c
