@@ -180,8 +180,6 @@ typedef struct {
 
     uint32_t u32TimeRef;
     uint64_t u64PTS;
-
-    uint64_t u64PrivateData;
 } video_frame_t;
 
 #endif /* __VIDEO_FRAME_H__ */

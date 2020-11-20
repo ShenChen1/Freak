@@ -55,18 +55,19 @@ typedef struct {
     uint32_t u32PackType; /* R; the pack type */
 } video_stream_pack_t;
 
+typedef enum {
+    VIDEO_STREAM_TYPE_H264,
+    VIDEO_STREAM_TYPE_H265,
+    VIDEO_STREAM_TYPE_JPEG,
+    VIDEO_STREAM_TYPE_MJPEG,
+} video_stream_type_e;
+
 /* Defines the features of an stream */
 typedef struct {
     video_stream_pack_t *pstPack; /* R; stream pack attribute */
     uint32_t u32PackCount;        /* R; the pack number of one frame stream */
     uint32_t u32Seq;              /* R; the list number of stream */
+    video_stream_type_e enType;
 } video_stream_t;
-
-typedef enum {
-    VIDEO_ENCODE_TYPE_H264,
-    VIDEO_ENCODE_TYPE_H265,
-    VIDEO_ENCODE_TYPE_JPEG,
-    VIDEO_ENCODE_TYPE_MJPEG,
-} video_encode_type_e;
 
 #endif /* __VIDEO_STREAM_H__ */

@@ -25,10 +25,10 @@ static int __transfor_encode_format(PAYLOAD_TYPE_E pt)
 {
     int i;
     const int convert[][2] = {
-        { PT_H264, VIDEO_ENCODE_TYPE_H264 },
-        { PT_H265, VIDEO_ENCODE_TYPE_H265 },
-        { PT_JPEG, VIDEO_ENCODE_TYPE_JPEG },
-        { PT_MJPEG, VIDEO_ENCODE_TYPE_MJPEG },
+        { PT_H264, VIDEO_STREAM_TYPE_H264 },
+        { PT_H265, VIDEO_STREAM_TYPE_H265 },
+        { PT_JPEG, VIDEO_STREAM_TYPE_JPEG },
+        { PT_MJPEG, VIDEO_STREAM_TYPE_MJPEG },
     };
 
     for (i = 0; i < ARRAY_SIZE(convert); i++) {
@@ -164,9 +164,8 @@ static HI_VOID *SAMPLE_COMM_VENC_GetVencStreamProc(HI_VOID *p)
                 priv = mod->objs[i]->priv;
                 if (priv->cb.func) {
                     __transfor_stream_info(&stStream, &stream);
-                    video_encode_type_e encode = VIDEO_ENCODE_TYPE_H264;
-                    encode = __transfor_encode_format(enPayLoadType[i]);
-                    s32Ret = priv->cb.func(i, encode, &stream, priv->cb.args);
+                    stream.enType = __transfor_encode_format(enPayLoadType[i]);
+                    s32Ret = priv->cb.func(&stream, priv->cb.args);
                     if (HI_SUCCESS != s32Ret) {
                         errorf("proc stream failed!");
                     }

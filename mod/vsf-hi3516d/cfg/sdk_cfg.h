@@ -61,7 +61,8 @@ typedef struct {
     int32_t ViChn;
     uint32_t abChnEnable[VPSS_MAX_PHY_CHN_NUM];
     int32_t aenSize[VPSS_MAX_PHY_CHN_NUM];
-    uint32_t enSnsType;
+    int32_t au32Depth[VPSS_MAX_PHY_CHN_NUM];
+    uint32_t enSnsSize;
 } sdk_vpss_info_t;
 extern void jsonb_opt_sdk_venc_info_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {

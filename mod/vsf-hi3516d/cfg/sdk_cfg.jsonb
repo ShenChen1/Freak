@@ -64,7 +64,8 @@ JSONB_FIELD(ViPipe, int32_t)
 JSONB_FIELD(ViChn, int32_t)
 JSONB_FIELD_ARRAY(abChnEnable, VPSS_MAX_PHY_CHN_NUM, uint32_t)
 JSONB_FIELD_ARRAY(aenSize, VPSS_MAX_PHY_CHN_NUM, int32_t)
-JSONB_FIELD(enSnsType, uint32_t)
+JSONB_FIELD_ARRAY(au32Depth, VPSS_MAX_PHY_CHN_NUM, int32_t)
+JSONB_FIELD(enSnsSize, uint32_t)
 JSONB_STRUCT_END(sdk_vpss_info_t)
 
 //////////////////////////////////////////////////////////////////////////////////

@@ -1,7 +1,8 @@
 #ifndef __VSF_VENC_H__
 #define __VSF_VENC_H__
 
-typedef int (*vsf_stream_proc_t)(int id, int type, void *stream, void *args);
+typedef int (*vsf_stream_proc_t)(void *stream, void *args);
+
 typedef struct {
     void *args;
     vsf_stream_proc_t func;

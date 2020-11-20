@@ -5,9 +5,17 @@
 #include "inc/sdk_cfg.h"
 
 typedef struct {
+    int chn;
+    vsf_frame_cb_t cb;
+    pthread_t thread;
+    void *group;
+} vsf_vpss_chn_t;
+
+typedef struct {
     int virtid;
     int phyid;
     sdk_vpss_info_t *info;
+    vsf_vpss_chn_t chn[VPSS_MAX_PHY_CHN_NUM];
 } vsf_vpss_priv_t;
 
 typedef struct {
@@ -27,6 +35,7 @@ static void __transfor_frame_info(VIDEO_FRAME_S *src, video_frame_t *dst)
 {
     int i;
 
+    memset(dst, 0 , sizeof(video_frame_t));
     dst->u32Width        = src->u32Height;
     dst->u32Height       = src->u32Height;
     dst->enPixelFormat   = __transfor_pixel_format(src->enPixelFormat);
@@ -36,7 +45,6 @@ static void __transfor_frame_info(VIDEO_FRAME_S *src, video_frame_t *dst)
     dst->s16OffsetRight  = src->s16OffsetRight;
     dst->u32TimeRef      = src->u32TimeRef;
     dst->u64PTS          = src->u64PTS;
-    dst->u64PrivateData  = (size_t)src;
 
     for (i = 0; i < 3; i++) {
         dst->u32HeaderStride[i]  = src->u32HeaderStride[i];
@@ -51,36 +59,57 @@ static void __transfor_frame_info(VIDEO_FRAME_S *src, video_frame_t *dst)
     }
 }
 
-static HI_S32 SAMPLE_VENC_VPSS_Init(VPSS_GRP VpssGrp,
-                                    HI_BOOL *pabChnEnable,
-                                    DYNAMIC_RANGE_E enDynamicRange,
-                                    PIXEL_FORMAT_E enPixelFormat,
-                                    SIZE_S stSize[],
-                                    SAMPLE_SNS_TYPE_E enSnsType)
+static void *__vpss_get_chn_frame_proc(void *p)
+{
+    HI_S32 s32Ret;
+    vsf_vpss_chn_t *chn   = p;
+    vsf_vpss_priv_t *priv = chn->group;
+
+    while (1) {
+        VIDEO_FRAME_INFO_S stVideoFrame = {};
+        s32Ret = HI_MPI_VPSS_GetChnFrame(priv->info->VpssGrp, chn->chn, &stVideoFrame, 1000);
+        if (HI_SUCCESS != s32Ret) {
+            errorf("HI_MPI_VPSS_GetChnFrame err:0x%x\n", s32Ret);
+            continue;
+        }
+
+        if (chn->cb.func) {
+            video_frame_t frame;
+            __transfor_frame_info(&stVideoFrame.stVFrame, &frame);
+            s32Ret = chn->cb.func(&frame, chn->cb.args);
+            if (HI_SUCCESS != s32Ret) {
+                errorf("proc stream failed!");
+            }
+        }
+
+        s32Ret = HI_MPI_VPSS_ReleaseChnFrame(priv->info->VpssGrp, chn->chn, &stVideoFrame);
+        if (HI_SUCCESS != s32Ret) {
+            errorf("HI_MPI_VPSS_ReleaseChnFrame err:0x%x\n", s32Ret);
+            continue;
+        }
+    }
+
+    return NULL;
+}
+
+static HI_S32 SAMPLE_VENC_VPSS_Init(sdk_vpss_info_t *info)
 {
     HI_S32 i;
     HI_S32 s32Ret;
-    PIC_SIZE_E enSnsSize;
-    SIZE_S stSnsSize;
+    SIZE_S stSize;
     VPSS_GRP_ATTR_S stVpssGrpAttr = { 0 };
     VPSS_CHN_ATTR_S stVpssChnAttr[VPSS_MAX_PHY_CHN_NUM];
 
-    s32Ret = SAMPLE_COMM_VI_GetSizeBySensor(enSnsType, &enSnsSize);
-    if (HI_SUCCESS != s32Ret) {
-        SAMPLE_PRT("SAMPLE_COMM_VI_GetSizeBySensor failed!\n");
-        return s32Ret;
-    }
-
-    s32Ret = SAMPLE_COMM_SYS_GetPicSize(enSnsSize, &stSnsSize);
+    s32Ret = SAMPLE_COMM_SYS_GetPicSize(info->enSnsSize, &stSize);
     if (HI_SUCCESS != s32Ret) {
         SAMPLE_PRT("SAMPLE_COMM_SYS_GetPicSize failed!\n");
         return s32Ret;
     }
 
-    stVpssGrpAttr.enDynamicRange              = enDynamicRange;
-    stVpssGrpAttr.enPixelFormat               = enPixelFormat;
-    stVpssGrpAttr.u32MaxW                     = stSnsSize.u32Width;
-    stVpssGrpAttr.u32MaxH                     = stSnsSize.u32Height;
+    stVpssGrpAttr.enDynamicRange              = DYNAMIC_RANGE_SDR8;
+    stVpssGrpAttr.enPixelFormat               = PIXEL_FORMAT_YVU_SEMIPLANAR_420;
+    stVpssGrpAttr.u32MaxW                     = stSize.u32Width;
+    stVpssGrpAttr.u32MaxH                     = stSize.u32Height;
     stVpssGrpAttr.stFrameRate.s32SrcFrameRate = -1;
     stVpssGrpAttr.stFrameRate.s32DstFrameRate = -1;
     stVpssGrpAttr.bNrEn                       = HI_TRUE;
@@ -89,16 +118,23 @@ static HI_S32 SAMPLE_VENC_VPSS_Init(VPSS_GRP VpssGrp,
     stVpssGrpAttr.stNrAttr.enCompressMode     = COMPRESS_MODE_FRAME;
 
     for (i = 0; i < VPSS_MAX_PHY_CHN_NUM; i++) {
-        if (HI_TRUE == pabChnEnable[i]) {
-            stVpssChnAttr[i].u32Width                    = stSize[i].u32Width;
-            stVpssChnAttr[i].u32Height                   = stSize[i].u32Height;
+        if (info->abChnEnable[i]) {
+
+            s32Ret = SAMPLE_COMM_SYS_GetPicSize(info->aenSize[i], &stSize);
+            if (HI_SUCCESS != s32Ret) {
+                errorf("SAMPLE_COMM_SYS_GetPicSize failed!");
+                return s32Ret;
+            }
+
+            stVpssChnAttr[i].u32Width                    = stSize.u32Width;
+            stVpssChnAttr[i].u32Height                   = stSize.u32Height;
             stVpssChnAttr[i].enChnMode                   = VPSS_CHN_MODE_USER;
             stVpssChnAttr[i].enCompressMode              = COMPRESS_MODE_NONE; // COMPRESS_MODE_SEG;
-            stVpssChnAttr[i].enDynamicRange              = enDynamicRange;
-            stVpssChnAttr[i].enPixelFormat               = enPixelFormat;
+            stVpssChnAttr[i].enDynamicRange              = DYNAMIC_RANGE_SDR8;
+            stVpssChnAttr[i].enPixelFormat               = PIXEL_FORMAT_YVU_SEMIPLANAR_420;
             stVpssChnAttr[i].stFrameRate.s32SrcFrameRate = -1;
             stVpssChnAttr[i].stFrameRate.s32DstFrameRate = -1;
-            stVpssChnAttr[i].u32Depth                    = 0;
+            stVpssChnAttr[i].u32Depth                    = info->au32Depth[i];
             stVpssChnAttr[i].bMirror                     = HI_FALSE;
             stVpssChnAttr[i].bFlip                       = HI_FALSE;
             stVpssChnAttr[i].enVideoFormat               = VIDEO_FORMAT_LINEAR;
@@ -106,9 +142,9 @@ static HI_S32 SAMPLE_VENC_VPSS_Init(VPSS_GRP VpssGrp,
         }
     }
 
-    s32Ret = SAMPLE_COMM_VPSS_Start(VpssGrp, pabChnEnable, &stVpssGrpAttr, stVpssChnAttr);
+    s32Ret = SAMPLE_COMM_VPSS_Start(info->VpssGrp, info->abChnEnable, &stVpssGrpAttr, stVpssChnAttr);
     if (s32Ret != HI_SUCCESS) {
-        SAMPLE_PRT("start VPSS fail for %#x!\n", s32Ret);
+        errorf("start VPSS fail for %#x!\n", s32Ret);
     }
 
     return s32Ret;
@@ -118,29 +154,11 @@ static HI_S32 SAMPLE_VENC_VPSS_Init(VPSS_GRP VpssGrp,
 
 static int __vpss_init(vsf_vpss_t *self)
 {
-    int i, s32Ret;
+    int s32Ret, i;
     vsf_vpss_t *obj       = self;
     vsf_vpss_priv_t *priv = obj->priv;
 
-    SIZE_S astSize[VPSS_MAX_PHY_CHN_NUM];
-    for (i = 0; i < ARRAY_SIZE(astSize); i++) {
-        if (!priv->info->abChnEnable[i]) {
-            continue;
-        }
-
-        s32Ret = SAMPLE_COMM_SYS_GetPicSize(priv->info->aenSize[i], &astSize[i]);
-        if (HI_SUCCESS != s32Ret) {
-            errorf("SAMPLE_COMM_SYS_GetPicSize failed!");
-            return s32Ret;
-        }
-    }
-
-    s32Ret = SAMPLE_VENC_VPSS_Init(priv->info->VpssGrp,
-                                   priv->info->abChnEnable,
-                                   DYNAMIC_RANGE_SDR8,
-                                   PIXEL_FORMAT_YVU_SEMIPLANAR_420,
-                                   astSize,
-                                   priv->info->enSnsType);
+    s32Ret = SAMPLE_VENC_VPSS_Init(priv->info);
     if (HI_SUCCESS != s32Ret) {
         errorf("Init VPSS err for %#x!", s32Ret);
         return s32Ret;
@@ -151,6 +169,10 @@ static int __vpss_init(vsf_vpss_t *self)
         errorf("VI Bind VPSS err for %#x!", s32Ret);
         SAMPLE_COMM_VPSS_Stop(priv->info->VpssGrp, priv->info->abChnEnable);
         return s32Ret;
+    }
+
+    for (i = 0; i < VPSS_MAX_PHY_CHN_NUM; i++) {
+         pthread_create(&priv->chn[i].thread, NULL, __vpss_get_chn_frame_proc, &priv->chn[i]);
     }
 
     return s32Ret;
@@ -171,31 +193,25 @@ static int __vpss_destroy(vsf_vpss_t *self)
     return 0;
 }
 
-static int __vpss_get_chn_frame(vsf_vpss_t *self, int chn, void *frame, int timeout)
+static int __vpss_regcallback(vsf_vpss_t *self, int id, vsf_frame_cb_t *cb)
 {
     vsf_vpss_t *obj       = self;
     vsf_vpss_priv_t *priv = obj->priv;
 
-    HI_S32 s32Ret;
-    VIDEO_FRAME_INFO_S stExtFrmInfo;
-    s32Ret = HI_MPI_VPSS_GetChnFrame(priv->info->VpssGrp, chn, &stExtFrmInfo, timeout);
-    if (s32Ret == HI_SUCCESS) {
-        __transfor_frame_info(&stExtFrmInfo.stVFrame, frame);
+    if (cb == NULL) {
+        priv->chn[id].cb.args = NULL;
+        priv->chn[id].cb.func = NULL;
+    } else {
+        priv->chn[id].cb.args = cb->args;
+        priv->chn[id].cb.func = cb->func;
     }
 
-    return s32Ret;
-}
-
-static int __vpss_free_chn_frame(vsf_vpss_t *self, int chn, void *frame)
-{
-    vsf_vpss_t *obj       = self;
-    vsf_vpss_priv_t *priv = obj->priv;
-    video_frame_t *pFrame = frame;
-    return HI_MPI_VPSS_ReleaseChnFrame(priv->info->VpssGrp, chn, (void *)(size_t)pFrame->u64PrivateData);
+    return 0;
 }
 
 vsf_vpss_t *VSF_createVpss(int id)
 {
+    int i;
     vsf_vpss_mod_t *mod   = &s_mod;
     vsf_vpss_t *obj       = NULL;
     vsf_vpss_priv_t *priv = NULL;
@@ -215,6 +231,10 @@ vsf_vpss_t *VSF_createVpss(int id)
     priv->virtid = id;
     priv->phyid  = *sdk_cfg_get_member(as32VpssId[id]);
     priv->info   = sdk_cfg_get_member(astVpssInfo[id]);
+    for (i = 0; i < VPSS_MAX_PHY_CHN_NUM; i++) {
+        priv->chn[i].chn = i;
+        priv->chn[i].group = priv;
+    }
 
     obj = malloc(sizeof(vsf_vpss_priv_t));
     if (obj == NULL) {
@@ -224,8 +244,7 @@ vsf_vpss_t *VSF_createVpss(int id)
     obj->priv    = priv;
     obj->init    = __vpss_init;
     obj->destroy = __vpss_destroy;
-    obj->getChnFrame = __vpss_get_chn_frame;
-    obj->freeChnFrame = __vpss_free_chn_frame;
+    obj->regcallback = __vpss_regcallback;
 
     mod->objs[id] = obj;
     return obj;

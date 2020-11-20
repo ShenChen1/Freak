@@ -121,33 +121,33 @@ static unsigned int recput(unsigned char *p1, unsigned int n1, unsigned char *p2
     return totalsize;
 }
 
-static int __vsf_stream_h264_proc(int id, void *data, void *args)
+static int __vsf_stream_h264_proc(video_stream_t *stream, void *args)
 {
     int i;
     size_t totalsize            = sizeof(media_record_t) + sizeof(video_stream_t);
-    video_stream_t *stream      = data;
     vsf_stream_mgr_priv_t *priv = s_mgr->priv;
+    proto_vsf_stream_t *info    = args;
 
     for (i = 0; i < stream->u32PackCount; i++) {
         totalsize += sizeof(video_stream_pack_t);
         totalsize += stream->pstPack[i].u32Len - stream->pstPack[i].u32Offset;
     }
 
-    if (ufifo_len(priv->fifo[id]) + totalsize > ufifo_size(priv->fifo[id])) {
-        ufifo_skip(priv->fifo[id]);
-        ufifo_oldest(priv->fifo[id], (0xdeadbeef << 8) | 1);
+    if (ufifo_len(priv->fifo[info->id]) + totalsize > ufifo_size(priv->fifo[info->id])) {
+        ufifo_skip(priv->fifo[info->id]);
+        ufifo_oldest(priv->fifo[info->id], (0xdeadbeef << 8) | 1);
     }
 
-    return ufifo_put(priv->fifo[id], stream, totalsize) != totalsize;
+    return ufifo_put(priv->fifo[info->id], stream, totalsize) != totalsize;
 }
 
-static int __vsf_stream_jpeg_proc(int id, void *data, void *args)
+static int __vsf_stream_jpeg_proc(video_stream_t *stream, void *args)
 {
     int i;
     char acFile[128];
     FILE *pFile                 = NULL;
-    video_stream_t *stream      = data;
     vsf_stream_mgr_priv_t *priv = s_mgr->priv;
+    proto_vsf_stream_t *info    = args;
 
     /* Obtain current time. */
     struct timeval tv;
@@ -157,7 +157,7 @@ static int __vsf_stream_jpeg_proc(int id, void *data, void *args)
     snprintf(acFile,
              sizeof(acFile),
              "snap_chn%d_%4d_%02d_%02d_%02d_%02d_%02d_%06ld.jpg",
-             priv->info[id].chn,
+             priv->info[info->id].chn,
              1900 + timeinfo->tm_year,
              1 + timeinfo->tm_mon,
              timeinfo->tm_mday,
@@ -176,13 +176,17 @@ static int __vsf_stream_jpeg_proc(int id, void *data, void *args)
     return 0;
 }
 
-static int __vsf_stream_proc(int id, int type, void *data, void *args)
+static int __vsf_stream_proc(void *data, void *args)
 {
-    switch (type) {
-    case VIDEO_ENCODE_TYPE_H264:
-        return __vsf_stream_h264_proc(id, data, args);
-    case VIDEO_ENCODE_TYPE_JPEG:
-        return __vsf_stream_jpeg_proc(id, data, args);
+    video_stream_t *stream = data;
+
+    switch (stream->enType) {
+        case VIDEO_STREAM_TYPE_H264:
+            return __vsf_stream_h264_proc(stream, args);
+        case VIDEO_STREAM_TYPE_JPEG:
+            return __vsf_stream_jpeg_proc(stream, args);
+        default:
+            return -1;
     }
 
     return 0;
@@ -194,7 +198,7 @@ static int __vsf_stream_ctrl(vsf_stream_mgr_t *self, proto_vsf_stream_t *info)
     vsf_stream_mgr_priv_t *priv = mgr->priv;
 
     char name[64];
-    snprintf(name, sizeof(name), PROTO_VSF_MEDIA_FIFO "%d-%d", info->chn, info->subchn);
+    snprintf(name, sizeof(name), PROTO_VSF_STREAM_FIFO "%d-%d", info->chn, info->subchn);
 
     if (info->enable) {
         if (!priv->fifo[info->id]) {

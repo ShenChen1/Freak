@@ -212,7 +212,7 @@ static int rtp_get_sdp(struct rtp_media_t *m, char *sdp)
             .hook = { recsize, rectag, NULL, recget },
         };
         char name[64];
-        snprintf(name, sizeof(name), PROTO_VSF_MEDIA_FIFO"%s", &priv->path[1]);
+        snprintf(name, sizeof(name), PROTO_VSF_STREAM_FIFO"%s", &priv->path[1]);
         ufifo_open(name, &init, &priv->track[MEDIA_TRACK_VIDEO].fifo);
         if (priv->track[MEDIA_TRACK_VIDEO].fifo == NULL) {
             return -1;
