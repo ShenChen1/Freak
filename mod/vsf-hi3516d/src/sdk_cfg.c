@@ -56,7 +56,7 @@ static sdk_cfg_t s_cfg = {
         .ViChn = 0,
         .abChnEnable = {1, 1, 1},
         .aenSize = {PIC_1080P, PIC_1080P, PIC_720P},
-        .au32Depth = {0, 4},
+        .au32Depth = {1, 2, 2},
         .enSnsSize = PIC_1080P,
     },
     .s32VencNum = 3,

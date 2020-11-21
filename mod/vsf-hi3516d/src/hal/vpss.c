@@ -3,11 +3,10 @@
 #include "media.h"
 #include "inc/hal/vpss.h"
 #include "inc/sdk_cfg.h"
-
 typedef struct {
     int chn;
-    vsf_frame_cb_t cb;
-    pthread_t thread;
+    vsf_frame_cb_t cb[VSF_FRAME_CB_MAX];
+    pthread_t thread[VSF_FRAME_CB_MAX];
     void *group;
 } vsf_vpss_chn_t;
 
@@ -28,15 +27,15 @@ static vsf_vpss_mod_t s_mod;
 static int __transfor_pixel_format(int type)
 {
     assert(type == PIXEL_FORMAT_YVU_SEMIPLANAR_420);
-    return VIDEO_FRAME_FORMAT_YUV420P_YVU;
+    return VIDEO_FRAME_FORMAT_YUV420SP_VU;
 }
 
-static void __transfor_frame_info(VIDEO_FRAME_S *src, video_frame_t *dst)
+static void __transfor_frame_info(VIDEO_FRAME_S *src, video_frame_t *dst, void *priv)
 {
     int i;
 
-    memset(dst, 0 , sizeof(video_frame_t));
-    dst->u32Width        = src->u32Height;
+    memset(dst, 0, sizeof(video_frame_t));
+    dst->u32Width        = src->u32Width;
     dst->u32Height       = src->u32Height;
     dst->enPixelFormat   = __transfor_pixel_format(src->enPixelFormat);
     dst->s16OffsetTop    = src->s16OffsetTop;
@@ -45,6 +44,7 @@ static void __transfor_frame_info(VIDEO_FRAME_S *src, video_frame_t *dst)
     dst->s16OffsetRight  = src->s16OffsetRight;
     dst->u32TimeRef      = src->u32TimeRef;
     dst->u64PTS          = src->u64PTS;
+    dst->u64PrivateData  = (size_t)priv;
 
     for (i = 0; i < 3; i++) {
         dst->u32HeaderStride[i]  = src->u32HeaderStride[i];
@@ -66,26 +66,59 @@ static void *__vpss_get_chn_frame_proc(void *p)
     vsf_vpss_priv_t *priv = chn->group;
 
     while (1) {
-        VIDEO_FRAME_INFO_S stVideoFrame = {};
-        s32Ret = HI_MPI_VPSS_GetChnFrame(priv->info->VpssGrp, chn->chn, &stVideoFrame, 1000);
+        VIDEO_FRAME_INFO_S *pstVideoFrame = malloc(sizeof(VIDEO_FRAME_INFO_S));
+        s32Ret = HI_MPI_VPSS_GetChnFrame(priv->info->VpssGrp, chn->chn, pstVideoFrame, 1000);
         if (HI_SUCCESS != s32Ret) {
-            errorf("HI_MPI_VPSS_GetChnFrame err:0x%x\n", s32Ret);
+            errorf("HI_MPI_VPSS_GetChnFrame %d-%d err:0x%x\n", priv->info->VpssGrp, chn->chn, s32Ret);
             continue;
         }
 
-        if (chn->cb.func) {
+        if (chn->cb[VSF_FRAME_CB_GET].func) {
             video_frame_t frame;
-            __transfor_frame_info(&stVideoFrame.stVFrame, &frame);
-            s32Ret = chn->cb.func(&frame, chn->cb.args);
+            __transfor_frame_info(&pstVideoFrame->stVFrame, &frame, pstVideoFrame);
+            tracef("frame:%u", frame.u32TimeRef);
+            s32Ret = chn->cb[VSF_FRAME_CB_GET].func(&frame, chn->cb[VSF_FRAME_CB_GET].args);
             if (HI_SUCCESS != s32Ret) {
-                errorf("proc stream failed!");
+                errorf("proc frame %d-%d failed!", priv->info->VpssGrp, chn->chn);
+            } else {
+                continue;
             }
         }
 
-        s32Ret = HI_MPI_VPSS_ReleaseChnFrame(priv->info->VpssGrp, chn->chn, &stVideoFrame);
+        s32Ret = HI_MPI_VPSS_ReleaseChnFrame(priv->info->VpssGrp, chn->chn, pstVideoFrame);
         if (HI_SUCCESS != s32Ret) {
-            errorf("HI_MPI_VPSS_ReleaseChnFrame err:0x%x\n", s32Ret);
-            continue;
+            errorf("HI_MPI_VPSS_ReleaseChnFrame %d-%d err:0x%x\n", priv->info->VpssGrp, chn->chn, s32Ret);
+        }
+        free(pstVideoFrame);
+    }
+
+    return NULL;
+}
+
+static void *__vpss_free_chn_frame_proc(void *p)
+{
+    HI_S32 s32Ret;
+    vsf_vpss_chn_t *chn   = p;
+    vsf_vpss_priv_t *priv = chn->group;
+
+    while (1) {
+        if (chn->cb[VSF_FRAME_CB_FREE].func) {
+            video_frame_t frame;
+            s32Ret = chn->cb[VSF_FRAME_CB_FREE].func(&frame, chn->cb[VSF_FRAME_CB_FREE].args);
+            if (HI_SUCCESS != s32Ret) {
+                errorf("proc frame %d-%d failed!", priv->info->VpssGrp, chn->chn);
+                continue;
+            }
+
+            tracef("frame:%u", frame.u32TimeRef);
+            VIDEO_FRAME_INFO_S *pstVideoFrame = (void *)(size_t)frame.u64PrivateData;
+            s32Ret = HI_MPI_VPSS_ReleaseChnFrame(priv->info->VpssGrp, chn->chn, pstVideoFrame);
+            if (HI_SUCCESS != s32Ret) {
+                errorf("HI_MPI_VPSS_ReleaseChnFrame %d-%d err:0x%x\n", priv->info->VpssGrp, chn->chn, s32Ret);
+            }
+            free(pstVideoFrame);
+        } else {
+            usleep(1000 * 1000);
         }
     }
 
@@ -172,7 +205,8 @@ static int __vpss_init(vsf_vpss_t *self)
     }
 
     for (i = 0; i < VPSS_MAX_PHY_CHN_NUM; i++) {
-         pthread_create(&priv->chn[i].thread, NULL, __vpss_get_chn_frame_proc, &priv->chn[i]);
+        pthread_create(&priv->chn[i].thread[VSF_FRAME_CB_GET], NULL, __vpss_get_chn_frame_proc, &priv->chn[i]);
+        pthread_create(&priv->chn[i].thread[VSF_FRAME_CB_FREE], NULL, __vpss_free_chn_frame_proc, &priv->chn[i]);
     }
 
     return s32Ret;
@@ -199,11 +233,15 @@ static int __vpss_regcallback(vsf_vpss_t *self, int id, vsf_frame_cb_t *cb)
     vsf_vpss_priv_t *priv = obj->priv;
 
     if (cb == NULL) {
-        priv->chn[id].cb.args = NULL;
-        priv->chn[id].cb.func = NULL;
+        priv->chn[id].cb[VSF_FRAME_CB_GET].args  = NULL;
+        priv->chn[id].cb[VSF_FRAME_CB_GET].func  = NULL;
+        priv->chn[id].cb[VSF_FRAME_CB_FREE].args = NULL;
+        priv->chn[id].cb[VSF_FRAME_CB_FREE].func = NULL;
     } else {
-        priv->chn[id].cb.args = cb->args;
-        priv->chn[id].cb.func = cb->func;
+        priv->chn[id].cb[VSF_FRAME_CB_GET].args  = cb[VSF_FRAME_CB_GET].args;
+        priv->chn[id].cb[VSF_FRAME_CB_GET].func  = cb[VSF_FRAME_CB_GET].func;
+        priv->chn[id].cb[VSF_FRAME_CB_FREE].args = cb[VSF_FRAME_CB_FREE].args;
+        priv->chn[id].cb[VSF_FRAME_CB_FREE].func = cb[VSF_FRAME_CB_FREE].func;
     }
 
     return 0;
@@ -232,7 +270,7 @@ vsf_vpss_t *VSF_createVpss(int id)
     priv->phyid  = *sdk_cfg_get_member(as32VpssId[id]);
     priv->info   = sdk_cfg_get_member(astVpssInfo[id]);
     for (i = 0; i < VPSS_MAX_PHY_CHN_NUM; i++) {
-        priv->chn[i].chn = i;
+        priv->chn[i].chn   = i;
         priv->chn[i].group = priv;
     }
 
@@ -241,9 +279,9 @@ vsf_vpss_t *VSF_createVpss(int id)
         return NULL;
     }
 
-    obj->priv    = priv;
-    obj->init    = __vpss_init;
-    obj->destroy = __vpss_destroy;
+    obj->priv        = priv;
+    obj->init        = __vpss_init;
+    obj->destroy     = __vpss_destroy;
     obj->regcallback = __vpss_regcallback;
 
     mod->objs[id] = obj;

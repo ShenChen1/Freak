@@ -156,7 +156,7 @@ static int rtp_send_data(void *arg)
         memset(rec, 0, sizeof(media_record_t));
 
         if (priv->track[MEDIA_TRACK_VIDEO].fifo) {
-            ufifo_get_block(priv->track[MEDIA_TRACK_VIDEO].fifo, priv->data, sizeof(priv->data));
+            ufifo_get_timeout(priv->track[MEDIA_TRACK_VIDEO].fifo, priv->data, sizeof(priv->data), 1000);
             tracef("bytes:%zu tag:0x%x ts:%zu", rec->size, rec->tag, rec->ts);
         }
 

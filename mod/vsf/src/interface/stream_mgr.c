@@ -194,6 +194,7 @@ static int __vsf_stream_proc(void *data, void *args)
 
 static int __vsf_stream_ctrl(vsf_stream_mgr_t *self, proto_vsf_stream_t *info)
 {
+    int ret;
     vsf_stream_mgr_t *mgr       = self;
     vsf_stream_mgr_priv_t *priv = mgr->priv;
 
@@ -208,7 +209,9 @@ static int __vsf_stream_ctrl(vsf_stream_mgr_t *self, proto_vsf_stream_t *info)
                 .alloc = { 1024 * 1024 },
                 .hook  = { recsize, rectag, recput },
             };
-            ufifo_open(name, &init, &priv->fifo[info->id]);
+            ret = ufifo_open(name, &init, &priv->fifo[info->id]);
+            assert(!ret);
+            assert(priv->fifo[info->id]);
         }
     } else {
         if (priv->fifo[info->id]) {

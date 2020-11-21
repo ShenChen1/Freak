@@ -9,6 +9,7 @@ add_executable(${PROJECT_NAME}
     src/cfg.c
     src/msgbox/msgbox.c
     src/msgbox/msgbox_vsf_stream.c
+    src/msgbox/msgbox_vsf_frame.c
     src/interface/stream_mgr.c
     src/interface/frame_mgr.c
     src/interface/chn_mgr.c

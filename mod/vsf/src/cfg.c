@@ -42,7 +42,7 @@ static vsf_cfg_t s_cfg = {
         .num = 2,
         .frames[0] = {
             .id = 0,
-            .enable = 1,
+            .enable = 0,
             .chn = 0,
             .subchn = 0,
             .format = VIDEO_FRAME_FORMAT_YUV420P_YVU,
@@ -52,7 +52,7 @@ static vsf_cfg_t s_cfg = {
         },
         .frames[1] = {
             .id = 1,
-            .enable = 1,
+            .enable = 0,
             .chn = 0,
             .subchn = 1,
             .format = VIDEO_FRAME_FORMAT_YUV420P_YVU,

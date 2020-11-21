@@ -7,6 +7,7 @@
 #define PROTO_VSF_CFG_PATH "/tmp/vsf-config.json"
 
 #define PROTO_VSF_STREAM_FIFO "vsf-stream-"
-#define PROTO_VSF_FRAME_FIFO "vsf-frame-"
+#define PROTO_VSF_FRAME_WORK_FIFO "vsf-frame-work-"
+#define PROTO_VSF_FRAME_FREE_FIFO "vsf-frame-free-"
 
 #endif /* __PATH_H__ */
