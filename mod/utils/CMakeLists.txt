@@ -8,6 +8,7 @@ add_library(${PROJECT_NAME} STATIC
     json-cfg/src/json-cfg.c
     log/src/log.c
     common/src/que.c
+    common/src/phymap.c
     nnm/src/nnm_utils.c
     nnm/src/nnm_pipeline.c
     nnm/src/nnm_reqrep.c

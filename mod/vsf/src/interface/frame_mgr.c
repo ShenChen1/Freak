@@ -94,7 +94,7 @@ static unsigned int recput(unsigned char *p1, unsigned int n1, unsigned char *p2
 
 static unsigned int recget(unsigned char *p1, unsigned int n1, unsigned char *p2, void *arg)
 {
-    media_record_t *rec = arg;
+    media_record_t *rec  = arg;
     video_frame_t *frame = arg;
     unsigned int a = 0, l = 0, _n1 = n1;
     unsigned char *p = NULL, *_p1 = p1, *_p2 = p2;
@@ -126,7 +126,7 @@ static unsigned int recget(unsigned char *p1, unsigned int n1, unsigned char *p2
     return sizeof(media_record_t) + sizeof(video_frame_t);
 }
 
-void __vsf_frame_SaveYUVFile(FILE *pfd, video_frame_t *pVBuf)
+static void __vsf_frame_SaveYUVFile(FILE *pfd, video_frame_t *pVBuf)
 {
     uint8_t *pY_map = NULL;
     uint8_t *pC_map = NULL;
@@ -164,42 +164,42 @@ void __vsf_frame_SaveYUVFile(FILE *pfd, video_frame_t *pVBuf)
         fwrite(pMemContent, pVBuf->u32Width, 1, pfd);
     }
 
-    fflush(pfd);
-    fprintf(stderr, "U......");
-    fflush(stderr);
+    if (VIDEO_FRAME_FORMAT_Y != enPixelFormat) {
+        fflush(pfd);
+        fprintf(stderr, "U......");
+        fflush(stderr);
 
-    pTmpBuff = (uint8_t *)malloc(pVBuf->u32Stride[0]);
-    if (NULL == pTmpBuff) {
-        errorf("malloc pTmpBuff (size=%d) fail!!!\n", pVBuf->u32Stride[0]);
-        return;
-    }
-    for (h = 0; h < u32UvHeight; h++) {
-        pMemContent = pC_map + h * pVBuf->u32Stride[1];
-
-        pMemContent += 1;
-
-        for (w = 0; w < pVBuf->u32Width / 2; w++) {
-            pTmpBuff[w] = *pMemContent;
-            pMemContent += 2;
+        pTmpBuff = (uint8_t *)malloc(pVBuf->u32Stride[0]);
+        if (NULL == pTmpBuff) {
+            errorf("malloc pTmpBuff (size=%d) fail!!!\n", pVBuf->u32Stride[0]);
+            return;
         }
-        fwrite(pTmpBuff, pVBuf->u32Width / 2, 1, pfd);
-    }
-    fflush(pfd);
+        for (h = 0; h < u32UvHeight; h++) {
+            pMemContent = pC_map + h * pVBuf->u32Stride[1];
+            pMemContent += 1;
 
-    fprintf(stderr, "V......");
-    fflush(stderr);
-    for (h = 0; h < u32UvHeight; h++) {
-        pMemContent = pC_map + h * pVBuf->u32Stride[1];
-
-        for (w = 0; w < pVBuf->u32Width / 2; w++) {
-            pTmpBuff[w] = *pMemContent;
-            pMemContent += 2;
+            for (w = 0; w < pVBuf->u32Width / 2; w++) {
+                pTmpBuff[w] = *pMemContent;
+                pMemContent += 2;
+            }
+            fwrite(pTmpBuff, pVBuf->u32Width / 2, 1, pfd);
         }
-        fwrite(pTmpBuff, pVBuf->u32Width / 2, 1, pfd);
-    }
-    free(pTmpBuff);
-    pTmpBuff = NULL;
+        fflush(pfd);
 
+        fprintf(stderr, "V......");
+        fflush(stderr);
+        for (h = 0; h < u32UvHeight; h++) {
+            pMemContent = pC_map + h * pVBuf->u32Stride[1];
+
+            for (w = 0; w < pVBuf->u32Width / 2; w++) {
+                pTmpBuff[w] = *pMemContent;
+                pMemContent += 2;
+            }
+            fwrite(pTmpBuff, pVBuf->u32Width / 2, 1, pfd);
+        }
+        free(pTmpBuff);
+        pTmpBuff = NULL;
+    }
     fflush(pfd);
 
     fprintf(stderr, "done!\n");
