@@ -7,9 +7,11 @@
 
 extern int msgbox_vsf_stream(msgbox_param_t *param);
 extern int msgbox_vsf_frame(msgbox_param_t *param);
+extern int msgbox_vsf_osd(msgbox_param_t *param);
 static msgbox_handler_t s_msgbox[PROTP_VSF_KEY_MAX] = {
     [PROTP_VSF_KEY_STREAM] = msgbox_vsf_stream,
     [PROTP_VSF_KEY_FRAME] = msgbox_vsf_frame,
+    [PROTP_VSF_KEY_OSD] = msgbox_vsf_osd,
 };
 
 int msgbox_init()

@@ -8,5 +8,6 @@
 #define VSF_VI_PRIORITY (103)
 #define VSF_VPSS_PRIORITY (104)
 #define VSF_VENC_PRIORITY (105)
+#define VSF_RGN_PRIORITY (106)
 
 #endif /* __SDK_COMMON_H__ */

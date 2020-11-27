@@ -7,7 +7,7 @@ void jsonb_opt_sdk_sys_vb_pool_info_t(jsonb_opt_e opt, cJSON *json, void *e, siz
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "u32BlkCnt");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -18,7 +18,7 @@ void jsonb_opt_sdk_sys_vb_pool_info_t(jsonb_opt_e opt, cJSON *json, void *e, siz
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "enSize");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -33,7 +33,7 @@ void jsonb_opt_sdk_sys_vb_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t s
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "u32MaxPoolCnt");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -44,7 +44,7 @@ void jsonb_opt_sdk_sys_vb_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t s
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "astCommPool");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateArray();
@@ -60,7 +60,7 @@ void jsonb_opt_sdk_sys_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "stVbConf");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -75,7 +75,7 @@ void jsonb_opt_sdk_vi_sensor_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "enSnsType");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -86,7 +86,7 @@ void jsonb_opt_sdk_vi_sensor_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "s32SnsId");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -97,7 +97,7 @@ void jsonb_opt_sdk_vi_sensor_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "s32BusId");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -108,7 +108,7 @@ void jsonb_opt_sdk_vi_sensor_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "MipiDev");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -123,7 +123,7 @@ void jsonb_opt_sdk_vi_dev_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t s
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "ViDev");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -134,7 +134,7 @@ void jsonb_opt_sdk_vi_dev_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t s
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "enWDRMode");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -149,7 +149,7 @@ void jsonb_opt_sdk_vi_pipe_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t 
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "aPipe");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateArray();
@@ -161,7 +161,7 @@ void jsonb_opt_sdk_vi_pipe_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t 
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "enMastPipeMode");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -172,7 +172,7 @@ void jsonb_opt_sdk_vi_pipe_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t 
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "bMultiPipe");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -183,7 +183,7 @@ void jsonb_opt_sdk_vi_pipe_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t 
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "bVcNumCfged");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -194,7 +194,7 @@ void jsonb_opt_sdk_vi_pipe_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t 
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "bIspBypass");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -205,7 +205,7 @@ void jsonb_opt_sdk_vi_pipe_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t 
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "enPixFmt");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -216,7 +216,7 @@ void jsonb_opt_sdk_vi_pipe_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t 
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "u32VCNum");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateArray();
@@ -232,7 +232,7 @@ void jsonb_opt_sdk_vi_chn_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t s
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "ViChn");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -243,7 +243,7 @@ void jsonb_opt_sdk_vi_chn_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t s
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "enPixFormat");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -254,7 +254,7 @@ void jsonb_opt_sdk_vi_chn_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t s
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "enDynamicRange");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -265,7 +265,7 @@ void jsonb_opt_sdk_vi_chn_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t s
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "enVideoFormat");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -276,7 +276,7 @@ void jsonb_opt_sdk_vi_chn_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t s
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "enCompressMode");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -291,7 +291,7 @@ void jsonb_opt_sdk_vi_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "stSnsInfo");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -302,7 +302,7 @@ void jsonb_opt_sdk_vi_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "stDevInfo");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -313,7 +313,7 @@ void jsonb_opt_sdk_vi_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "stPipeInfo");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -324,7 +324,7 @@ void jsonb_opt_sdk_vi_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "stChnInfo");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -339,7 +339,7 @@ void jsonb_opt_sdk_vpss_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "VpssGrp");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -350,7 +350,7 @@ void jsonb_opt_sdk_vpss_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "ViPipe");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -361,7 +361,7 @@ void jsonb_opt_sdk_vpss_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "ViChn");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -372,7 +372,7 @@ void jsonb_opt_sdk_vpss_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "abChnEnable");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateArray();
@@ -384,7 +384,7 @@ void jsonb_opt_sdk_vpss_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "aenSize");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateArray();
@@ -396,7 +396,7 @@ void jsonb_opt_sdk_vpss_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "au32Depth");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateArray();
@@ -408,7 +408,7 @@ void jsonb_opt_sdk_vpss_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "enSnsSize");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -423,7 +423,7 @@ void jsonb_opt_sdk_venc_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "VencChn");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -434,7 +434,7 @@ void jsonb_opt_sdk_venc_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "VpssGrp");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -445,7 +445,7 @@ void jsonb_opt_sdk_venc_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "VpssChn");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -456,7 +456,7 @@ void jsonb_opt_sdk_venc_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "u32Profile");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -467,7 +467,7 @@ void jsonb_opt_sdk_venc_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "enPayLoad");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -478,7 +478,7 @@ void jsonb_opt_sdk_venc_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "enSize");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -489,7 +489,7 @@ void jsonb_opt_sdk_venc_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "bRcnRefShareBuf");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -500,7 +500,7 @@ void jsonb_opt_sdk_venc_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "enRcMode");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -511,7 +511,7 @@ void jsonb_opt_sdk_venc_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "enGopMode");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -526,7 +526,7 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "s32SysNum");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -537,7 +537,7 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "as32SysId");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateArray();
@@ -549,7 +549,7 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "astSysInfo");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateArray();
@@ -561,7 +561,7 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "s32ViNum");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -572,7 +572,7 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "as32ViId");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateArray();
@@ -584,7 +584,7 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "astViInfo");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateArray();
@@ -596,7 +596,7 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "s32VpssNum");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -607,7 +607,7 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "as32VpssId");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateArray();
@@ -619,7 +619,7 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "astVpssInfo");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateArray();
@@ -631,7 +631,7 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "s32VencNum");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -642,7 +642,7 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "as32VencId");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateArray();
@@ -654,7 +654,7 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) assert(0);
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "astVencInfo");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateArray();

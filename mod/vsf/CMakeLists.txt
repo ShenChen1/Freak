@@ -10,13 +10,16 @@ add_executable(${PROJECT_NAME}
     src/msgbox/msgbox.c
     src/msgbox/msgbox_vsf_stream.c
     src/msgbox/msgbox_vsf_frame.c
+    src/msgbox/msgbox_vsf_osd.c
     src/interface/stream_mgr.c
     src/interface/frame_mgr.c
     src/interface/chn_mgr.c
+    src/interface/osd_mgr.c
     src/hal/sys.c
     src/hal/vi.c
     src/hal/vpss.c
     src/hal/venc.c
+    src/hal/rgn.c
     cfg/cfg.c)
 
 target_link_libraries(${PROJECT_NAME}

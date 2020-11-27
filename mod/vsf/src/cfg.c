@@ -61,6 +61,24 @@ static vsf_cfg_t s_cfg = {
             .fps = 5,
         },
     },
+    .osd = {
+        .num = 1,
+        .osds[0] = {
+            .id = 0,
+            .enable = 1,
+            .chn = 0,
+            .subchn = 0,
+            .info = {
+                .condition = 1,
+                .mask = {
+                    .points[0] = {100, 100},
+                    .points[1] = {400, 400},
+                    .points[2] = {100, 400},
+                    .points[3] = {400, 100},
+                },
+            },
+        },
+    },
 };
 
 int cfg_load(const char *path)

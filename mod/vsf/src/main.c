@@ -50,6 +50,16 @@ int main()
         nnm_free(obuf);
     }
 
+    for (i = 0; i < cfg_get_member(osd)->num; i++) {
+        uint8_t *obuf = NULL;
+        size_t osize  = 0;
+        proto_package_fill(ibuf, i, PROTP_VSF_KEY_OSD, PROTO_ACTION_SET, PROTO_FORMAT_STRUCTE, cfg_get_member(osd)->osds + i, sizeof(proto_vsf_osd_t));
+        nnm_req_exchange(req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
+        assert(osize == sizeof(proto_header_t));
+        memcpy(ibuf, obuf, osize);
+        nnm_free(obuf);
+    }
+
     // init end
     ret = nnm_req_destory(req);
     assert(!ret);
