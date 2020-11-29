@@ -304,40 +304,31 @@ void jsonb_opt_proto_vsf_osd_union_t(jsonb_opt_e opt, cJSON *json, void *e, size
         json_child = cJSON_CreateObject();
         cJSON_AddItemToObject(json, "condition", json_child);
     }
-    jsonb_opt_int(opt, json_child, &element->condition, sizeof(int));
+    jsonb_opt_string(opt, json_child, element->condition, 32);
 }
-switch (element->condition)
+if (strncmp("mask", element->condition, sizeof("mask")))
 {
-    case 1:
-    {
-        cJSON *json_child = NULL;
-        if (opt == JSONB_OPT_J2S) {
-            if (cJSON_IsNull(json)) return;
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) return;
             json_child = cJSON_GetObjectItem(json, "mask");
-        } else if (opt == JSONB_OPT_S2J) {
-            json_child = cJSON_CreateObject();
-            cJSON_AddItemToObject(json, "mask", json_child);
-        }
-        jsonb_opt_proto_vsf_osd_mask_t(opt, json_child, &element->mask, sizeof(proto_vsf_osd_mask_t));
-        break;
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "mask", json_child);
     }
-    case 2:
-    {
-        cJSON *json_child = NULL;
-        if (opt == JSONB_OPT_J2S) {
-            if (cJSON_IsNull(json)) return;
+    jsonb_opt_proto_vsf_osd_mask_t(opt, json_child, &element->mask, sizeof(proto_vsf_osd_mask_t));
+}
+if (strncmp("text", element->condition, sizeof("text")))
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) return;
             json_child = cJSON_GetObjectItem(json, "text");
-        } else if (opt == JSONB_OPT_S2J) {
-            json_child = cJSON_CreateObject();
-            cJSON_AddItemToObject(json, "text", json_child);
-        }
-        jsonb_opt_proto_vsf_osd_text_t(opt, json_child, &element->text, sizeof(proto_vsf_osd_text_t));
-        break;
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "text", json_child);
     }
-    default:
-    {
-        break;
-    }
+    jsonb_opt_proto_vsf_osd_text_t(opt, json_child, &element->text, sizeof(proto_vsf_osd_text_t));
 }
 }
 void jsonb_opt_proto_vsf_osd_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)

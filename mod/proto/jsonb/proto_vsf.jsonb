@@ -53,8 +53,8 @@ JSONB_STRING(text, 64)
 JSONB_STRUCT_END(proto_vsf_osd_text_t)
 
 JSONB_UNION_START(proto_vsf_osd_union_t)
-JSONB_UNION_FIELD(mask, proto_vsf_osd_mask_t, 1)
-JSONB_UNION_FIELD(text, proto_vsf_osd_text_t, 2)
+JSONB_UNION_FIELD(mask, proto_vsf_osd_mask_t)
+JSONB_UNION_FIELD(text, proto_vsf_osd_text_t)
 JSONB_UNION_END(proto_vsf_osd_union_t)
 
 JSONB_STRUCT_START(proto_vsf_osd_t)

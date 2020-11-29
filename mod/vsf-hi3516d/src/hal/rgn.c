@@ -111,9 +111,9 @@ static int __rgn_ctrl(vsf_rgn_t *self, void *param)
     proto_vsf_osd_t *osd = param;
 
     assert(priv->id == osd->id);
-    if (osd->info.condition == 1) {
+    if (!strncmp(osd->info.condition, "mask", sizeof("mask"))) {
         return __rgn_ctrl_mask(self, param);
-    } else if (osd->info.condition == 2) {
+    } else if (!strncmp(osd->info.condition, "text", sizeof("text"))) {
         return -1;
     }
 

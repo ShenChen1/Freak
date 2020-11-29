@@ -49,7 +49,7 @@ typedef struct {
 } proto_vsf_osd_text_t;
 extern void jsonb_opt_proto_vsf_osd_union_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
-    int condition;
+    char condition[32];
     union {
         proto_vsf_osd_mask_t mask;
         proto_vsf_osd_text_t text;
