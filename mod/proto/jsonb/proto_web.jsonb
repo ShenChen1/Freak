@@ -1,0 +1,3 @@
+JSONB_STRUCT_START(proto_web_http_t)
+JSONB_FIELD(port, int)
+JSONB_STRUCT_END(proto_web_http_t)

@@ -8,6 +8,7 @@
 #include "proto_bsp.h"
 #include "proto_rtsp.h"
 #include "proto_vsf.h"
+#include "proto_web.h"
 
 #define PROTO_PACKAGE_MAXSIZE (1024)
 
@@ -42,7 +43,6 @@ typedef enum {
 } proto_bsp_key_e;
 
 typedef enum {
-    PROTP_VSF_KEY_CAPS,
     PROTP_VSF_KEY_FRAME,
     PROTP_VSF_KEY_STREAM,
     PROTP_VSF_KEY_OSD,
@@ -54,6 +54,12 @@ typedef enum {
     PROTP_RTSP_KEY_CLOSE,
     PROTP_RTSP_KEY_MAX,
 } proto_rtsp_key_e;
+
+typedef enum {
+    PROTP_WEB_KEY_OPEN,
+    PROTP_WEB_KEY_CLOSE,
+    PROTP_WEB_KEY_MAX,
+} proto_web_key_e;
 
 #define proto_header_dump(_package)                               \
     (void)({                                                      \
