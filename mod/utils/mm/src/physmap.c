@@ -1,6 +1,6 @@
 #include "common.h"
 
-void *phymap(off_t phyaddr, size_t size)
+void *physmap(off_t phyaddr, size_t size)
 {
     off_t offset  = phyaddr;
     size_t length = size;
@@ -29,7 +29,7 @@ end:
     return mem;
 }
 
-int phyunmap(void *virtaddr, size_t size)
+int physunmap(void *virtaddr, size_t size)
 {
     off_t offset  = (off_t)virtaddr;
     size_t length = size;

@@ -306,7 +306,7 @@ void jsonb_opt_proto_vsf_osd_union_t(jsonb_opt_e opt, cJSON *json, void *e, size
     }
     jsonb_opt_string(opt, json_child, element->condition, 32);
 }
-if (strncmp("mask", element->condition, sizeof("mask")))
+if (!strncmp("mask", element->condition, sizeof("mask")))
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
@@ -318,7 +318,7 @@ if (strncmp("mask", element->condition, sizeof("mask")))
     }
     jsonb_opt_proto_vsf_osd_mask_t(opt, json_child, &element->mask, sizeof(proto_vsf_osd_mask_t));
 }
-if (strncmp("text", element->condition, sizeof("text")))
+if (!strncmp("text", element->condition, sizeof("text")))
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {

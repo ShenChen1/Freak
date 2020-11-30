@@ -21,7 +21,6 @@
 #include <sys/types.h>
 
 #include "list.h"
-#include "phymap.h"
 #include "que.h"
 #include "uthash.h"
 #include "utils.h"

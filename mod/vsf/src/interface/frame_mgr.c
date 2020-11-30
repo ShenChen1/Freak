@@ -7,6 +7,7 @@
 #include "inc/hal/vpss.h"
 #include "log.h"
 #include "ufifo.h"
+#include "mm.h"
 
 typedef struct {
     ufifo_t *fifo[VSF_FRAME_MAX][VSF_FRAME_CB_MAX];
@@ -134,28 +135,39 @@ static void __vsf_frame_SaveYUVFile(FILE *pfd, video_frame_t *pVBuf)
     uint8_t *pMemContent;
     uint8_t *pTmpBuff = NULL;
     uint64_t phy_addr;
-    uint32_t u32Size, s32Ysize;
+    uint32_t u32Size;
     video_frame_format_e enPixelFormat = pVBuf->enPixelFormat;
     uint32_t u32UvHeight;
+    bool bUvInvert = false;
 
-    if (VIDEO_FRAME_FORMAT_YUV420SP_VU == enPixelFormat) {
-        s32Ysize    = (pVBuf->u64PhyAddr[1] - pVBuf->u64PhyAddr[0]);
-        u32Size     = s32Ysize * 3 / 2;
+    if (VIDEO_FRAME_FORMAT_YUV420SP_UV == enPixelFormat ||
+        VIDEO_FRAME_FORMAT_YUV422SP_UV == enPixelFormat) {
+        bUvInvert = true;
+    }
+
+    if (VIDEO_FRAME_FORMAT_YUV420SP_VU == enPixelFormat ||
+        VIDEO_FRAME_FORMAT_YUV420SP_UV == enPixelFormat) {
+        u32Size     = pVBuf->u32Stride[0] * pVBuf->u32Height * 3 / 2;
         u32UvHeight = pVBuf->u32Height / 2;
+    } else if (VIDEO_FRAME_FORMAT_YUV422SP_VU == enPixelFormat ||
+               VIDEO_FRAME_FORMAT_YUV422SP_UV == enPixelFormat) {
+        u32Size     = pVBuf->u32Stride[0] * pVBuf->u32Height * 2;
+        u32UvHeight = pVBuf->u32Height;
+    } else if (VIDEO_FRAME_FORMAT_Y == enPixelFormat) {
+        u32Size     = pVBuf->u32Stride[0] * pVBuf->u32Height;
+        u32UvHeight = pVBuf->u32Height;
     } else {
         errorf("This YUV format is not support!");
         return;
     }
 
     phy_addr = pVBuf->u64PhyAddr[0];
-
-    pY_map = phymap(phy_addr, u32Size);
+    pY_map = physmap(phy_addr, u32Size);
     if (NULL == pY_map) {
-        errorf("HI_MPI_SYS_Mmap for pY_map fail!!\n");
+        errorf("physmap for pY_map fail!!\n");
         return;
     }
-
-    pC_map = pY_map + s32Ysize;
+    pC_map = pY_map + pVBuf->u32Stride[0] * pVBuf->u32Height;
 
     fprintf(stderr, "saving......Y......");
     fflush(stderr);
@@ -176,7 +188,7 @@ static void __vsf_frame_SaveYUVFile(FILE *pfd, video_frame_t *pVBuf)
         }
         for (h = 0; h < u32UvHeight; h++) {
             pMemContent = pC_map + h * pVBuf->u32Stride[1];
-            pMemContent += 1;
+            if (!bUvInvert) pMemContent += 1;
 
             for (w = 0; w < pVBuf->u32Width / 2; w++) {
                 pTmpBuff[w] = *pMemContent;
@@ -190,6 +202,7 @@ static void __vsf_frame_SaveYUVFile(FILE *pfd, video_frame_t *pVBuf)
         fflush(stderr);
         for (h = 0; h < u32UvHeight; h++) {
             pMemContent = pC_map + h * pVBuf->u32Stride[1];
+            if (bUvInvert) pMemContent += 1;
 
             for (w = 0; w < pVBuf->u32Width / 2; w++) {
                 pTmpBuff[w] = *pMemContent;
@@ -202,13 +215,11 @@ static void __vsf_frame_SaveYUVFile(FILE *pfd, video_frame_t *pVBuf)
     }
     fflush(pfd);
 
-    fprintf(stderr, "done!\n");
+    fprintf(stderr, "done %d!\n", pVBuf->u32TimeRef);
     fflush(stderr);
 
-    phyunmap(pY_map, u32Size);
+    physunmap(pY_map, u32Size);
     pY_map = NULL;
-
-    return;
 }
 
 static int __vsf_get_frame_proc(void *data, void *args)

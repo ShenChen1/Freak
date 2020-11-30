@@ -8,7 +8,8 @@ add_library(${PROJECT_NAME} STATIC
     json-cfg/src/json-cfg.c
     log/src/log.c
     common/src/que.c
-    common/src/phymap.c
+    mm/src/physmap.c
+    mm/src/virt2phys.c
     nnm/src/nnm_utils.c
     nnm/src/nnm_pipeline.c
     nnm/src/nnm_reqrep.c
@@ -19,6 +20,7 @@ target_include_directories(${PROJECT_NAME}
     PRIVATE ${FREAK_TOOLS_PATH}/jsonb-c/inc
     PUBLIC ${PROJECT_SOURCE_DIR}/common/inc
     PUBLIC ${PROJECT_SOURCE_DIR}/log/inc
+    PUBLIC ${PROJECT_SOURCE_DIR}/mm/inc
     PUBLIC ${PROJECT_SOURCE_DIR}/nnm/inc)
 
 add_dependencies(${PROJECT_NAME} ${LIB_CJSON_NAME})
