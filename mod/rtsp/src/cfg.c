@@ -4,7 +4,10 @@
 #include "json-cfg.h"
 
 static rtsp_cfg_t s_cfg = {
-    .port = 1234,
+    .server = {
+        .url = "0.0.0.0",
+        .port = 1234,
+    },
 };
 
 int cfg_load(const char *path)

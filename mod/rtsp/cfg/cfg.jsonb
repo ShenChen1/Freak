@@ -1,5 +1,5 @@
 JSONB_INCLUDE_HEADER(proto_rtsp.h)
 
 JSONB_STRUCT_START(rtsp_cfg_t)
-JSONB_FIELD(port, int)
+JSONB_FIELD(server, proto_rtsp_server_t)
 JSONB_STRUCT_END(rtsp_cfg_t)

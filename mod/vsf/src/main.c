@@ -33,7 +33,7 @@ int main()
     for (i = 0; i < cfg_get_member(stream)->num; i++) {
         uint8_t *obuf = NULL;
         size_t osize  = 0;
-        proto_package_fill(ibuf, i, PROTP_VSF_KEY_STREAM, PROTO_ACTION_SET, PROTO_FORMAT_STRUCTE, cfg_get_member(stream)->streams + i, sizeof(proto_vsf_stream_t));
+        proto_package_fill(ibuf, i, PROTO_VSF_KEY_STREAM, PROTO_ACTION_SET, PROTO_FORMAT_STRUCTE, cfg_get_member(stream)->streams + i, sizeof(proto_vsf_stream_t));
         nnm_req_exchange(req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
         assert(osize == sizeof(proto_header_t));
         memcpy(ibuf, obuf, osize);
@@ -43,7 +43,7 @@ int main()
     for (i = 0; i < cfg_get_member(frame)->num; i++) {
         uint8_t *obuf = NULL;
         size_t osize  = 0;
-        proto_package_fill(ibuf, i, PROTP_VSF_KEY_FRAME, PROTO_ACTION_SET, PROTO_FORMAT_STRUCTE, cfg_get_member(frame)->frames + i, sizeof(proto_vsf_frame_t));
+        proto_package_fill(ibuf, i, PROTO_VSF_KEY_FRAME, PROTO_ACTION_SET, PROTO_FORMAT_STRUCTE, cfg_get_member(frame)->frames + i, sizeof(proto_vsf_frame_t));
         nnm_req_exchange(req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
         assert(osize == sizeof(proto_header_t));
         memcpy(ibuf, obuf, osize);
@@ -53,7 +53,7 @@ int main()
     for (i = 0; i < cfg_get_member(osd)->num; i++) {
         uint8_t *obuf = NULL;
         size_t osize  = 0;
-        proto_package_fill(ibuf, i, PROTP_VSF_KEY_OSD, PROTO_ACTION_SET, PROTO_FORMAT_STRUCTE, cfg_get_member(osd)->osds + i, sizeof(proto_vsf_osd_t));
+        proto_package_fill(ibuf, i, PROTO_VSF_KEY_OSD, PROTO_ACTION_SET, PROTO_FORMAT_STRUCTE, cfg_get_member(osd)->osds + i, sizeof(proto_vsf_osd_t));
         nnm_req_exchange(req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
         assert(osize == sizeof(proto_header_t));
         memcpy(ibuf, obuf, osize);

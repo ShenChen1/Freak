@@ -38,27 +38,27 @@ typedef enum {
 } proto_format_e;
 
 typedef enum {
-    PROTP_BSP_KEY_DUMMY,
-    PROTP_BSP_KEY_MAX,
+    PROTO_BSP_KEY_DUMMY,
+    PROTO_BSP_KEY_MAX,
 } proto_bsp_key_e;
 
 typedef enum {
-    PROTP_VSF_KEY_FRAME,
-    PROTP_VSF_KEY_STREAM,
-    PROTP_VSF_KEY_OSD,
-    PROTP_VSF_KEY_MAX,
+    PROTO_VSF_KEY_FRAME,
+    PROTO_VSF_KEY_STREAM,
+    PROTO_VSF_KEY_OSD,
+    PROTO_VSF_KEY_MAX,
 } proto_vsf_key_e;
 
 typedef enum {
-    PROTP_RTSP_KEY_OPEN,
-    PROTP_RTSP_KEY_CLOSE,
-    PROTP_RTSP_KEY_MAX,
+    PROTO_RTSP_KEY_OPEN,
+    PROTO_RTSP_KEY_CLOSE,
+    PROTO_RTSP_KEY_MAX,
 } proto_rtsp_key_e;
 
 typedef enum {
-    PROTP_WEB_KEY_OPEN,
-    PROTP_WEB_KEY_CLOSE,
-    PROTP_WEB_KEY_MAX,
+    PROTO_WEB_KEY_OPEN,
+    PROTO_WEB_KEY_CLOSE,
+    PROTO_WEB_KEY_MAX,
 } proto_web_key_e;
 
 #define proto_header_dump(_package)                               \

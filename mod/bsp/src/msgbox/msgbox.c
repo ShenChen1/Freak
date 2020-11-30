@@ -4,8 +4,8 @@
 #include "inc/msgbox.h"
 
 extern int msgbox_dummy(msgbox_param_t *param);
-static msgbox_handler_t s_msgbox[PROTP_BSP_KEY_MAX] = {
-    [PROTP_BSP_KEY_DUMMY] = msgbox_dummy,
+static msgbox_handler_t s_msgbox[PROTO_BSP_KEY_MAX] = {
+    [PROTO_BSP_KEY_DUMMY] = msgbox_dummy,
 };
 
 int msgbox_init()
