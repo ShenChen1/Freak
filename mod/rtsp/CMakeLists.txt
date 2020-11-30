@@ -5,7 +5,6 @@ add_definitions(-DOS_LINUX)
 add_executable(${PROJECT_NAME}
     src/main.c
     src/cfg.c
-    src/rtsp-ctrl.c
     src/msgbox/msgbox.c
     src/msgbox/msgbox_rtsp.c
     src/rtsp/rtp-media.c
@@ -14,7 +13,6 @@ add_executable(${PROJECT_NAME}
     src/rtsp/rtp-transport-tcp.c
     src/rtsp/rtp-transport-udp.c
     src/rtsp/rtsp-server.c
-    src/rtsp/rtsp-client.c
     cfg/cfg.c)
 
 target_link_libraries(${PROJECT_NAME}

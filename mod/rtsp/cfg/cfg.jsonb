@@ -2,5 +2,4 @@ JSONB_INCLUDE_HEADER(proto_rtsp.h)
 
 JSONB_STRUCT_START(rtsp_cfg_t)
 JSONB_FIELD(port, int)
-JSONB_FIELD(auth, int)
 JSONB_STRUCT_END(rtsp_cfg_t)
