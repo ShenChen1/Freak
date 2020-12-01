@@ -16,7 +16,7 @@ int main()
     nnm_t rep = NULL;
     nnm_t req = NULL;
 
-    log_init(PROTO_LOG_COM_NODE, true);
+    log_init(PROTO_LOG_COM_NODE, false);
     cfg_load(PROTO_VSF_CFG_PATH);
     msgbox_init();
 

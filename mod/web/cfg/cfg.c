@@ -8,11 +8,11 @@ void jsonb_opt_web_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
         if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "http");
+        json_child = cJSON_GetObjectItem(json, "server");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "http", json_child);
+        cJSON_AddItemToObject(json, "server", json_child);
     }
-    jsonb_opt_proto_web_http_t(opt, json_child, &element->http, sizeof(proto_web_http_t));
+    jsonb_opt_proto_web_server_t(opt, json_child, &element->server, sizeof(proto_web_server_t));
 }
 }

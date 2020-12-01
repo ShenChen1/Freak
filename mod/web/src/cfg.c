@@ -4,7 +4,8 @@
 #include "cfg/cfg.h"
 
 static web_cfg_t s_cfg = {
-    .http = {
+    .server = {
+        .url = "0.0.0.0",
         .port = 8080,
     },
 };

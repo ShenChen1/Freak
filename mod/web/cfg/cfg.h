@@ -4,6 +4,6 @@
 #include "proto_web.h"
 extern void jsonb_opt_web_cfg_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
-    proto_web_http_t http;
+    proto_web_server_t server;
 } web_cfg_t;
 #endif /* __CFG_JSONB_C_API_H__ */

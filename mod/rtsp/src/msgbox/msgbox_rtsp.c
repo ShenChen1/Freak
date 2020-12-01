@@ -25,6 +25,7 @@ int msgbox_rtsp_open(msgbox_param_t *param)
         if (s_server == NULL) {
             s_server = rtsp_server_init(in->url, in->port);
         }
+        ret = s_server ? 0 : ESRCH;
         *param->osize = 0;
     } else {
         ret = EPERM;
@@ -66,6 +67,7 @@ int msgbox_rtsp_close(msgbox_param_t *param)
         if (s_server) {
             ret = rtsp_server_uninit(s_server);
         }
+        s_server = NULL;
         *param->osize = 0;
     } else {
         ret = EPERM;

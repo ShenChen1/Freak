@@ -17,7 +17,7 @@ int main()
     nnm_t rep = NULL;
     nnm_t req = NULL;
 
-    log_init(PROTO_LOG_COM_NODE, true);
+    log_init(PROTO_LOG_COM_NODE, false);
     cfg_load(PROTO_WEB_CFG_PATH);
     msgbox_init();
 
@@ -33,7 +33,7 @@ int main()
         // init http server
         uint8_t *obuf = NULL;
         size_t osize  = 0;
-        proto_package_fill(ibuf, 0, PROTO_WEB_KEY_OPEN, PROTO_ACTION_SET, PROTO_FORMAT_STRUCTE, cfg_get_member(http), sizeof(proto_web_http_t));
+        proto_package_fill(ibuf, 0, PROTO_WEB_KEY_OPEN, PROTO_ACTION_SET, PROTO_FORMAT_STRUCTE, cfg_get_member(server), sizeof(proto_web_server_t));
         nnm_req_exchange(req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
         assert(osize == sizeof(proto_header_t));
         memcpy(ibuf, obuf, osize);

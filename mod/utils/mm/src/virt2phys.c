@@ -37,14 +37,14 @@ off_t virt2phys(void *virtaddr)
 
     int pagemap_fd = open("/proc/self/pagemap", O_RDONLY);
     if (pagemap_fd < 0) {
-        return 0;
+        return (off_t)(-1);
     }
 
     uint8_t data[PAGEMAP_ENTRY];
     size_t offset = vaddr / pagesize * sizeof(data);
     if (pread(pagemap_fd, data, sizeof(data), offset) != sizeof(data)) {
         close(pagemap_fd);
-        return 0;
+        return (off_t)(-1);
     }
 
     int i;
@@ -63,11 +63,11 @@ off_t virt2phys(void *virtaddr)
 
     if (entry.present) {
         if (entry.swapped) {
-            return 0;
+            return (off_t)(-1);
         } else {
             return entry.pfn * pagesize + vaddr % sysconf(_SC_PAGE_SIZE);
         }
     }
 
-    return 0;
+    return (off_t)(-1);
 }
