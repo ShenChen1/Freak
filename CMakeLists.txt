@@ -5,6 +5,10 @@ execute_process(COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/scripts/install-git-hooks
 
 # Set CMake modules path
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/modules")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/utils")
+
+# tool
+include(strip)
 
 project(FREAK)
 set(FREAK_HOME_PATH ${PROJECT_SOURCE_DIR})

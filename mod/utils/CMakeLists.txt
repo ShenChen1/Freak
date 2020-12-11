@@ -4,7 +4,7 @@ add_definitions(-DMODULE_NAME="${PROJECT_NAME}")
 add_compile_options(-ffunction-sections -fdata-sections)
 add_link_options(-Wl,--gc-sections)
 
-add_library(${PROJECT_NAME} STATIC
+add_library(${PROJECT_NAME} SHARED
     json-cfg/src/json-cfg.c
     log/src/log.c
     common/src/que.c
@@ -22,7 +22,9 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC ${PROJECT_SOURCE_DIR}/log/inc
     PUBLIC ${PROJECT_SOURCE_DIR}/mm/inc
     PUBLIC ${PROJECT_SOURCE_DIR}/nnm/inc)
-
 add_dependencies(${PROJECT_NAME} ${LIB_CJSON_NAME})
 add_dependencies(${PROJECT_NAME} ${LIB_UTHASH_NAME})
 add_dependencies(${PROJECT_NAME} ${LIB_NANOMSG_NAME})
+
+install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
+strip(${PROJECT_NAME} ${FREAK_SYSROOT_PATH}/usr/lib)

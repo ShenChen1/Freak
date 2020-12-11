@@ -26,7 +26,6 @@ add_library(${PROJECT_NAME} STATIC
 target_link_libraries(${PROJECT_NAME}
     utils
     proto)
-
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/../vsf/)
 include_directories(${FREAK_SYSROOT_PATH}/usr/local/include/mpp)
