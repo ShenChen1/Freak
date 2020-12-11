@@ -42,4 +42,21 @@ done
 echo "Following files need to be cleaned up:"
 echo "${FILES[*]}"
 
-exit $RETURN
+if [ $RETURN -eq 1 ]; then
+    # Ask the question (not using "read -p" as it uses stderr not stdout)
+    echo -en "ignore and commit ? [y/n]"
+
+    # Read the answer
+    if tty >/dev/null 2>&1; then
+        TTY=$(tty)
+    else
+        TTY=/dev/tty
+    fi
+    read REPLY < "$TTY"
+
+    # Check if the reply is valid
+    case "$REPLY" in
+        N*|n*) exit 1 ;;
+        Y*|y*) exit 0 ;;
+    esac
+fi
