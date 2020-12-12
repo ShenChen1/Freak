@@ -34,7 +34,7 @@ set_target_properties(${LIB_MEDIA_SRV_NAME}::aio PROPERTIES
 
 add_library(${LIB_MEDIA_SRV_NAME}::utils SHARED IMPORTED)
 set_target_properties(${LIB_MEDIA_SRV_NAME}::utils PROPERTIES
-    IMPORTED_LOCATION ${FREAK_SYSROOT_PATH}/usr/local/lib/libutils.so)
+    IMPORTED_LOCATION ${FREAK_SYSROOT_PATH}/usr/local/lib/libutils-media.so)
 
 add_custom_target(${LIB_MEDIA_SRV_NAME})
 include_directories(${FREAK_SYSROOT_PATH}/usr/local/include/media-server)

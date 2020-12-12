@@ -38,7 +38,7 @@ ExternalProject_Add(build-${PROJECT_NAME}-sdk
     COMMAND mkdir -p ${FREAK_SYSROOT_PATH}/usr/local/lib/
     COMMAND cp -av ${PROJECT_BINARY_DIR}/build/libhttp.a ${FREAK_SYSROOT_PATH}/usr/local/lib/
     COMMAND cp -av ${PROJECT_BINARY_DIR}/build/libaio.so ${FREAK_SYSROOT_PATH}/usr/local/lib/
-    COMMAND cp -av ${PROJECT_BINARY_DIR}/build/libutils.so ${FREAK_SYSROOT_PATH}/usr/local/lib/
+    COMMAND cp -av ${PROJECT_BINARY_DIR}/build/libutils.so ${FREAK_SYSROOT_PATH}/usr/local/lib/libutils-media.so
     COMMAND mkdir -p ${FREAK_SYSROOT_PATH}/usr/local/include/${PROJECT_NAME}
     COMMAND cmake -E copy_directory ${PROJECT_BINARY_DIR}/build-${PROJECT_NAME}-sdk-prefix/src/build-${PROJECT_NAME}-sdk/libhttp/include/ ${FREAK_SYSROOT_PATH}/usr/local/include/${PROJECT_NAME}/libhttp
     COMMAND cmake -E copy_directory ${PROJECT_BINARY_DIR}/build-${PROJECT_NAME}-sdk-prefix/src/build-${PROJECT_NAME}-sdk/libaio/include/ ${FREAK_SYSROOT_PATH}/usr/local/include/${PROJECT_NAME}/libaio

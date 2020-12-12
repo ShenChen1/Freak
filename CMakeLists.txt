@@ -7,14 +7,15 @@ execute_process(COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/scripts/install-git-hooks
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/modules")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/utils")
 
-# tool
-include(strip)
-
-project(FREAK)
+project(FREAK VERSION 1.0.0 LANGUAGES C CXX)
 set(FREAK_HOME_PATH ${PROJECT_SOURCE_DIR})
 set(FREAK_BUILD_PATH ${PROJECT_SOURCE_DIR}/build)
 set(FREAK_SYSROOT_PATH ${PROJECT_SOURCE_DIR}/sysroot)
 set(FREAK_TOOLS_PATH ${PROJECT_SOURCE_DIR}/tools)
+
+# tool
+include(strip)
+include(GNUInstallDirs)
 
 add_subdirectory(fw)
 add_subdirectory(sdk)
