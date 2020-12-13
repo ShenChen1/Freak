@@ -31,7 +31,4 @@ include_directories(${PROJECT_SOURCE_DIR}/../vsf/)
 include_directories(${FREAK_SYSROOT_PATH}/usr/local/include/mpp)
 add_dependencies(${PROJECT_NAME} sdk-${CMAKE_CHIP_NAME})
 
-add_custom_target(cfg-${PROJECT_NAME}
-    COMMAND python ${FREAK_TOOLS_PATH}/jsonb-c/src/jsonb_c.py --source=${PROJECT_SOURCE_DIR}/cfg/sdk_cfg.jsonb --installdir=${PROJECT_SOURCE_DIR}/cfg)
-include_directories(${FREAK_TOOLS_PATH}/jsonb-c/inc/)
-add_dependencies(${PROJECT_NAME} cfg-${PROJECT_NAME})
+jsonb(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/cfg/sdk_cfg.jsonb ${PROJECT_SOURCE_DIR}/cfg)

@@ -20,12 +20,8 @@ add_dependencies(${PROJECT_NAME} ${LIB_CJSON_NAME})
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
 strip(${PROJECT_NAME} ${FREAK_SYSROOT_PATH}/usr/lib)
-
-add_custom_target(cfg-${PROJECT_NAME}
-    COMMAND python ${FREAK_TOOLS_PATH}/jsonb-c/src/jsonb_c.py --source=${PROJECT_SOURCE_DIR}/jsonb/proto_base.jsonb --installdir=${PROJECT_SOURCE_DIR}/jsonb
-    COMMAND python ${FREAK_TOOLS_PATH}/jsonb-c/src/jsonb_c.py --source=${PROJECT_SOURCE_DIR}/jsonb/proto_bsp.jsonb --installdir=${PROJECT_SOURCE_DIR}/jsonb
-    COMMAND python ${FREAK_TOOLS_PATH}/jsonb-c/src/jsonb_c.py --source=${PROJECT_SOURCE_DIR}/jsonb/proto_rtsp.jsonb --installdir=${PROJECT_SOURCE_DIR}/jsonb
-    COMMAND python ${FREAK_TOOLS_PATH}/jsonb-c/src/jsonb_c.py --source=${PROJECT_SOURCE_DIR}/jsonb/proto_vsf.jsonb --installdir=${PROJECT_SOURCE_DIR}/jsonb
-    COMMAND python ${FREAK_TOOLS_PATH}/jsonb-c/src/jsonb_c.py --source=${PROJECT_SOURCE_DIR}/jsonb/proto_web.jsonb --installdir=${PROJECT_SOURCE_DIR}/jsonb)
-include_directories(${FREAK_TOOLS_PATH}/jsonb-c/inc/)
-add_dependencies(${PROJECT_NAME} cfg-${PROJECT_NAME})
+jsonb(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/jsonb/proto_base.jsonb ${PROJECT_SOURCE_DIR}/jsonb)
+jsonb(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/jsonb/proto_bsp.jsonb ${PROJECT_SOURCE_DIR}/jsonb)
+jsonb(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/jsonb/proto_rtsp.jsonb ${PROJECT_SOURCE_DIR}/jsonb)
+jsonb(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/jsonb/proto_vsf.jsonb ${PROJECT_SOURCE_DIR}/jsonb)
+jsonb(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/jsonb/proto_web.jsonb ${PROJECT_SOURCE_DIR}/jsonb)

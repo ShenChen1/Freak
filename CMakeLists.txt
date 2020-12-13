@@ -15,6 +15,7 @@ set(FREAK_TOOLS_PATH ${PROJECT_SOURCE_DIR}/tools)
 
 # tool
 include(strip)
+include(jsonb)
 include(GNUInstallDirs)
 
 add_subdirectory(fw)
