@@ -14,9 +14,9 @@ if [[ $current_branch = $protected_branch ]] ; then
     echo -e "${YELLOW}Trying to build tests project...${NC}"
 
     # build the project
-    rm -rf build
+    rm -rf build package
     cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=./cmake/platforms/host.cmake
-    make -sC build
+    make -sC build install
 
     # $? is a shell variable which stores the return code from what we just ran
     rc=$?

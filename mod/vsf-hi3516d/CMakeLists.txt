@@ -1,7 +1,7 @@
 project(vsf-hi3516d)
 
+# SDK
 include(sdk-${CMAKE_CHIP_NAME})
-include(cjson)
 
 add_definitions(-DMODULE_NAME="${PROJECT_NAME}")
 add_definitions(-DSENSOR0_TYPE=SONY_IMX327_2L_MIPI_2M_30FPS_12BIT)

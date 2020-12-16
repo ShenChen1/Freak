@@ -1,8 +1,5 @@
 project(bsp)
 
-include(cjson)
-include(nanomsg)
-
 add_definitions(-DMODULE_NAME="${PROJECT_NAME}")
 add_executable(${PROJECT_NAME}
     src/main.c
@@ -13,6 +10,8 @@ add_executable(${PROJECT_NAME}
     cfg/cfg.c)
 
 target_link_libraries(${PROJECT_NAME}
+    -l${LIB_CJSON_NAME}
+    -l${LIB_NANOMSG_NAME}
     utils
     proto)
 include_directories(${PROJECT_SOURCE_DIR})

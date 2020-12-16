@@ -33,19 +33,13 @@ set_target_properties(${LIB_MEDIA_SRV_NAME}::sip PROPERTIES
 
 include_directories(${MEDIA_SRV_SDK_HEADER_DIR})
 link_directories(${MEDIA_SRV_SDK_LINK_DIR})
-add_link_options(-laio -lutils-media)
+
+set(LIB_MEDIA_SRV_AIO_NAME aio)
+set(LIB_MEDIA_SRV_UTILS_NAME utils-media)
 
 add_library(${LIB_MEDIA_SRV_NAME}::http STATIC IMPORTED)
 set_target_properties(${LIB_MEDIA_SRV_NAME}::http PROPERTIES
     IMPORTED_LOCATION ${MEDIA_SRV_SDK_LINK_DIR}/libhttp.a)
-
-add_library(${LIB_MEDIA_SRV_NAME}::aio SHARED IMPORTED)
-set_target_properties(${LIB_MEDIA_SRV_NAME}::aio PROPERTIES
-    IMPORTED_LOCATION ${MEDIA_SRV_SDK_LINK_DIR}/libaio.so)
-
-add_library(${LIB_MEDIA_SRV_NAME}::utils SHARED IMPORTED)
-set_target_properties(${LIB_MEDIA_SRV_NAME}::utils PROPERTIES
-    IMPORTED_LOCATION ${MEDIA_SRV_SDK_LINK_DIR}/libutils-media.so)
 
 ################################################################
 

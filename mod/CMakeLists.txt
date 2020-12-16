@@ -1,3 +1,10 @@
+include(cjson)
+include(media-server)
+include(mongoose)
+include(nanomsg)
+include(uthash)
+include(ufifo)
+
 add_compile_options(-g -Os -Wall -Werror)
 add_subdirectory(utils)
 add_subdirectory(proto)

@@ -2,9 +2,6 @@ project(vsf)
 
 # SDK
 include(sdk-${CMAKE_CHIP_NAME})
-include(cjson)
-include(nanomsg)
-include(ufifo)
 
 add_definitions(-DMODULE_NAME="${PROJECT_NAME}")
 add_executable(${PROJECT_NAME}
@@ -26,6 +23,9 @@ add_executable(${PROJECT_NAME}
     cfg/cfg.c)
 
 target_link_libraries(${PROJECT_NAME}
+    -l${LIB_CJSON_NAME}
+    -l${LIB_NANOMSG_NAME}
+    -l${LIB_UFIFO_NAME}
     ${LIB_SDK_NAME}
     -Wl,--whole-archive
     vsf-${CMAKE_CHIP_NAME}

@@ -1,10 +1,5 @@
 project(rtsp)
 
-include(cjson)
-include(media-server)
-include(nanomsg)
-include(ufifo)
-
 add_definitions(-DMODULE_NAME="${PROJECT_NAME}")
 add_definitions(-DOS_LINUX)
 add_executable(${PROJECT_NAME}
@@ -21,6 +16,11 @@ add_executable(${PROJECT_NAME}
     cfg/cfg.c)
 
 target_link_libraries(${PROJECT_NAME}
+    -l${LIB_CJSON_NAME}
+    -l${LIB_NANOMSG_NAME}
+    -l${LIB_MEDIA_SRV_AIO_NAME}
+    -l${LIB_MEDIA_SRV_UTILS_NAME}
+    -l${LIB_UFIFO_NAME}
     ${LIB_MEDIA_SRV_NAME}::rtsp
     ${LIB_MEDIA_SRV_NAME}::http
     ${LIB_MEDIA_SRV_NAME}::rtp
