@@ -5,12 +5,19 @@ ExternalProject_Add(${PROJECT_NAME}
     CONFIGURE_COMMAND true
     BUILD_COMMAND true
     INSTALL_COMMAND true
-    COMMAND mkdir -p ${FREAK_SYSROOT_PATH}/usr/local/lib/mpp/
-    COMMAND cmake -E copy_directory ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-prefix/src/${PROJECT_NAME}/lib/ ${FREAK_SYSROOT_PATH}/usr/local/lib/mpp/
-    COMMAND mkdir -p ${FREAK_SYSROOT_PATH}/usr/local/include/mpp/
-    COMMAND cmake -E copy_directory ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-prefix/src/${PROJECT_NAME}/include/ ${FREAK_SYSROOT_PATH}/usr/local/include/mpp/
-    COMMAND mkdir -p ${FREAK_SYSROOT_PATH}/usr/local/ko/
-    COMMAND cmake -E copy_directory ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-prefix/src/${PROJECT_NAME}/ko/ ${FREAK_SYSROOT_PATH}/usr/local/ko/
     COMMAND mkdir -p ${FREAK_HOME_PATH}/mod/vsf-hi3516d/sample/
     COMMAND cmake -E copy_directory ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-prefix/src/${PROJECT_NAME}/sample/common ${FREAK_HOME_PATH}/mod/vsf-hi3516d/sample/
     BUILD_IN_SOURCE 1)
+
+# set search path
+set(MEDIA_SDK_HEADER_DIR "${PROJECT_BINARY_DIR}/${PROJECT_NAME}-prefix/src/${PROJECT_NAME}/include"
+    CACHE PATH INTERNAL FORCE)
+set(MEDIA_SDK_LINK_DIR "${PROJECT_BINARY_DIR}/${PROJECT_NAME}-prefix/src/${PROJECT_NAME}/lib"
+    CACHE PATH INTERNAL FORCE)
+set(MEDIA_SDK_KO_DIR "${PROJECT_BINARY_DIR}/${PROJECT_NAME}-prefix/src/${PROJECT_NAME}/ko"
+    CACHE PATH INTERNAL FORCE)
+
+# set so and ko
+install(DIRECTORY "${MEDIA_SDK_LINK_DIR}" DESTINATION ${CMAKE_INSTALL_PREFIX}/usr/local
+    FILES_MATCHING PATTERN "*.so")
+install(DIRECTORY "${MEDIA_SDK_KO_DIR}" DESTINATION ${CMAKE_INSTALL_PREFIX}/usr/local)

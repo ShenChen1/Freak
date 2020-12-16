@@ -1,7 +1,15 @@
 set(LIB_UFIFO_NAME ufifo)
 
+################################################################
+
+include_directories(${UFIFO_HEADER_DIR})
+link_directories(${UFIFO_LINK_DIR})
+add_link_options(-l${LIB_UFIFO_NAME})
+
 add_library(${LIB_UFIFO_NAME} SHARED IMPORTED)
 set_target_properties(${LIB_UFIFO_NAME} PROPERTIES
-    IMPORTED_LOCATION ${FREAK_SYSROOT_PATH}/usr/local/lib/libufifo.so)
-include_directories(${FREAK_SYSROOT_PATH}/usr/local/include/ufifo)
+    IMPORTED_LOCATION ${UFIFO_LINK_DIR}/libufifo.so)
+
+################################################################
+
 add_dependencies(${LIB_UFIFO_NAME} build-${LIB_UFIFO_NAME})

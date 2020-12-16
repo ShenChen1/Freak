@@ -12,9 +12,9 @@ set(FREAK_HOME_PATH ${PROJECT_SOURCE_DIR})
 set(FREAK_BUILD_PATH ${PROJECT_SOURCE_DIR}/build)
 set(FREAK_SYSROOT_PATH ${PROJECT_SOURCE_DIR}/sysroot)
 set(FREAK_TOOLS_PATH ${PROJECT_SOURCE_DIR}/tools)
+set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/package)
 
 # tool
-include(strip)
 include(jsonb)
 include(GNUInstallDirs)
 

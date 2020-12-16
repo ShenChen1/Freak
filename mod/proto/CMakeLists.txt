@@ -1,5 +1,7 @@
 project(proto)
 
+include(cjson)
+
 add_definitions(-DMODULE_NAME="${PROJECT_NAME}")
 add_compile_options(-ffunction-sections -fdata-sections)
 add_link_options(-Wl,--gc-sections)
@@ -19,7 +21,6 @@ target_include_directories(${PROJECT_NAME}
 add_dependencies(${PROJECT_NAME} ${LIB_CJSON_NAME})
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
-strip(${PROJECT_NAME} ${FREAK_SYSROOT_PATH}/usr/lib)
 jsonb(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/jsonb/proto_base.jsonb ${PROJECT_SOURCE_DIR}/jsonb)
 jsonb(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/jsonb/proto_bsp.jsonb ${PROJECT_SOURCE_DIR}/jsonb)
 jsonb(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/jsonb/proto_rtsp.jsonb ${PROJECT_SOURCE_DIR}/jsonb)

@@ -1,5 +1,5 @@
-include_directories(${FREAK_SYSROOT_PATH}/usr/local/include/mpp)
-link_directories(${FREAK_SYSROOT_PATH}/usr/local/lib/mpp)
+include_directories(${MEDIA_SDK_HEADER_DIR})
+link_directories(${MEDIA_SDK_LINK_DIR})
 
 list(APPEND LIB_SDK_NAME "aaccomm")
 list(APPEND LIB_SDK_NAME "aacdec")

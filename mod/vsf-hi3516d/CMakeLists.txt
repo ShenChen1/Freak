@@ -1,5 +1,8 @@
 project(vsf-hi3516d)
 
+include(sdk-${CMAKE_CHIP_NAME})
+include(cjson)
+
 add_definitions(-DMODULE_NAME="${PROJECT_NAME}")
 add_definitions(-DSENSOR0_TYPE=SONY_IMX327_2L_MIPI_2M_30FPS_12BIT)
 add_definitions(-DSENSOR1_TYPE=SONY_IMX327_2L_MIPI_2M_30FPS_12BIT)
@@ -28,7 +31,6 @@ target_link_libraries(${PROJECT_NAME}
     proto)
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/../vsf/)
-include_directories(${FREAK_SYSROOT_PATH}/usr/local/include/mpp)
 add_dependencies(${PROJECT_NAME} sdk-${CMAKE_CHIP_NAME})
 
 jsonb(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/cfg/sdk_cfg.jsonb ${PROJECT_SOURCE_DIR}/cfg)

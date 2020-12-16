@@ -1,5 +1,9 @@
 project(utils)
 
+include(cjson)
+include(nanomsg)
+include(uthash)
+
 add_definitions(-DMODULE_NAME="${PROJECT_NAME}")
 add_compile_options(-ffunction-sections -fdata-sections)
 add_link_options(-Wl,--gc-sections)
@@ -16,6 +20,7 @@ add_library(${PROJECT_NAME} SHARED
     nnm/src/nnm_pubsub.c)
 
 target_include_directories(${PROJECT_NAME}
+    PUBLIC ${UTHASH_HEADER_DIR}
     PUBLIC ${PROJECT_SOURCE_DIR}/json-cfg/inc
     PRIVATE ${FREAK_TOOLS_PATH}/jsonb-c/inc
     PUBLIC ${PROJECT_SOURCE_DIR}/common/inc
@@ -27,4 +32,3 @@ add_dependencies(${PROJECT_NAME} ${LIB_UTHASH_NAME})
 add_dependencies(${PROJECT_NAME} ${LIB_NANOMSG_NAME})
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
-strip(${PROJECT_NAME} ${FREAK_SYSROOT_PATH}/usr/lib)

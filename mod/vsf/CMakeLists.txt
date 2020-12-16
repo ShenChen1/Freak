@@ -2,6 +2,9 @@ project(vsf)
 
 # SDK
 include(sdk-${CMAKE_CHIP_NAME})
+include(cjson)
+include(nanomsg)
+include(ufifo)
 
 add_definitions(-DMODULE_NAME="${PROJECT_NAME}")
 add_executable(${PROJECT_NAME}
@@ -23,10 +26,7 @@ add_executable(${PROJECT_NAME}
     cfg/cfg.c)
 
 target_link_libraries(${PROJECT_NAME}
-    ${LIB_CJSON_NAME}
-    ${LIB_NANOMSG_NAME}
     ${LIB_SDK_NAME}
-    ${LIB_UFIFO_NAME}
     -Wl,--whole-archive
     vsf-${CMAKE_CHIP_NAME}
     -Wl,--no-whole-archive
@@ -34,7 +34,7 @@ target_link_libraries(${PROJECT_NAME}
     proto)
 include_directories(${PROJECT_SOURCE_DIR})
 add_dependencies(${PROJECT_NAME} vsf-${CMAKE_CHIP_NAME})
+add_dependencies(${PROJECT_NAME} ${LIB_UFIFO_NAME})
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_BINDIR})
-strip(${PROJECT_NAME} ${FREAK_SYSROOT_PATH}/usr/bin)
 jsonb(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/cfg/cfg.jsonb ${PROJECT_SOURCE_DIR}/cfg)

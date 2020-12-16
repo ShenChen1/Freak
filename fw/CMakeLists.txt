@@ -1,6 +1,5 @@
 include(ExternalProject)
 add_subdirectory(cjson)
-add_subdirectory(st)
 add_subdirectory(nanomsg)
 add_subdirectory(mongoose)
 add_subdirectory(media-server)

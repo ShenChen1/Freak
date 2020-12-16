@@ -1,5 +1,9 @@
 project(web)
 
+include(cjson)
+include(mongoose)
+include(nanomsg)
+
 add_definitions(-DMODULE_NAME="${PROJECT_NAME}")
 add_executable(${PROJECT_NAME}
     src/main.c
@@ -10,13 +14,10 @@ add_executable(${PROJECT_NAME}
     cfg/cfg.c)
 
 target_link_libraries(${PROJECT_NAME}
-    ${LIB_CJSON_NAME}
-    ${LIB_NANOMSG_NAME}
-    ${LIB_MONGOOSE_NAME}
     utils
     proto)
 include_directories(${PROJECT_SOURCE_DIR})
+add_dependencies(${PROJECT_NAME} ${LIB_MONGOOSE_NAME})
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_BINDIR})
-strip(${PROJECT_NAME} ${FREAK_SYSROOT_PATH}/usr/bin)
 jsonb(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/cfg/cfg.jsonb ${PROJECT_SOURCE_DIR}/cfg)
