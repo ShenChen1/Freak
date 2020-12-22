@@ -33,4 +33,4 @@ include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/../vsf/)
 add_dependencies(${PROJECT_NAME} sdk-${CMAKE_CHIP_NAME})
 
-jsonb(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/cfg/sdk_cfg.jsonb ${PROJECT_SOURCE_DIR}/cfg)
+jsonb(${PROJECT_NAME} sdkcfg ${PROJECT_SOURCE_DIR}/cfg/sdk_cfg.jsonb ${PROJECT_SOURCE_DIR}/cfg)
