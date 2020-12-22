@@ -4,13 +4,20 @@
 #include "cfg/cfg.h"
 
 static bsp_cfg_t s_cfg = {
-    .board = {
-        .model = "IPC",
-        .sn = "123456",
-        .chip = "HI3516DV300",
-    },
-    .dummy[0] = {
-        .value = 0xdeadbeef,
+    .dummy = {
+        .num = 2,
+        .cfgs[0] = {
+            .value = 0x1234,
+        },
+        .caps[0] = {
+            .value = 0x2345,
+        },
+        .cfgs[1] = {
+            .value = 0x3456,
+        },
+        .caps[1] = {
+            .value = 0x4567,
+        },
     },
 };
 

@@ -5,10 +5,6 @@
 #include "media.h"
 #include "node.h"
 #include "path.h"
-#include "proto_bsp.h"
-#include "proto_rtsp.h"
-#include "proto_vsf.h"
-#include "proto_web.h"
 
 #define PROTO_PACKAGE_MAXSIZE (1024)
 
@@ -28,6 +24,8 @@ typedef struct {
 } proto_header_t;
 
 typedef enum {
+    PROTO_ACTION_NUM,
+    PROTO_ACTION_CAP,
     PROTO_ACTION_GET,
     PROTO_ACTION_SET,
 } proto_action_e;
@@ -69,7 +67,14 @@ typedef enum {
         infof("- ts:        %llu", p->ts);                        \
         infof("- chn:       %u", p->chn);                         \
         infof("- key:       %u", p->key);                         \
-        infof("- action:    %s", p->action ? "SET" : "GET");      \
+        if (p->action == PROTO_ACTION_SET)                        \
+        infof("- action:    %s", "SET");                          \
+        if (p->action == PROTO_ACTION_GET)                        \
+        infof("- action:    %s", "GET");                          \
+        if (p->action == PROTO_ACTION_CAP)                        \
+        infof("- action:    %s", "CAP");                          \
+        if (p->action == PROTO_ACTION_NUM)                        \
+        infof("- action:    %s", "NUM");                          \
         infof("- errcode:   %u", p->errcode);                     \
         infof("- format:    %s", p->format ? "JSON" : "STRUCTE"); \
         infof("- size:      %u", p->size);                        \

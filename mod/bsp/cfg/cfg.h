@@ -4,7 +4,6 @@
 #include "proto_bsp.h"
 extern void jsonb_opt_bsp_cfg_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
-    proto_bsp_board_t board;
-    proto_bsp_dummy_t dummy[3];
+    proto_bsp_dummy_t dummy;
 } bsp_cfg_t;
 #endif /* __CFG_JSONB_C_API_H__ */

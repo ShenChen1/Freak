@@ -1,14 +1,15 @@
+#include "bsp/dummy.h"
 #include "common.h"
+#include "inc/cfg.h"
 #include "log.h"
-#include "inc/dummy.h"
-
-#define DUMMY_RESOURCE_NUM (3)
 
 typedef struct {
+    int id;
     int value;
+    proto_bsp_dummy_cap_t *cap;
 } dummy_priv_t;
 
-static dummy_t *s_dummy_obj[DUMMY_RESOURCE_NUM] = {};
+static dummy_t *s_dummy_obj[BSP_ITEM_MAX] = {};
 
 static int __dummy_destroy(dummy_t *self)
 {
@@ -17,18 +18,27 @@ static int __dummy_destroy(dummy_t *self)
     return 0;
 }
 
-static int __dummy_set(dummy_t *self, int value)
+static int __dummy_cap(dummy_t *self, proto_bsp_dummy_cap_t *cap)
 {
     dummy_priv_t *priv = self->priv;
 
-    priv->value = value;
+    memcpy(cap, priv->cap, sizeof(proto_bsp_dummy_cap_t));
     return 0;
 }
-static int __dummy_get(dummy_t *self, int *value)
+
+static int __dummy_set(dummy_t *self, proto_bsp_dummy_cfg_t *cfg)
 {
     dummy_priv_t *priv = self->priv;
 
-    *value = priv->value;
+    priv->value = cfg->value;
+    return 0;
+}
+
+static int __dummy_get(dummy_t *self, proto_bsp_dummy_cfg_t *cfg)
+{
+    dummy_priv_t *priv = self->priv;
+
+    cfg->value = priv->value;
     return 0;
 }
 
@@ -37,7 +47,7 @@ dummy_t *createDummy(int id)
     dummy_t *obj       = NULL;
     dummy_priv_t *priv = NULL;
 
-    if (id >= getDummyResourceNum()) {
+    if (id >= cfg_get_member(dummy)->num) {
         return NULL;
     }
 
@@ -49,10 +59,13 @@ dummy_t *createDummy(int id)
     priv = malloc(sizeof(dummy_priv_t));
     assert(priv);
     priv->value = 0;
+    priv->id = id;
+    priv->cap = &cfg_get_member(dummy)->caps[priv->id];
 
     obj = malloc(sizeof(dummy_t));
     assert(obj);
     obj->priv    = priv;
+    obj->cap     = __dummy_cap;
     obj->set     = __dummy_set;
     obj->get     = __dummy_get;
     obj->destroy = __dummy_destroy;
@@ -62,7 +75,7 @@ dummy_t *createDummy(int id)
     return s_dummy_obj[id];
 }
 
-int getDummyResourceNum()
+int getDummyNum()
 {
-    return DUMMY_RESOURCE_NUM;
+    return cfg_get_member(dummy)->num;
 }

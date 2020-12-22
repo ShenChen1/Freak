@@ -4,18 +4,21 @@ add_definitions(-DMODULE_NAME="${PROJECT_NAME}")
 add_compile_options(-ffunction-sections -fdata-sections)
 add_link_options(-Wl,--gc-sections)
 
-add_library(${PROJECT_NAME} SHARED
+add_library(${PROJECT_NAME} STATIC
     jsonb/proto_base.c
     jsonb/proto_bsp.c
     jsonb/proto_rtsp.c
     jsonb/proto_vsf.c
     jsonb/proto_web.c
-    src/dummy.c)
+    interface/bsp/dummy.c)
 
+target_link_libraries(${PROJECT_NAME}
+    utils)
 target_include_directories(${PROJECT_NAME}
     PUBLIC ${PROJECT_SOURCE_DIR}/inc
     PUBLIC ${PROJECT_SOURCE_DIR}/media
-    PUBLIC ${PROJECT_SOURCE_DIR}/jsonb)
+    PUBLIC ${PROJECT_SOURCE_DIR}/jsonb
+    PUBLIC ${PROJECT_SOURCE_DIR}/interface)
 add_dependencies(${PROJECT_NAME} ${LIB_CJSON_NAME})
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})

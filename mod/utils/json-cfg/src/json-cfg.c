@@ -18,12 +18,11 @@ int json_cfg_load(const char *filename, void *cfg, size_t size, jsonb_opt_func_t
     len = ftell(fp);
     fseek(fp, 0, SEEK_SET);
 
-    data = malloc(len + 1);
+    data = calloc(1, len + 1);
     if (data == NULL) {
         ret = -ENOMEM;
         goto end1;
     }
-    data[size] = '\0';
 
     if (fread(data, 1, len, fp) < len) {
         ret = -EIO;
