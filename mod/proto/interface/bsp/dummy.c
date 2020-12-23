@@ -73,7 +73,7 @@ static int __dummy_get(dummy_t *self, proto_bsp_dummy_cfg_t *cfg)
     return 0;
 }
 
-dummy_t *createDummy_r(int id)
+dummy_t * __weak createDummy(int id)
 {
     int ret;
     dummy_t *obj       = NULL;
@@ -97,12 +97,7 @@ dummy_t *createDummy_r(int id)
     return obj;
 }
 
-dummy_t * __weak createDummy(int id)
-{
-    return createDummy_r(id);
-}
-
-int getDummyNum_r()
+int __weak getDummyNum()
 {
     int ret;
     nnm_t req = NULL;
@@ -123,9 +118,4 @@ int getDummyNum_r()
 
     nnm_req_destory(req);
     return ret;
-}
-
-int __weak getDummyNum()
-{
-    return getDummyNum_r();
 }

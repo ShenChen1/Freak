@@ -10,7 +10,11 @@ add_library(${PROJECT_NAME} STATIC
     jsonb/proto_rtsp.c
     jsonb/proto_vsf.c
     jsonb/proto_web.c
-    interface/bsp/dummy.c)
+    interface/bsp/dummy.c
+    interface/vsf/chn_mgr.c
+    interface/vsf/frame_mgr.c
+    interface/vsf/osd_mgr.c
+    interface/vsf/stream_mgr.c)
 
 target_link_libraries(${PROJECT_NAME}
     utils)

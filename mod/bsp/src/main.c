@@ -26,9 +26,9 @@ int main()
     nnm_pub_create(PROTO_BSP_PUB_NODE, &pub);
 
     int i;
-    int total = getDummyNum_r();
+    int total = getDummyNum();
     for (i = 0; i < total; i++) {
-        dummy_t *dummy = createDummy_r(i);
+        dummy_t *dummy = createDummy(i);
         // get cap
         proto_bsp_dummy_cap_t cap;
         dummy->cap(dummy, &cap);

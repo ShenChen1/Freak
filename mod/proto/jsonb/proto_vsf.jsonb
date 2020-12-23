@@ -1,44 +1,55 @@
 JSONB_INCLUDE_HEADER(proto_base.h)
 
+JSONB_MACRO_DEFINE(VSF_ITEM_MAX, 8)
 JSONB_MACRO_DEFINE(VSF_FRAME_MAX, 8)
 JSONB_MACRO_DEFINE(VSF_STREAM_MAX, 6)
 JSONB_MACRO_DEFINE(VSF_OSD_MAX, 16)
 
 /////////////////////////////////////////////////////////////////////////////////
 
-JSONB_STRUCT_START(proto_vsf_frame_t)
+JSONB_STRUCT_START(proto_vsf_frame_cfg_t)
 JSONB_FIELD(id, int)
 JSONB_FIELD(enable, int)
-JSONB_FIELD(chn, int)
-JSONB_FIELD(subchn, int)
 JSONB_FIELD(format, int)
 JSONB_FIELD(width, int)
 JSONB_FIELD(height, int)
 JSONB_FIELD(fps, int)
-JSONB_STRUCT_END(proto_vsf_frame_t)
-
-JSONB_STRUCT_START(proto_vsf_frame_cfg_t)
-JSONB_FIELD(num, int)
-JSONB_FIELD_ARRAY(frames, VSF_FRAME_MAX, proto_vsf_frame_t)
 JSONB_STRUCT_END(proto_vsf_frame_cfg_t)
+
+JSONB_STRUCT_START(proto_vsf_frame_cap_t)
+JSONB_FIELD(id, int)
+JSONB_FIELD(chn, int)
+JSONB_FIELD(subchn, int)
+JSONB_STRUCT_END(proto_vsf_frame_cap_t)
+
+JSONB_STRUCT_START(proto_vsf_frame_t)
+JSONB_FIELD(num, int)
+JSONB_FIELD_ARRAY(caps, VSF_FRAME_MAX, proto_vsf_frame_cap_t)
+JSONB_FIELD_ARRAY(cfgs, VSF_FRAME_MAX, proto_vsf_frame_cfg_t)
+JSONB_STRUCT_END(proto_vsf_frame_t)
 
 /////////////////////////////////////////////////////////////////////////////////
 
-JSONB_STRUCT_START(proto_vsf_stream_t)
+JSONB_STRUCT_START(proto_vsf_stream_cfg_t)
 JSONB_FIELD(id, int)
 JSONB_FIELD(enable, int)
-JSONB_FIELD(chn, int)
-JSONB_FIELD(subchn, int)
 JSONB_FIELD(encode, int)
 JSONB_FIELD(width, int)
 JSONB_FIELD(height, int)
 JSONB_FIELD(fps, int)
-JSONB_STRUCT_END(proto_vsf_stream_t)
-
-JSONB_STRUCT_START(proto_vsf_stream_cfg_t)
-JSONB_FIELD(num, int)
-JSONB_FIELD_ARRAY(streams, VSF_STREAM_MAX, proto_vsf_stream_t)
 JSONB_STRUCT_END(proto_vsf_stream_cfg_t)
+
+JSONB_STRUCT_START(proto_vsf_stream_cap_t)
+JSONB_FIELD(id, int)
+JSONB_FIELD(chn, int)
+JSONB_FIELD(subchn, int)
+JSONB_STRUCT_END(proto_vsf_stream_cap_t)
+
+JSONB_STRUCT_START(proto_vsf_stream_t)
+JSONB_FIELD(num, int)
+JSONB_FIELD_ARRAY(caps, VSF_STREAM_MAX, proto_vsf_stream_cap_t)
+JSONB_FIELD_ARRAY(cfgs, VSF_STREAM_MAX, proto_vsf_stream_cfg_t)
+JSONB_STRUCT_END(proto_vsf_stream_t)
 
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -57,15 +68,20 @@ JSONB_UNION_FIELD(mask, proto_vsf_osd_mask_t)
 JSONB_UNION_FIELD(text, proto_vsf_osd_text_t)
 JSONB_UNION_END(proto_vsf_osd_union_t)
 
-JSONB_STRUCT_START(proto_vsf_osd_t)
+JSONB_STRUCT_START(proto_vsf_osd_cfg_t)
 JSONB_FIELD(id, int)
 JSONB_FIELD(enable, int)
+JSONB_FIELD(info, proto_vsf_osd_union_t)
+JSONB_STRUCT_END(proto_vsf_osd_cfg_t)
+
+JSONB_STRUCT_START(proto_vsf_osd_cap_t)
+JSONB_FIELD(id, int)
 JSONB_FIELD(chn, int)
 JSONB_FIELD(subchn, int)
-JSONB_FIELD(info, proto_vsf_osd_union_t)
-JSONB_STRUCT_END(proto_vsf_osd_t)
+JSONB_STRUCT_END(proto_vsf_osd_cap_t)
 
-JSONB_STRUCT_START(proto_vsf_osd_cfg_t)
+JSONB_STRUCT_START(proto_vsf_osd_t)
 JSONB_FIELD(num, int)
-JSONB_FIELD_ARRAY(osds, VSF_OSD_MAX, proto_vsf_osd_t)
-JSONB_STRUCT_END(proto_vsf_osd_cfg_t)
+JSONB_FIELD_ARRAY(caps, VSF_OSD_MAX, proto_vsf_osd_cap_t)
+JSONB_FIELD_ARRAY(cfgs, VSF_OSD_MAX, proto_vsf_osd_cfg_t)
+JSONB_STRUCT_END(proto_vsf_osd_t)
