@@ -21,7 +21,7 @@ static unsigned int recsize(unsigned char *p1, unsigned int n1, unsigned char *p
 
     if (n1 >= size) {
         media_record_t *rec = (media_record_t *)p1;
-        size = rec->size;
+        size                = rec->size;
     } else {
         media_record_t rec;
         void *p = (void *)(&rec);
@@ -41,7 +41,7 @@ static unsigned int rectag(unsigned char *p1, unsigned int n1, unsigned char *p2
 
     if (n1 >= size) {
         media_record_t *rec = (media_record_t *)p1;
-        tag = rec->tag;
+        tag                 = rec->tag;
     } else {
         media_record_t rec;
         void *p = (void *)(&rec);
@@ -169,7 +169,8 @@ static int __vsf_stream_jpeg_proc(video_stream_t *stream, void *args)
     for (i = 0; i < stream->u32PackCount; i++) {
         fwrite(stream->pstPack[i].pu8Addr + stream->pstPack[i].u32Offset,
                stream->pstPack[i].u32Len - stream->pstPack[i].u32Offset,
-               1, pFile);
+               1,
+               pFile);
         fflush(pFile);
     }
     fclose(pFile);
@@ -181,14 +182,20 @@ static int __vsf_stream_proc(void *data, void *args)
     video_stream_t *stream = data;
 
     switch (stream->enType) {
-        case VIDEO_STREAM_TYPE_H264:
-            return __vsf_stream_h264_proc(stream, args);
-        case VIDEO_STREAM_TYPE_JPEG:
-            return __vsf_stream_jpeg_proc(stream, args);
-        default:
-            return -1;
+    case VIDEO_STREAM_TYPE_H264:
+        return __vsf_stream_h264_proc(stream, args);
+    case VIDEO_STREAM_TYPE_JPEG:
+        return __vsf_stream_jpeg_proc(stream, args);
+    default:
+        return -1;
     }
 
+    return 0;
+}
+
+static int __vsf_stream_destroy(vsf_stream_mgr_t *self)
+{
+    // never destroy
     return 0;
 }
 
@@ -199,8 +206,11 @@ static int __vsf_stream_set(vsf_stream_mgr_t *self, proto_vsf_stream_cfg_t *cfg)
     vsf_stream_mgr_priv_t *priv = mgr->priv;
 
     char name[64];
-    snprintf(name, sizeof(name), PROTO_VSF_STREAM_FIFO "%d-%d",
-        priv->info->caps[cfg->id].chn, priv->info->caps[cfg->id].subchn);
+    snprintf(name,
+             sizeof(name),
+             PROTO_VSF_STREAM_FIFO "%d-%d",
+             priv->info->caps[cfg->id].chn,
+             priv->info->caps[cfg->id].subchn);
 
     if (cfg->enable) {
         if (!priv->fifo[cfg->id]) {
@@ -261,7 +271,7 @@ static int __vsf_stream_num(vsf_stream_mgr_t *self)
     return priv->info->num;
 }
 
-vsf_stream_mgr_t *VSF_createStreamMgr()
+vsf_stream_mgr_t *vsf_createStreamMgr()
 {
     vsf_stream_mgr_t *mgr       = s_mgr;
     vsf_stream_mgr_priv_t *priv = NULL;
@@ -280,11 +290,12 @@ vsf_stream_mgr_t *VSF_createStreamMgr()
         return NULL;
     }
 
-    mgr->priv = priv;
-    mgr->get  = __vsf_stream_get;
-    mgr->set  = __vsf_stream_set;
-    mgr->num  = __vsf_stream_num;
-    mgr->cap  = __vsf_stream_cap;
+    mgr->priv    = priv;
+    mgr->destroy = __vsf_stream_destroy;
+    mgr->get     = __vsf_stream_get;
+    mgr->set     = __vsf_stream_set;
+    mgr->num     = __vsf_stream_num;
+    mgr->cap     = __vsf_stream_cap;
 
     s_mgr = mgr;
     return mgr;

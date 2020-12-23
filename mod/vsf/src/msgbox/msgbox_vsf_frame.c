@@ -16,7 +16,7 @@ static int msgbox_frame_set(msgbox_param_t *param)
         }
     }
 
-    vsf_frame_mgr_t *obj = VSF_createFrameMgr();
+    vsf_frame_mgr_t *obj = vsf_createFrameMgr();
     assert(obj && obj->set);
     ret = obj->set(obj, in);
     if (!ret) {
@@ -40,7 +40,7 @@ static int msgbox_frame_get(msgbox_param_t *param)
         out = malloc(sizeof(proto_vsf_frame_cfg_t));
     }
 
-    vsf_frame_mgr_t *obj = VSF_createFrameMgr();
+    vsf_frame_mgr_t *obj = vsf_createFrameMgr();
     assert(obj && obj->get);
     ret = obj->get(obj, out);
     *param->osize = sizeof(proto_vsf_frame_cfg_t);
@@ -68,7 +68,7 @@ static int msgbox_frame_cap(msgbox_param_t *param)
         out = malloc(sizeof(proto_vsf_frame_cap_t));
     }
 
-    vsf_frame_mgr_t *obj = VSF_createFrameMgr();
+    vsf_frame_mgr_t *obj = vsf_createFrameMgr();
     assert(obj && obj->cap);
     ret = obj->cap(obj, out);
     *param->osize = sizeof(proto_vsf_frame_cap_t);
@@ -97,14 +97,14 @@ static int msgbox_frame_num(msgbox_param_t *param)
     }
 
 
-    vsf_frame_mgr_t *obj = VSF_createFrameMgr();
+    vsf_frame_mgr_t *obj = vsf_createFrameMgr();
     assert(obj && obj->num);
     ret = obj->num(obj);
     if (ret >= 0) {
         *out = ret;
         ret = 0;
     } else {
-        ret = -EINVAL;
+        ret = EINVAL;
     }
     *param->osize = sizeof(int);
 

@@ -14,6 +14,6 @@ typedef struct osd_mgr {
 
 } vsf_osd_mgr_t;
 
-vsf_osd_mgr_t *VSF_createOsdMgr(void);
+vsf_osd_mgr_t *vsf_createOsdMgr(void);
 
 #endif //__VSF_OSD_MGR_H__

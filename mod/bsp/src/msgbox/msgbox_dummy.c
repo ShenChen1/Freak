@@ -17,7 +17,7 @@ static int msgbox_dummy_set(msgbox_param_t *param)
         }
     }
 
-    dummy_t *obj = createDummy(param->chn);
+    bsp_dummy_t *obj = bsp_createDummy(param->chn);
     assert(obj && obj->set);
     ret = obj->set(obj, in);
     if (!ret) {
@@ -41,7 +41,7 @@ static int msgbox_dummy_get(msgbox_param_t *param)
         out = malloc(sizeof(proto_bsp_dummy_cfg_t));
     }
 
-    dummy_t *obj = createDummy(param->chn);
+    bsp_dummy_t *obj = bsp_createDummy(param->chn);
     assert(obj && obj->get);
     ret = obj->get(obj, out);
     *param->osize = sizeof(proto_bsp_dummy_cfg_t);
@@ -69,7 +69,7 @@ static int msgbox_dummy_cap(msgbox_param_t *param)
         out = malloc(sizeof(proto_bsp_dummy_cap_t));
     }
 
-    dummy_t *obj = createDummy(param->chn);
+    bsp_dummy_t *obj = bsp_createDummy(param->chn);
     assert(obj && obj->cap);
     ret = obj->cap(obj, out);
     *param->osize = sizeof(proto_bsp_dummy_cap_t);
@@ -97,12 +97,12 @@ static int msgbox_dummy_num(msgbox_param_t *param)
         out = malloc(sizeof(int));
     }
 
-    ret = getDummyNum(param->chn);
+    ret = bsp_getDummyNum(param->chn);
     if (ret >= 0) {
         *out = ret;
         ret = 0;
     } else {
-        ret = -EINVAL;
+        ret = EINVAL;
     }
     *param->osize = sizeof(int);
 

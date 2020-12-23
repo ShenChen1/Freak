@@ -13,8 +13,8 @@ static int __rep_recv(void *in, size_t isize, void **out, size_t *osize, void *a
 int main(int argc, char *argv[])
 {
     int ret;
-    nnm_t rep    = NULL;
-    nnm_t req    = NULL;
+    nnm_t rep = NULL;
+    nnm_t req = NULL;
 
     log_init(PROTO_LOG_COM_NODE, false);
     log_setlevel(LOG_LV_INFO);
@@ -48,7 +48,6 @@ int main(int argc, char *argv[])
         sleep(1);
     }
 
-    nnm_req_destory(req);
     nnm_rep_destory(rep);
     msgbox_deinit();
     log_deinit();

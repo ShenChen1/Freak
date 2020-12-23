@@ -91,7 +91,7 @@ static int __vsf_frame_num(vsf_frame_mgr_t *self)
     return ret;
 }
 
-vsf_frame_mgr_t * __weak VSF_createFrameMgr()
+vsf_frame_mgr_t * __weak vsf_createFrameMgr()
 {
     int ret;
     vsf_frame_mgr_t *mgr       = NULL;

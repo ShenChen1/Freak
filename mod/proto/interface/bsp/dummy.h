@@ -42,7 +42,7 @@ typedef struct dummy {
      */
     int (*get)(struct dummy *self, proto_bsp_dummy_cfg_t *cfg);
 
-} dummy_t;
+} bsp_dummy_t;
 
 /**
  * @brief  Create dummy instance
@@ -51,13 +51,13 @@ typedef struct dummy {
  * @return dummy        created instance on success,
  *                      NULL on error
  */
-dummy_t *createDummy(int id);
+bsp_dummy_t *bsp_createDummy(int id);
 
 /**
  * @brief  get the number of dummy
  *
  * @return >=0 for the number, <0 otherwise.
  */
-int getDummyNum();
+int bsp_getDummyNum();
 
 #endif //__BSP_DUMMY_H__

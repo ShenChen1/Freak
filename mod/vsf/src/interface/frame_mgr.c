@@ -22,7 +22,7 @@ static unsigned int recsize(unsigned char *p1, unsigned int n1, unsigned char *p
 
     if (n1 >= size) {
         media_record_t *rec = (media_record_t *)p1;
-        size = rec->size;
+        size                = rec->size;
     } else {
         media_record_t rec;
         void *p = (void *)(&rec);
@@ -42,7 +42,7 @@ static unsigned int rectag(unsigned char *p1, unsigned int n1, unsigned char *p2
 
     if (n1 >= size) {
         media_record_t *rec = (media_record_t *)p1;
-        tag = rec->tag;
+        tag                 = rec->tag;
     } else {
         media_record_t rec;
         void *p = (void *)(&rec);
@@ -265,6 +265,12 @@ static int __vsf_free_frame_proc(void *data, void *args)
     return ufifo_get_block(priv->fifo[cfg->id][VSF_FRAME_CB_FREE], frame, totalsize) != totalsize;
 }
 
+static int __vsf_frame_destroy(vsf_frame_mgr_t *self)
+{
+    // never destroy
+    return 0;
+}
+
 static int __vsf_frame_set(vsf_frame_mgr_t *self, proto_vsf_frame_cfg_t *cfg)
 {
     int ret;
@@ -281,15 +287,21 @@ static int __vsf_frame_set(vsf_frame_mgr_t *self, proto_vsf_frame_cfg_t *cfg)
         };
 
         if (!priv->fifo[cfg->id][VSF_FRAME_CB_GET]) {
-            snprintf(name, sizeof(name), PROTO_VSF_FRAME_WORK_FIFO "%d-%d",
-                priv->info->caps[cfg->id].chn, priv->info->caps[cfg->id].subchn);
+            snprintf(name,
+                     sizeof(name),
+                     PROTO_VSF_FRAME_WORK_FIFO "%d-%d",
+                     priv->info->caps[cfg->id].chn,
+                     priv->info->caps[cfg->id].subchn);
             ret = ufifo_open(name, &init, &priv->fifo[cfg->id][VSF_FRAME_CB_GET]);
             assert(!ret);
             assert(priv->fifo[cfg->id][VSF_FRAME_CB_GET]);
         }
         if (!priv->fifo[cfg->id][VSF_FRAME_CB_FREE]) {
-            snprintf(name, sizeof(name), PROTO_VSF_FRAME_FREE_FIFO "%d-%d",
-                priv->info->caps[cfg->id].chn, priv->info->caps[cfg->id].subchn);
+            snprintf(name,
+                     sizeof(name),
+                     PROTO_VSF_FRAME_FREE_FIFO "%d-%d",
+                     priv->info->caps[cfg->id].chn,
+                     priv->info->caps[cfg->id].subchn);
             ret = ufifo_open(name, &init, &priv->fifo[cfg->id][VSF_FRAME_CB_FREE]);
             assert(!ret);
             assert(priv->fifo[cfg->id][VSF_FRAME_CB_FREE]);
@@ -345,7 +357,7 @@ static int __vsf_frame_num(vsf_frame_mgr_t *self)
     return priv->info->num;
 }
 
-vsf_frame_mgr_t *VSF_createFrameMgr()
+vsf_frame_mgr_t *vsf_createFrameMgr()
 {
     vsf_frame_mgr_t *mgr       = s_mgr;
     vsf_frame_mgr_priv_t *priv = NULL;
@@ -364,11 +376,12 @@ vsf_frame_mgr_t *VSF_createFrameMgr()
         return NULL;
     }
 
-    mgr->priv = priv;
-    mgr->get  = __vsf_frame_get;
-    mgr->set  = __vsf_frame_set;
-    mgr->cap  = __vsf_frame_cap;
-    mgr->num  = __vsf_frame_num;
+    mgr->priv    = priv;
+    mgr->destroy = __vsf_frame_destroy;
+    mgr->get     = __vsf_frame_get;
+    mgr->set     = __vsf_frame_set;
+    mgr->cap     = __vsf_frame_cap;
+    mgr->num     = __vsf_frame_num;
 
     s_mgr = mgr;
     return mgr;

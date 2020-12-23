@@ -8,7 +8,7 @@ typedef struct {
     nnm_t req;
 } dummy_priv_t;
 
-static int __dummy_destroy(dummy_t *self)
+static int __bsp_dummy_destroy(bsp_dummy_t *self)
 {
     dummy_priv_t *priv = self->priv;
 
@@ -18,7 +18,7 @@ static int __dummy_destroy(dummy_t *self)
     return 0;
 }
 
-static int __dummy_cap(dummy_t *self, proto_bsp_dummy_cap_t *cap)
+static int __bsp_dummy_cap(bsp_dummy_t *self, proto_bsp_dummy_cap_t *cap)
 {
     dummy_priv_t *priv = self->priv;
     uint8_t ibuf[PROTO_PACKAGE_MAXSIZE] = {};
@@ -37,7 +37,7 @@ static int __dummy_cap(dummy_t *self, proto_bsp_dummy_cap_t *cap)
     return 0;
 }
 
-static int __dummy_set(dummy_t *self, proto_bsp_dummy_cfg_t *cfg)
+static int __bsp_dummy_set(bsp_dummy_t *self, proto_bsp_dummy_cfg_t *cfg)
 {
     dummy_priv_t *priv = self->priv;
     uint8_t ibuf[PROTO_PACKAGE_MAXSIZE] = {};
@@ -55,7 +55,7 @@ static int __dummy_set(dummy_t *self, proto_bsp_dummy_cfg_t *cfg)
     return 0;
 }
 
-static int __dummy_get(dummy_t *self, proto_bsp_dummy_cfg_t *cfg)
+static int __bsp_dummy_get(bsp_dummy_t *self, proto_bsp_dummy_cfg_t *cfg)
 {
     dummy_priv_t *priv = self->priv;
     uint8_t ibuf[PROTO_PACKAGE_MAXSIZE] = {};
@@ -73,10 +73,10 @@ static int __dummy_get(dummy_t *self, proto_bsp_dummy_cfg_t *cfg)
     return 0;
 }
 
-dummy_t * __weak createDummy(int id)
+bsp_dummy_t * __weak bsp_createDummy(int id)
 {
     int ret;
-    dummy_t *obj       = NULL;
+    bsp_dummy_t *obj       = NULL;
     dummy_priv_t *priv = NULL;
 
     priv = malloc(sizeof(dummy_priv_t));
@@ -85,19 +85,19 @@ dummy_t * __weak createDummy(int id)
     assert(!ret);
     priv->id = id;
 
-    obj = malloc(sizeof(dummy_t));
+    obj = malloc(sizeof(bsp_dummy_t));
     assert(obj);
     obj->priv    = priv;
-    obj->cap     = __dummy_cap;
-    obj->set     = __dummy_set;
-    obj->get     = __dummy_get;
-    obj->destroy = __dummy_destroy;
+    obj->cap     = __bsp_dummy_cap;
+    obj->set     = __bsp_dummy_set;
+    obj->get     = __bsp_dummy_get;
+    obj->destroy = __bsp_dummy_destroy;
 
     infof("Create dummy %d : %p", id, obj);
     return obj;
 }
 
-int __weak getDummyNum()
+int __weak bsp_getDummyNum()
 {
     int ret;
     nnm_t req = NULL;

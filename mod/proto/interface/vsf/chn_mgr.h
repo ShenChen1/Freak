@@ -14,6 +14,6 @@ typedef struct chn_mgr {
 
 } vsf_chn_mgr_t;
 
-vsf_chn_mgr_t *VSF_createChnMgr(void);
+vsf_chn_mgr_t *vsf_createChnMgr(void);
 
 #endif //__VSF_CHN_MGR_H__

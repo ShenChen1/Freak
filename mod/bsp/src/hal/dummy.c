@@ -9,16 +9,16 @@ typedef struct {
     proto_bsp_dummy_cap_t *cap;
 } dummy_priv_t;
 
-static dummy_t *s_dummy_obj[BSP_ITEM_MAX] = {};
+static bsp_dummy_t *s_dummy_obj[BSP_ITEM_MAX] = {};
 
-static int __dummy_destroy(dummy_t *self)
+static int __bsp_dummy_destroy(bsp_dummy_t *self)
 {
     free(self->priv);
     free(self);
     return 0;
 }
 
-static int __dummy_cap(dummy_t *self, proto_bsp_dummy_cap_t *cap)
+static int __bsp_dummy_cap(bsp_dummy_t *self, proto_bsp_dummy_cap_t *cap)
 {
     dummy_priv_t *priv = self->priv;
 
@@ -26,7 +26,7 @@ static int __dummy_cap(dummy_t *self, proto_bsp_dummy_cap_t *cap)
     return 0;
 }
 
-static int __dummy_set(dummy_t *self, proto_bsp_dummy_cfg_t *cfg)
+static int __bsp_dummy_set(bsp_dummy_t *self, proto_bsp_dummy_cfg_t *cfg)
 {
     dummy_priv_t *priv = self->priv;
 
@@ -34,7 +34,7 @@ static int __dummy_set(dummy_t *self, proto_bsp_dummy_cfg_t *cfg)
     return 0;
 }
 
-static int __dummy_get(dummy_t *self, proto_bsp_dummy_cfg_t *cfg)
+static int __bsp_dummy_get(bsp_dummy_t *self, proto_bsp_dummy_cfg_t *cfg)
 {
     dummy_priv_t *priv = self->priv;
 
@@ -42,9 +42,9 @@ static int __dummy_get(dummy_t *self, proto_bsp_dummy_cfg_t *cfg)
     return 0;
 }
 
-dummy_t *createDummy(int id)
+bsp_dummy_t *bsp_createDummy(int id)
 {
-    dummy_t *obj       = NULL;
+    bsp_dummy_t *obj       = NULL;
     dummy_priv_t *priv = NULL;
 
     if (id >= cfg_get_member(dummy)->num) {
@@ -62,20 +62,20 @@ dummy_t *createDummy(int id)
     priv->id = id;
     priv->cap = &cfg_get_member(dummy)->caps[priv->id];
 
-    obj = malloc(sizeof(dummy_t));
+    obj = malloc(sizeof(bsp_dummy_t));
     assert(obj);
     obj->priv    = priv;
-    obj->cap     = __dummy_cap;
-    obj->set     = __dummy_set;
-    obj->get     = __dummy_get;
-    obj->destroy = __dummy_destroy;
+    obj->cap     = __bsp_dummy_cap;
+    obj->set     = __bsp_dummy_set;
+    obj->get     = __bsp_dummy_get;
+    obj->destroy = __bsp_dummy_destroy;
 
     s_dummy_obj[id] = obj;
     infof("Create dummy %d : %p", id, s_dummy_obj[id]);
     return s_dummy_obj[id];
 }
 
-int getDummyNum()
+int bsp_getDummyNum()
 {
     return cfg_get_member(dummy)->num;
 }

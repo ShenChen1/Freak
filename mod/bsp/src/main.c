@@ -2,8 +2,8 @@
 #include "log.h"
 #include "nnm.h"
 #include "inc/cfg.h"
-#include "bsp/dummy.h"
 #include "inc/msgbox.h"
+#include "bsp/dummy.h"
 
 static int __rep_recv(void *in, size_t isize, void **out, size_t *osize, void *arg)
 {
@@ -25,20 +25,15 @@ int main()
     nnm_rep_create(PROTO_BSP_COM_NODE, &init, &rep);
     nnm_pub_create(PROTO_BSP_PUB_NODE, &pub);
 
-    int i;
-    int total = getDummyNum();
+    int i, total;
+    total = bsp_getDummyNum();
     for (i = 0; i < total; i++) {
-        dummy_t *dummy = createDummy(i);
-        // get cap
-        proto_bsp_dummy_cap_t cap;
-        dummy->cap(dummy, &cap);
-        // set cfg
+        bsp_dummy_t *dummy = bsp_createDummy(i);
         proto_bsp_dummy_cfg_t cfg;
-        cfg.value = cap.value;
-        dummy->set(dummy, &cfg);
         // get cfg
         dummy->get(dummy, &cfg);
-        assert(cfg.value == cap.value);
+        // set cfg
+        dummy->set(dummy, &cfg);
         // delete
         dummy->destroy(dummy);
     }

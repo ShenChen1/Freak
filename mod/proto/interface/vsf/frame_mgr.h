@@ -14,6 +14,6 @@ typedef struct frame_mgr {
 
 } vsf_frame_mgr_t;
 
-vsf_frame_mgr_t *VSF_createFrameMgr(void);
+vsf_frame_mgr_t *vsf_createFrameMgr(void);
 
 #endif //__VSF_FRAME_MGR_H__

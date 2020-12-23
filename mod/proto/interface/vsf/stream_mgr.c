@@ -91,7 +91,7 @@ static int __vsf_stream_num(vsf_stream_mgr_t *self)
     return ret;
 }
 
-vsf_stream_mgr_t * __weak VSF_createStreamMgr()
+vsf_stream_mgr_t * __weak vsf_createStreamMgr()
 {
     int ret;
     vsf_stream_mgr_t *mgr       = NULL;

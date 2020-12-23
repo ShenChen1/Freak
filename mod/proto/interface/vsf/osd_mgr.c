@@ -91,7 +91,7 @@ static int __vsf_osd_num(vsf_osd_mgr_t *self)
     return ret;
 }
 
-vsf_osd_mgr_t * __weak VSF_createFrameMgr()
+vsf_osd_mgr_t * __weak vsf_createFrameMgr()
 {
     int ret;
     vsf_osd_mgr_t *mgr       = NULL;
