@@ -122,7 +122,7 @@ static int msgbox_stream_num(msgbox_param_t *param)
     return ret;
 }
 
-int msgbox_stream(msgbox_param_t *param)
+int msgbox_vsf_stream(msgbox_param_t *param)
 {
     int ret = 0;
 

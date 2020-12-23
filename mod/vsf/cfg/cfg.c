@@ -13,7 +13,7 @@ void jsonb_opt_vsf_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
         json_child = cJSON_CreateObject();
         cJSON_AddItemToObject(json, "frame", json_child);
     }
-    jsonb_opt_proto_vsf_frame_cfg_t(opt, json_child, &element->frame, sizeof(proto_vsf_frame_cfg_t));
+    jsonb_opt_proto_vsf_frame_t(opt, json_child, &element->frame, sizeof(proto_vsf_frame_t));
 }
 {
     cJSON *json_child = NULL;
@@ -24,7 +24,7 @@ void jsonb_opt_vsf_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
         json_child = cJSON_CreateObject();
         cJSON_AddItemToObject(json, "stream", json_child);
     }
-    jsonb_opt_proto_vsf_stream_cfg_t(opt, json_child, &element->stream, sizeof(proto_vsf_stream_cfg_t));
+    jsonb_opt_proto_vsf_stream_t(opt, json_child, &element->stream, sizeof(proto_vsf_stream_t));
 }
 {
     cJSON *json_child = NULL;
@@ -35,6 +35,6 @@ void jsonb_opt_vsf_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
         json_child = cJSON_CreateObject();
         cJSON_AddItemToObject(json, "osd", json_child);
     }
-    jsonb_opt_proto_vsf_osd_cfg_t(opt, json_child, &element->osd, sizeof(proto_vsf_osd_cfg_t));
+    jsonb_opt_proto_vsf_osd_t(opt, json_child, &element->osd, sizeof(proto_vsf_osd_t));
 }
 }

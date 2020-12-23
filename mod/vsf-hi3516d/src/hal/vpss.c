@@ -74,7 +74,7 @@ static void *__vpss_get_chn_frame_proc(void *p)
         s32Ret = HI_MPI_VPSS_GetChnFrame(priv->info->VpssGrp, chn->chn, pstVideoFrame, 1000);
         if (HI_SUCCESS != s32Ret) {
             errorf("HI_MPI_VPSS_GetChnFrame %d-%d err:0x%x\n", priv->info->VpssGrp, chn->chn, s32Ret);
-            continue;
+            goto end;
         }
 
         if (chn->cb[VSF_FRAME_CB_GET].func) {
@@ -93,6 +93,8 @@ static void *__vpss_get_chn_frame_proc(void *p)
         if (HI_SUCCESS != s32Ret) {
             errorf("HI_MPI_VPSS_ReleaseChnFrame %d-%d err:0x%x\n", priv->info->VpssGrp, chn->chn, s32Ret);
         }
+
+    end:
         free(pstVideoFrame);
     }
 

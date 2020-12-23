@@ -7,67 +7,80 @@
 static vsf_cfg_t s_cfg = {
     .stream = {
         .num = 3,
-        .streams[0] = {
+        .cfgs[0] = {
             .id = 0,
             .enable = 1,
-            .chn = 0,
-            .subchn = 0,
             .encode = VIDEO_STREAM_TYPE_H264,
             .width = 1920,
             .height = 1080,
             .fps = 25,
         },
-        .streams[1] = {
+        .caps[0] = {
+            .id = 0,
+            .chn = 0,
+            .subchn = 0,
+        },
+        .cfgs[1] = {
             .id = 1,
             .enable = 1,
-            .chn = 0,
-            .subchn = 1,
             .encode = VIDEO_STREAM_TYPE_H264,
             .width = 1280,
             .height = 720,
             .fps = 25,
         },
-        .streams[2] = {
+        .caps[1] = {
+            .id = 1,
+            .chn = 0,
+            .subchn = 1,
+        },
+        .cfgs[2] = {
             .id = 2,
             .enable = 0,
-            .chn = 0,
-            .subchn = 2,
             .encode = VIDEO_STREAM_TYPE_JPEG,
             .width = 1920,
             .height = 1080,
             .fps = 1,
         },
+        .caps[2] = {
+            .id = 2,
+            .chn = 0,
+            .subchn = 2,
+        },
     },
     .frame = {
         .num = 2,
-        .frames[0] = {
+        .cfgs[0] = {
             .id = 0,
             .enable = 0,
-            .chn = 0,
-            .subchn = 0,
             .format = VIDEO_FRAME_FORMAT_YUV420P_YVU,
             .width = 1920,
             .height = 1080,
             .fps = 10,
         },
-        .frames[1] = {
-            .id = 1,
-            .enable = 0,
+        .caps[0] = {
+            .id = 0,
             .chn = 0,
             .subchn = 1,
+        },
+        .cfgs[1] = {
+            .id = 1,
+            .enable = 0,
             .format = VIDEO_FRAME_FORMAT_YUV420P_YVU,
             .width = 1280,
             .height = 720,
             .fps = 5,
         },
+        .caps[1] = {
+            .id = 0,
+            .chn = 0,
+            .subchn = 2,
+        },
     },
     .osd = {
         .num = 1,
-        .osds[0] = {
+        .cfgs[0] = {
             .id = 0,
             .enable = 1,
-            .chn = 0,
-            .subchn = 0,
             .info = {
                 .condition = "mask",
                 .mask = {
@@ -77,6 +90,11 @@ static vsf_cfg_t s_cfg = {
                     .points[3] = {400, 100},
                 },
             },
+        },
+        .caps[0] = {
+            .id = 0,
+            .chn = 0,
+            .subchn = 1,
         },
     },
 };

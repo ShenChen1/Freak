@@ -48,75 +48,8 @@ static int __rgn_destroy(vsf_rgn_t *self)
     return 0;
 }
 
-static int __rgn_ctrl_mask(vsf_rgn_t *self, void *param) {
-    HI_S32 s32Ret        = 0;
-    vsf_rgn_t *obj       = self;
-    vsf_rgn_priv_t *priv = obj->priv;
-    proto_vsf_osd_t *osd = param;
-
-    priv->stRegion.enType = COVER_RGN;
-
-    priv->stChn.enModId  = HI_ID_VPSS;
-    priv->stChn.s32DevId = osd->chn;
-    priv->stChn.s32ChnId = 0;
-
-    VPSS_CHN_ATTR_S stChnAttr;
-    s32Ret = HI_MPI_VPSS_GetChnAttr(osd->chn, 0, &stChnAttr);
-    assert(s32Ret == HI_SUCCESS);
-
-    priv->stChnAttr.bShow                                             = osd->enable;
-    priv->stChnAttr.enType                                            = COVER_RGN;
-    priv->stChnAttr.unChnAttr.stCoverChn.enCoverType                  = AREA_QUAD_RANGLE;
-    priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.bSolid          = HI_TRUE;
-    priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.u32Thick        = 2;
-    priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.stPoint[0].s32X = osd->info.mask.points[0].x * stChnAttr.u32Width / 8192;
-    priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.stPoint[0].s32X = ALIGN_UP(priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.stPoint[0].s32X, 2);
-    priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.stPoint[0].s32Y = osd->info.mask.points[0].y * stChnAttr.u32Height / 8192;
-    priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.stPoint[0].s32Y = ALIGN_UP(priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.stPoint[0].s32Y, 2);
-    priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.stPoint[1].s32X = osd->info.mask.points[1].x * stChnAttr.u32Width / 8192;
-    priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.stPoint[1].s32X = ALIGN_UP(priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.stPoint[1].s32X, 2);
-    priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.stPoint[1].s32Y = osd->info.mask.points[1].y * stChnAttr.u32Height / 8192;
-    priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.stPoint[1].s32Y = ALIGN_UP(priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.stPoint[1].s32Y, 2);
-    priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.stPoint[2].s32X = osd->info.mask.points[2].x * stChnAttr.u32Width / 8192;
-    priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.stPoint[2].s32X = ALIGN_UP(priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.stPoint[2].s32X, 2);
-    priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.stPoint[2].s32Y = osd->info.mask.points[2].y * stChnAttr.u32Height / 8192;
-    priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.stPoint[2].s32Y = ALIGN_UP(priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.stPoint[2].s32Y, 2);
-    priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.stPoint[3].s32X = osd->info.mask.points[3].x * stChnAttr.u32Width / 8192;
-    priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.stPoint[3].s32X = ALIGN_UP(priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.stPoint[3].s32X, 2);
-    priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.stPoint[3].s32Y = osd->info.mask.points[3].y * stChnAttr.u32Height / 8192;
-    priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.stPoint[3].s32Y = ALIGN_UP(priv->stChnAttr.unChnAttr.stCoverChn.stQuadRangle.stPoint[3].s32Y, 2);
-    priv->stChnAttr.unChnAttr.stCoverChn.u32Layer                     = priv->id;
-    priv->stChnAttr.unChnAttr.stCoverChn.u32Color                     = osd->info.mask.color;
-
-    // create;
-    if (priv->status < VSF_RGN_CREATE) {
-        s32Ret |= HI_MPI_RGN_Create(priv->id, &priv->stRegion);
-        priv->status = VSF_RGN_CREATE;
-    }
-    // attach;
-    if (priv->status < VSF_RGN_ATTACH) {
-        s32Ret |= HI_MPI_RGN_AttachToChn(priv->id, &priv->stChn, &priv->stChnAttr);
-        priv->status = VSF_RGN_ATTACH;
-    }
-    // display;
-    s32Ret |= HI_MPI_RGN_SetDisplayAttr(priv->id, &priv->stChn, &priv->stChnAttr);
-
-    return s32Ret;
-}
-
 static int __rgn_ctrl(vsf_rgn_t *self, void *param)
 {
-    vsf_rgn_t *obj       = self;
-    vsf_rgn_priv_t *priv = obj->priv;
-    proto_vsf_osd_t *osd = param;
-
-    assert(priv->id == osd->id);
-    if (!strncmp(osd->info.condition, "mask", sizeof("mask"))) {
-        return __rgn_ctrl_mask(self, param);
-    } else if (!strncmp(osd->info.condition, "text", sizeof("text"))) {
-        return -1;
-    }
-
     return -1;
 }
 

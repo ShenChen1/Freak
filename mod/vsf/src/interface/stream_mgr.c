@@ -1,16 +1,16 @@
-#include "inc/interface/stream_mgr.h"
-#include "cfg/cfg.h"
-#include "common.h"
+#include "vsf/stream_mgr.h"
+#include "inc/cfg.h"
 #include "inc/hal/sys.h"
 #include "inc/hal/venc.h"
 #include "inc/hal/vi.h"
 #include "inc/hal/vpss.h"
 #include "log.h"
+#include "proto.h"
 #include "ufifo.h"
 
 typedef struct {
     ufifo_t *fifo[VSF_STREAM_MAX];
-    proto_vsf_stream_t info[VSF_STREAM_MAX];
+    proto_vsf_stream_t *info;
 } vsf_stream_mgr_priv_t;
 
 static vsf_stream_mgr_t *s_mgr = NULL;
@@ -126,19 +126,19 @@ static int __vsf_stream_h264_proc(video_stream_t *stream, void *args)
     int i;
     size_t totalsize            = sizeof(media_record_t) + sizeof(video_stream_t);
     vsf_stream_mgr_priv_t *priv = s_mgr->priv;
-    proto_vsf_stream_t *info    = args;
+    proto_vsf_stream_cfg_t *cfg = args;
 
     for (i = 0; i < stream->u32PackCount; i++) {
         totalsize += sizeof(video_stream_pack_t);
         totalsize += stream->pstPack[i].u32Len - stream->pstPack[i].u32Offset;
     }
 
-    if (ufifo_len(priv->fifo[info->id]) + totalsize > ufifo_size(priv->fifo[info->id])) {
-        ufifo_skip(priv->fifo[info->id]);
-        ufifo_oldest(priv->fifo[info->id], (0xdeadbeef << 8) | 1);
+    if (ufifo_len(priv->fifo[cfg->id]) + totalsize > ufifo_size(priv->fifo[cfg->id])) {
+        ufifo_skip(priv->fifo[cfg->id]);
+        ufifo_oldest(priv->fifo[cfg->id], (0xdeadbeef << 8) | 1);
     }
 
-    return ufifo_put(priv->fifo[info->id], stream, totalsize) != totalsize;
+    return ufifo_put(priv->fifo[cfg->id], stream, totalsize) != totalsize;
 }
 
 static int __vsf_stream_jpeg_proc(video_stream_t *stream, void *args)
@@ -147,7 +147,7 @@ static int __vsf_stream_jpeg_proc(video_stream_t *stream, void *args)
     char acFile[128];
     FILE *pFile                 = NULL;
     vsf_stream_mgr_priv_t *priv = s_mgr->priv;
-    proto_vsf_stream_t *info    = args;
+    proto_vsf_stream_cfg_t *cfg = args;
 
     /* Obtain current time. */
     struct timeval tv;
@@ -157,7 +157,7 @@ static int __vsf_stream_jpeg_proc(video_stream_t *stream, void *args)
     snprintf(acFile,
              sizeof(acFile),
              "snap_chn%d_%4d_%02d_%02d_%02d_%02d_%02d_%06ld.jpg",
-             priv->info[info->id].chn,
+             priv->info->caps[cfg->id].chn,
              1900 + timeinfo->tm_year,
              1 + timeinfo->tm_mon,
              timeinfo->tm_mday,
@@ -192,46 +192,73 @@ static int __vsf_stream_proc(void *data, void *args)
     return 0;
 }
 
-static int __vsf_stream_ctrl(vsf_stream_mgr_t *self, proto_vsf_stream_t *info)
+static int __vsf_stream_set(vsf_stream_mgr_t *self, proto_vsf_stream_cfg_t *cfg)
 {
     int ret;
     vsf_stream_mgr_t *mgr       = self;
     vsf_stream_mgr_priv_t *priv = mgr->priv;
 
     char name[64];
-    snprintf(name, sizeof(name), PROTO_VSF_STREAM_FIFO "%d-%d", info->chn, info->subchn);
+    snprintf(name, sizeof(name), PROTO_VSF_STREAM_FIFO "%d-%d",
+        priv->info->caps[cfg->id].chn, priv->info->caps[cfg->id].subchn);
 
-    if (info->enable) {
-        if (!priv->fifo[info->id]) {
+    if (cfg->enable) {
+        if (!priv->fifo[cfg->id]) {
             ufifo_init_t init = {
                 .lock  = UFIFO_LOCK_NONE,
                 .opt   = UFIFO_OPT_ALLOC,
-                .alloc = { 1024 * 1024 },
+                .alloc = { 4 * 1024 * 1024 },
                 .hook  = { recsize, rectag, recput },
             };
-            ret = ufifo_open(name, &init, &priv->fifo[info->id]);
+            ret = ufifo_open(name, &init, &priv->fifo[cfg->id]);
             assert(!ret);
-            assert(priv->fifo[info->id]);
+            assert(priv->fifo[cfg->id]);
         }
     } else {
-        if (priv->fifo[info->id]) {
-            ufifo_close(priv->fifo[info->id]);
-            priv->fifo[info->id] = NULL;
+        if (priv->fifo[cfg->id]) {
+            ufifo_close(priv->fifo[cfg->id]);
+            priv->fifo[cfg->id] = NULL;
         }
     }
 
-    memcpy(&priv->info[info->id], info, sizeof(proto_vsf_stream_t));
-
     vsf_stream_cb_t cb = { NULL, NULL };
-    if (info->enable) {
-        cb.args = &priv->info[info->id];
+    if (cfg->enable) {
+        cb.args = &priv->info[cfg->id];
         cb.func = __vsf_stream_proc;
     }
 
-    vsf_venc_t *venc = VSF_createVenc(info->id);
-    assert(venc);
+    vsf_venc_t *venc = VSF_createVenc(cfg->id);
+    // reg hook
+    assert(venc->regcallback);
     venc->regcallback(venc, &cb);
+
     return 0;
+}
+
+static int __vsf_stream_get(vsf_stream_mgr_t *self, proto_vsf_stream_cfg_t *cfg)
+{
+    vsf_stream_mgr_t *mgr       = self;
+    vsf_stream_mgr_priv_t *priv = mgr->priv;
+
+    *cfg = priv->info->cfgs[cfg->id];
+    return 0;
+}
+
+static int __vsf_stream_cap(vsf_stream_mgr_t *self, proto_vsf_stream_cap_t *cap)
+{
+    vsf_stream_mgr_t *mgr       = self;
+    vsf_stream_mgr_priv_t *priv = mgr->priv;
+
+    *cap = priv->info->caps[cap->id];
+    return 0;
+}
+
+static int __vsf_stream_num(vsf_stream_mgr_t *self)
+{
+    vsf_stream_mgr_t *mgr       = self;
+    vsf_stream_mgr_priv_t *priv = mgr->priv;
+
+    return priv->info->num;
 }
 
 vsf_stream_mgr_t *VSF_createStreamMgr()
@@ -246,6 +273,7 @@ vsf_stream_mgr_t *VSF_createStreamMgr()
     priv = malloc(sizeof(vsf_stream_mgr_priv_t));
     assert(priv);
     memset(priv, 0, sizeof(vsf_stream_mgr_priv_t));
+    priv->info = cfg_get_member(stream);
 
     mgr = malloc(sizeof(vsf_stream_mgr_t));
     if (mgr == NULL) {
@@ -253,7 +281,10 @@ vsf_stream_mgr_t *VSF_createStreamMgr()
     }
 
     mgr->priv = priv;
-    mgr->ctrl = __vsf_stream_ctrl;
+    mgr->get  = __vsf_stream_get;
+    mgr->set  = __vsf_stream_set;
+    mgr->num  = __vsf_stream_num;
+    mgr->cap  = __vsf_stream_cap;
 
     s_mgr = mgr;
     return mgr;

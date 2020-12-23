@@ -122,7 +122,7 @@ static int msgbox_osd_num(msgbox_param_t *param)
     return ret;
 }
 
-int msgbox_osd(msgbox_param_t *param)
+int msgbox_vsf_osd(msgbox_param_t *param)
 {
     int ret = 0;
 

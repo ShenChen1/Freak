@@ -122,7 +122,7 @@ static int msgbox_frame_num(msgbox_param_t *param)
     return ret;
 }
 
-int msgbox_frame(msgbox_param_t *param)
+int msgbox_vsf_frame(msgbox_param_t *param)
 {
     int ret = 0;
 

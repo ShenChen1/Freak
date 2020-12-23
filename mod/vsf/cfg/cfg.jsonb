@@ -1,7 +1,7 @@
 JSONB_INCLUDE_HEADER(proto_vsf.h)
 
 JSONB_STRUCT_START(vsf_cfg_t)
-JSONB_FIELD(frame, proto_vsf_frame_cfg_t)
-JSONB_FIELD(stream, proto_vsf_stream_cfg_t)
-JSONB_FIELD(osd, proto_vsf_osd_cfg_t)
+JSONB_FIELD(frame, proto_vsf_frame_t)
+JSONB_FIELD(stream, proto_vsf_stream_t)
+JSONB_FIELD(osd, proto_vsf_osd_t)
 JSONB_STRUCT_END(vsf_cfg_t)
