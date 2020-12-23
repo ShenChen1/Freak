@@ -1,41 +1,141 @@
 #include "inc/cfg.h"
 #include "inc/msgbox.h"
-#include "inc/interface/stream_mgr.h"
+#include "vsf/stream_mgr.h"
 
-int msgbox_vsf_stream(msgbox_param_t *param)
+static int msgbox_stream_set(msgbox_param_t *param)
 {
-    int ret = 0;
-    proto_vsf_stream_t *in  = param->in;
-    proto_vsf_stream_t *out = param->out;
+    int ret;
+    proto_vsf_stream_cfg_t *in = param->in;
 
     if (param->format == PROTO_FORMAT_JSON) {
-        in  = malloc(sizeof(proto_vsf_stream_t));
-        out = malloc(sizeof(proto_vsf_stream_t));
+        in = malloc(sizeof(proto_vsf_stream_cfg_t));
         if (param->isize) {
             cJSON *json = cJSON_Parse(param->in);
-            jsonb_opt_proto_vsf_stream_t(JSONB_OPT_J2S, json, in, sizeof(proto_vsf_stream_t));
+            jsonb_opt_proto_vsf_stream_cfg_t(JSONB_OPT_J2S, json, in, sizeof(proto_vsf_stream_cfg_t));
             cJSON_Delete(json);
         }
     }
 
-    if (param->action == PROTO_ACTION_SET) {
-        vsf_stream_mgr_t *mgr = VSF_createStreamMgr();
-        mgr->ctrl(mgr, in);
-        *param->osize = 0;
-    } else {
-        *param->osize = sizeof(proto_vsf_stream_t);
+    vsf_stream_mgr_t *obj = VSF_createStreamMgr();
+    assert(obj && obj->set);
+    ret = obj->set(obj, in);
+    if (!ret) {
+        cfg_get_member(stream)->cfgs[param->chn] = *in;
     }
+    *param->osize = 0;
+
+    if (param->format == PROTO_FORMAT_JSON) {
+        free(in);
+    }
+
+    return ret;
+}
+
+static int msgbox_stream_get(msgbox_param_t *param)
+{
+    int ret;
+    proto_vsf_stream_cfg_t *out = param->out;
+
+    if (param->format == PROTO_FORMAT_JSON) {
+        out = malloc(sizeof(proto_vsf_stream_cfg_t));
+    }
+
+    vsf_stream_mgr_t *obj = VSF_createStreamMgr();
+    assert(obj && obj->get);
+    ret = obj->get(obj, out);
+    *param->osize = sizeof(proto_vsf_stream_cfg_t);
 
     if (param->format == PROTO_FORMAT_JSON) {
         if (*param->osize) {
             cJSON *json = cJSON_CreateObject();
-            jsonb_opt_proto_vsf_stream_t(JSONB_OPT_S2J, json, out, sizeof(proto_vsf_stream_t));
+            jsonb_opt_proto_vsf_stream_cfg_t(JSONB_OPT_S2J, json, out, sizeof(proto_vsf_stream_cfg_t));
             cJSON_PrintPreallocated(json, param->out, PROTO_PACKAGE_MAXSIZE, 0);
             cJSON_Delete(json);
             *param->osize = strlen(param->out) + 1;
         }
-        free(in);
         free(out);
+    }
+
+    return ret;
+}
+
+static int msgbox_stream_cap(msgbox_param_t *param)
+{
+    int ret;
+    proto_vsf_stream_cap_t *out = param->out;
+
+    if (param->format == PROTO_FORMAT_JSON) {
+        out = malloc(sizeof(proto_vsf_stream_cap_t));
+    }
+
+    vsf_stream_mgr_t *obj = VSF_createStreamMgr();
+    assert(obj && obj->cap);
+    ret = obj->cap(obj, out);
+    *param->osize = sizeof(proto_vsf_stream_cap_t);
+
+    if (param->format == PROTO_FORMAT_JSON) {
+        if (*param->osize) {
+            cJSON *json = cJSON_CreateObject();
+            jsonb_opt_proto_vsf_stream_cap_t(JSONB_OPT_S2J, json, out, sizeof(proto_vsf_stream_cap_t));
+            cJSON_PrintPreallocated(json, param->out, PROTO_PACKAGE_MAXSIZE, 0);
+            cJSON_Delete(json);
+            *param->osize = strlen(param->out) + 1;
+        }
+        free(out);
+    }
+
+    return ret;
+}
+
+static int msgbox_stream_num(msgbox_param_t *param)
+{
+    int ret;
+    int *out = param->out;
+
+    if (param->format == PROTO_FORMAT_JSON) {
+        out = malloc(sizeof(int));
+    }
+
+
+    vsf_stream_mgr_t *obj = VSF_createStreamMgr();
+    assert(obj && obj->num);
+    ret = obj->num(obj);
+    if (ret >= 0) {
+        *out = ret;
+        ret = 0;
+    } else {
+        ret = -EINVAL;
+    }
+    *param->osize = sizeof(int);
+
+    if (param->format == PROTO_FORMAT_JSON) {
+        if (*param->osize) {
+            cJSON *json = cJSON_CreateObject();
+            jsonb_opt_proto_vsf_stream_cap_t(JSONB_OPT_S2J, json, out, sizeof(int));
+            cJSON_PrintPreallocated(json, param->out, PROTO_PACKAGE_MAXSIZE, 0);
+            cJSON_Delete(json);
+            *param->osize = strlen(param->out) + 1;
+        }
+        free(out);
+    }
+
+    return ret;
+}
+
+int msgbox_stream(msgbox_param_t *param)
+{
+    int ret = 0;
+
+    if (param->action == PROTO_ACTION_SET) {
+        ret = msgbox_stream_set(param);
+    } else if (param->action == PROTO_ACTION_GET) {
+        ret = msgbox_stream_get(param);
+    } else if (param->action == PROTO_ACTION_CAP) {
+        ret = msgbox_stream_cap(param);
+    } else if (param->action == PROTO_ACTION_NUM) {
+        ret = msgbox_stream_num(param);
+    } else {
+        assert(0);
     }
 
     return ret;
