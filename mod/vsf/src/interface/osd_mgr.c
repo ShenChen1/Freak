@@ -71,10 +71,8 @@ vsf_osd_mgr_t *vsf_createOsdMgr()
     priv->info = cfg_get_member(osd);
 
     mgr = malloc(sizeof(vsf_osd_mgr_t));
-    if (mgr == NULL) {
-        return NULL;
-    }
-
+    assert(mgr);
+    memset(mgr, 0, sizeof(vsf_osd_mgr_t));
     mgr->priv    = priv;
     mgr->destroy = __vsf_osd_destroy;
     mgr->set     = __vsf_osd_set;

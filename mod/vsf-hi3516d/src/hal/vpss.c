@@ -280,11 +280,9 @@ vsf_vpss_t *VSF_createVpss(int id)
         priv->chn[i].group = priv;
     }
 
-    obj = malloc(sizeof(vsf_vpss_priv_t));
-    if (obj == NULL) {
-        return NULL;
-    }
-
+    obj = malloc(sizeof(vsf_vpss_t));
+    assert(priv);
+    memset(priv, 0, sizeof(vsf_vpss_t));
     obj->priv        = priv;
     obj->init        = __vpss_init;
     obj->destroy     = __vpss_destroy;

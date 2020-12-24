@@ -2,10 +2,28 @@
 #define __PROTO_VSF_JSONB_C_API_H__
 #include "jsonb_c_type.h"
 #include "proto_base.h"
-#define VSF_ITEM_MAX (8)
+#define VSF_CHN_MAX (2)
 #define VSF_FRAME_MAX (8)
 #define VSF_STREAM_MAX (6)
 #define VSF_OSD_MAX (16)
+extern void jsonb_opt_proto_vsf_chn_cfg_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
+typedef struct {
+    int id;
+    int rotate;
+    bool freeze;
+    bool mirror;
+} proto_vsf_chn_cfg_t;
+extern void jsonb_opt_proto_vsf_chn_cap_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
+typedef struct {
+    int id;
+    int chn;
+} proto_vsf_chn_cap_t;
+extern void jsonb_opt_proto_vsf_chn_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
+typedef struct {
+    int num;
+    proto_vsf_chn_cap_t caps[VSF_CHN_MAX];
+    proto_vsf_chn_cap_t cfgs[VSF_CHN_MAX];
+} proto_vsf_chn_t;
 extern void jsonb_opt_proto_vsf_frame_cfg_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
     int id;

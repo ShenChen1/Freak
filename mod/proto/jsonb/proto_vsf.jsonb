@@ -1,9 +1,29 @@
 JSONB_INCLUDE_HEADER(proto_base.h)
 
-JSONB_MACRO_DEFINE(VSF_ITEM_MAX, 8)
+JSONB_MACRO_DEFINE(VSF_CHN_MAX, 2)
 JSONB_MACRO_DEFINE(VSF_FRAME_MAX, 8)
 JSONB_MACRO_DEFINE(VSF_STREAM_MAX, 6)
 JSONB_MACRO_DEFINE(VSF_OSD_MAX, 16)
+
+/////////////////////////////////////////////////////////////////////////////////
+
+JSONB_STRUCT_START(proto_vsf_chn_cfg_t)
+JSONB_FIELD(id, int)
+JSONB_FIELD(rotate, int)
+JSONB_FIELD(freeze, bool)
+JSONB_FIELD(mirror, bool)
+JSONB_STRUCT_END(proto_vsf_chn_cfg_t)
+
+JSONB_STRUCT_START(proto_vsf_chn_cap_t)
+JSONB_FIELD(id, int)
+JSONB_FIELD(chn, int)
+JSONB_STRUCT_END(proto_vsf_chn_cap_t)
+
+JSONB_STRUCT_START(proto_vsf_chn_t)
+JSONB_FIELD(num, int)
+JSONB_FIELD_ARRAY(caps, VSF_CHN_MAX, proto_vsf_chn_cap_t)
+JSONB_FIELD_ARRAY(cfgs, VSF_CHN_MAX, proto_vsf_chn_cap_t)
+JSONB_STRUCT_END(proto_vsf_chn_t)
 
 /////////////////////////////////////////////////////////////////////////////////
 

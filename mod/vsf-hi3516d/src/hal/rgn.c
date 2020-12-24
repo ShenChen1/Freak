@@ -74,11 +74,9 @@ vsf_rgn_t *VSF_createRgn(int id)
     priv->id     = id;
     priv->status = VSF_RGN_NONE;
 
-    obj = malloc(sizeof(vsf_rgn_priv_t));
-    if (obj == NULL) {
-        return NULL;
-    }
-
+    obj = malloc(sizeof(vsf_rgn_t));
+    assert(priv);
+    memset(priv, 0, sizeof(vsf_rgn_t));
     obj->priv    = priv;
     obj->init    = __rgn_init;
     obj->destroy = __rgn_destroy;

@@ -88,11 +88,9 @@ vsf_sys_t *VSF_createSys(int id)
     priv->phyid = *sdk_cfg_get_member(as32SysId[id]);
     priv->info = sdk_cfg_get_member(astSysInfo[id]);
 
-    obj = malloc(sizeof(vsf_sys_priv_t));
-    if (obj == NULL) {
-        return NULL;
-    }
-
+    obj = malloc(sizeof(vsf_sys_t));
+    assert(priv);
+    memset(priv, 0, sizeof(vsf_sys_t));
     obj->priv = priv;
     obj->init = __sys_init;
     obj->destroy = __sys_destroy;

@@ -54,11 +54,9 @@ off_t virt2phys(void *virtaddr)
     }
 
     pagemap_entry_t entry;
-    entry.pfn        = GET_PFN(info);
-    entry.soft_dirty = GET_BIT(info, 55);
-    entry.file_page  = GET_BIT(info, 61);
-    entry.swapped    = GET_BIT(info, 62);
-    entry.present    = GET_BIT(info, 63);
+    entry.pfn     = GET_PFN(info);
+    entry.swapped = GET_BIT(info, 62);
+    entry.present = GET_BIT(info, 63);
     close(pagemap_fd);
 
     if (entry.present) {

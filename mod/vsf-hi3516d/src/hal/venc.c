@@ -900,11 +900,9 @@ vsf_venc_t *VSF_createVenc(int id)
     priv->phyid  = *sdk_cfg_get_member(as32VencId[id]);
     priv->info   = sdk_cfg_get_member(astVencInfo[id]);
 
-    obj = malloc(sizeof(vsf_venc_priv_t));
-    if (obj == NULL) {
-        return NULL;
-    }
-
+    obj = malloc(sizeof(vsf_venc_t));
+    assert(priv);
+    memset(priv, 0, sizeof(vsf_venc_t));
     obj->priv        = priv;
     obj->init        = __venc_init;
     obj->destroy     = __venc_destroy;

@@ -25,7 +25,7 @@ static unsigned int recsize(unsigned char *p1, unsigned int n1, unsigned char *p
         size                = rec->size;
     } else {
         media_record_t rec;
-        void *p = (void *)(&rec);
+        char *p = (char *)(&rec);
         memcpy(p, p1, n1);
         memcpy(p + n1, p2, size - n1);
         size = rec.size;
@@ -45,7 +45,7 @@ static unsigned int rectag(unsigned char *p1, unsigned int n1, unsigned char *p2
         tag                 = rec->tag;
     } else {
         media_record_t rec;
-        void *p = (void *)(&rec);
+        char *p = (char *)(&rec);
         memcpy(p, p1, n1);
         memcpy(p + n1, p2, size - n1);
         tag = rec.tag;
@@ -319,13 +319,13 @@ static int __vsf_frame_set(vsf_frame_mgr_t *self, proto_vsf_frame_cfg_t *cfg)
 
     vsf_frame_cb_t cb[VSF_FRAME_CB_MAX] = {};
     if (cfg->enable) {
-        cb[VSF_FRAME_CB_GET].args  = &priv->info[cfg->id];
+        cb[VSF_FRAME_CB_GET].args  = &priv->info->cfgs[cfg->id];
         cb[VSF_FRAME_CB_GET].func  = __vsf_get_frame_proc;
-        cb[VSF_FRAME_CB_FREE].args = &priv->info[cfg->id];
+        cb[VSF_FRAME_CB_FREE].args = &priv->info->cfgs[cfg->id];
         cb[VSF_FRAME_CB_FREE].func = __vsf_free_frame_proc;
     }
 
-    vsf_vpss_t *vpss = VSF_createVpss(cfg->id);
+    vsf_vpss_t *vpss = VSF_createVpss(priv->info->caps[cfg->id].chn);
     assert(vpss->regcallback);
     vpss->regcallback(vpss, cfg->id, cb);
     return 0;
@@ -372,10 +372,8 @@ vsf_frame_mgr_t *vsf_createFrameMgr()
     priv->info = cfg_get_member(frame);
 
     mgr = malloc(sizeof(vsf_frame_mgr_t));
-    if (mgr == NULL) {
-        return NULL;
-    }
-
+    assert(mgr);
+    memset(mgr, 0, sizeof(vsf_frame_mgr_t));
     mgr->priv    = priv;
     mgr->destroy = __vsf_frame_destroy;
     mgr->get     = __vsf_frame_get;

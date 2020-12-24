@@ -52,7 +52,7 @@ static unsigned int recsize(unsigned char *p1, unsigned int n1, unsigned char *p
         size = rec->size;
     } else {
         media_record_t rec;
-        void *p = (void *)(&rec);
+        char *p = (char *)(&rec);
         memcpy(p, p1, n1);
         memcpy(p + n1, p2, size - n1);
         size = rec.size;
@@ -71,7 +71,7 @@ static unsigned int rectag(unsigned char *p1, unsigned int n1, unsigned char *p2
         tag = rec->tag;
     } else {
         media_record_t rec;
-        void *p = (void *)(&rec);
+        char *p = (char *)(&rec);
         memcpy(p, p1, n1);
         memcpy(p + n1, p2, size - n1);
         tag = rec.tag;
@@ -271,8 +271,8 @@ static int rtp_seek(struct rtp_media_t *m, int64_t pos)
 
 static int rtp_get_rtpinfo(struct rtp_media_t *m, const char *uri, char *rtpinfo, size_t bytes)
 {
-    uint16_t seq;
-    uint32_t timestamp;
+    uint16_t seq = 0;
+    uint32_t timestamp = 0;
     rtp_media_priv_t *priv = container_of(m, rtp_media_priv_t, base);
     tracef("m:%p uri:%p rtpinfo:%s bytes:%d", m, uri, rtpinfo, bytes);
 

@@ -24,7 +24,7 @@ static unsigned int recsize(unsigned char *p1, unsigned int n1, unsigned char *p
         size                = rec->size;
     } else {
         media_record_t rec;
-        void *p = (void *)(&rec);
+        char *p = (char *)(&rec);
         memcpy(p, p1, n1);
         memcpy(p + n1, p2, size - n1);
         size = rec.size;
@@ -44,7 +44,7 @@ static unsigned int rectag(unsigned char *p1, unsigned int n1, unsigned char *p2
         tag                 = rec->tag;
     } else {
         media_record_t rec;
-        void *p = (void *)(&rec);
+        char *p = (char *)(&rec);
         memcpy(p, p1, n1);
         memcpy(p + n1, p2, size - n1);
         tag = rec.tag;
@@ -233,7 +233,7 @@ static int __vsf_stream_set(vsf_stream_mgr_t *self, proto_vsf_stream_cfg_t *cfg)
 
     vsf_stream_cb_t cb = { NULL, NULL };
     if (cfg->enable) {
-        cb.args = &priv->info[cfg->id];
+        cb.args = &priv->info->cfgs[cfg->id];
         cb.func = __vsf_stream_proc;
     }
 
@@ -286,10 +286,8 @@ vsf_stream_mgr_t *vsf_createStreamMgr()
     priv->info = cfg_get_member(stream);
 
     mgr = malloc(sizeof(vsf_stream_mgr_t));
-    if (mgr == NULL) {
-        return NULL;
-    }
-
+    assert(mgr);
+    memset(mgr, 0, sizeof(vsf_stream_mgr_t));
     mgr->priv    = priv;
     mgr->destroy = __vsf_stream_destroy;
     mgr->get     = __vsf_stream_get;

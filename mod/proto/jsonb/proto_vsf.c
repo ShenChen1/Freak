@@ -1,6 +1,119 @@
 #include "jsonb_c_type.h"
 #include "jsonb_c_base.h"
 #include "proto_vsf.h"
+void jsonb_opt_proto_vsf_chn_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
+{
+    proto_vsf_chn_cfg_t *element= e;
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) return;
+        json_child = cJSON_GetObjectItem(json, "id");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "id", json_child);
+    }
+    jsonb_opt_int(opt, json_child, &element->id, sizeof(int));
+}
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) return;
+        json_child = cJSON_GetObjectItem(json, "rotate");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "rotate", json_child);
+    }
+    jsonb_opt_int(opt, json_child, &element->rotate, sizeof(int));
+}
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) return;
+        json_child = cJSON_GetObjectItem(json, "freeze");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "freeze", json_child);
+    }
+    jsonb_opt_bool(opt, json_child, &element->freeze, sizeof(bool));
+}
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) return;
+        json_child = cJSON_GetObjectItem(json, "mirror");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "mirror", json_child);
+    }
+    jsonb_opt_bool(opt, json_child, &element->mirror, sizeof(bool));
+}
+}
+void jsonb_opt_proto_vsf_chn_cap_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
+{
+    proto_vsf_chn_cap_t *element= e;
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) return;
+        json_child = cJSON_GetObjectItem(json, "id");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "id", json_child);
+    }
+    jsonb_opt_int(opt, json_child, &element->id, sizeof(int));
+}
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) return;
+        json_child = cJSON_GetObjectItem(json, "chn");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "chn", json_child);
+    }
+    jsonb_opt_int(opt, json_child, &element->chn, sizeof(int));
+}
+}
+void jsonb_opt_proto_vsf_chn_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
+{
+    proto_vsf_chn_t *element= e;
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) return;
+        json_child = cJSON_GetObjectItem(json, "num");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "num", json_child);
+    }
+    jsonb_opt_int(opt, json_child, &element->num, sizeof(int));
+}
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) return;
+        json_child = cJSON_GetObjectItem(json, "caps");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateArray();
+        cJSON_AddItemToObject(json, "caps", json_child);
+    }
+    const size_t array_size_list[] = {VSF_CHN_MAX,0};
+    jsonb_opt_array(opt, json_child, element->caps, sizeof(proto_vsf_chn_cap_t) * 1 * VSF_CHN_MAX, array_size_list, jsonb_opt_proto_vsf_chn_cap_t);
+}
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) return;
+        json_child = cJSON_GetObjectItem(json, "cfgs");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateArray();
+        cJSON_AddItemToObject(json, "cfgs", json_child);
+    }
+    const size_t array_size_list[] = {VSF_CHN_MAX,0};
+    jsonb_opt_array(opt, json_child, element->cfgs, sizeof(proto_vsf_chn_cap_t) * 1 * VSF_CHN_MAX, array_size_list, jsonb_opt_proto_vsf_chn_cap_t);
+}
+}
 void jsonb_opt_proto_vsf_frame_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
 {
     proto_vsf_frame_cfg_t *element= e;
