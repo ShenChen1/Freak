@@ -1,5 +1,5 @@
 JSONB_INCLUDE_HEADER(proto_web.h)
 
 JSONB_STRUCT_START(web_cfg_t)
-JSONB_FIELD(server, proto_web_server_t)
+JSONB_FIELD(server, proto_web_svr_t)
 JSONB_STRUCT_END(web_cfg_t)

@@ -5,8 +5,17 @@
 
 static web_cfg_t s_cfg = {
     .server = {
-        .url = "0.0.0.0",
-        .port = 8080,
+        .num =1,
+        .cfgs[0] = {
+            .id = 0,
+            .enable = 1,
+            .ip = "0.0.0.0",
+            .port = 8080,
+        },
+        .caps[0] = {
+            .id = 0,
+            .dummy = 0x8080,
+        },
     },
 };
 

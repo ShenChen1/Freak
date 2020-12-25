@@ -2,8 +2,8 @@
 #include "log.h"
 #include "nnm.h"
 #include "inc/cfg.h"
-#include "inc/http.h"
 #include "inc/msgbox.h"
+#include "web/svr_mgr.h"
 
 static int __rep_recv(void *in, size_t isize, void **out, size_t *osize, void *arg)
 {
@@ -13,35 +13,27 @@ static int __rep_recv(void *in, size_t isize, void **out, size_t *osize, void *a
 
 int main()
 {
-    int ret;
     nnm_t rep = NULL;
-    nnm_t req = NULL;
 
     log_init(PROTO_LOG_COM_NODE, false);
     cfg_load(PROTO_WEB_CFG_PATH);
     msgbox_init();
 
-    static uint8_t ibuf[PROTO_PACKAGE_MAXSIZE];
     static uint8_t obuf[PROTO_PACKAGE_MAXSIZE];
     nnm_rep_init_t init = { __rep_recv, obuf };
     nnm_rep_create(PROTO_WEB_COM_NODE, &init, &rep);
 
-    // init start
-    ret = nnm_req_create(PROTO_WEB_COM_NODE, &req);
-    assert(!ret);
-    {
-        // init http server
-        uint8_t *obuf = NULL;
-        size_t osize  = 0;
-        proto_package_fill(ibuf, 0, PROTO_WEB_KEY_OPEN, PROTO_ACTION_SET, PROTO_FORMAT_STRUCTE, cfg_get_member(server), sizeof(proto_web_server_t));
-        nnm_req_exchange(req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
-        assert(osize == sizeof(proto_header_t));
-        memcpy(ibuf, obuf, osize);
-        nnm_free(obuf);
+    int i, total;
+    web_svr_mgr_t *server = web_createSvrMgr();
+    total = server->num(server);
+    for (i = 0; i < total; i++) {
+        proto_web_svr_cfg_t cfg = {.id = i};
+        // get cfg
+        server->get(server, &cfg);
+        // set cfg
+        server->set(server, &cfg);
     }
-    // init end
-    ret = nnm_req_destory(req);
-    assert(!ret);
+    server->destroy(server);
 
     while (1) {
         infof("keep alive");

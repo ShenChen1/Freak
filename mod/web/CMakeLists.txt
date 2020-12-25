@@ -7,6 +7,7 @@ add_executable(${PROJECT_NAME}
     src/http.c
     src/msgbox/msgbox.c
     src/msgbox/msgbox_http.c
+    src/interface/svr_mgr.c
     cfg/cfg.c)
 
 target_link_libraries(${PROJECT_NAME}

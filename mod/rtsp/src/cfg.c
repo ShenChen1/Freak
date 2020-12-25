@@ -8,6 +8,7 @@ static rtsp_cfg_t s_cfg = {
         .num =1,
         .cfgs[0] = {
             .id = 0,
+            .enable = 1,
             .ip = "0.0.0.0",
             .port = 1234,
         },

@@ -13,6 +13,6 @@ void jsonb_opt_web_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
         json_child = cJSON_CreateObject();
         cJSON_AddItemToObject(json, "server", json_child);
     }
-    jsonb_opt_proto_web_server_t(opt, json_child, &element->server, sizeof(proto_web_server_t));
+    jsonb_opt_proto_web_svr_t(opt, json_child, &element->server, sizeof(proto_web_svr_t));
 }
 }

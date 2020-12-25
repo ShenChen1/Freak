@@ -25,17 +25,17 @@ static int __rtsp_svr_set(rtsp_svr_mgr_t *self, proto_rtsp_svr_cfg_t *cfg)
     rtsp_svr_mgr_t *mgr       = self;
     rtsp_svr_mgr_priv_t *priv = mgr->priv;
 
-    if (cfg->enable == priv->info->cfgs[cfg->id].enable) {
-        return 0;
-    }
-
     if (cfg->enable) {
-        priv->server[cfg->id] = rtsp_server_init(cfg->ip, cfg->port);
-        assert(priv->server[cfg->id]);
+        if (priv->server[cfg->id] == NULL) {
+            priv->server[cfg->id] = rtsp_server_init(cfg->ip, cfg->port);
+            assert(priv->server[cfg->id]);
+        }
     } else {
-        ret = rtsp_server_uninit(priv->server[cfg->id]);
-        assert(ret == 0);
-        priv->server[cfg->id] = NULL;
+        if (priv->server[cfg->id]) {
+            ret = rtsp_server_uninit(priv->server[cfg->id]);
+            assert(ret == 0);
+            priv->server[cfg->id] = NULL;
+        }
     }
 
     return 0;

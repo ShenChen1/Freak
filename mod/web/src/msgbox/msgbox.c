@@ -3,11 +3,9 @@
 #include "inc/cfg.h"
 #include "inc/msgbox.h"
 
-extern int msgbox_http_open(msgbox_param_t *param);
-extern int msgbox_http_close(msgbox_param_t *param);
+extern int msgbox_web_server(msgbox_param_t *param);
 static msgbox_handler_t s_msgbox[PROTO_WEB_KEY_MAX] = {
-    [PROTO_WEB_KEY_OPEN] = msgbox_http_open,
-    [PROTO_WEB_KEY_CLOSE] = msgbox_http_close,
+    [PROTO_WEB_KEY_SERVER] = msgbox_web_server,
 };
 
 int msgbox_init()
