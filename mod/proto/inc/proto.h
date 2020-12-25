@@ -48,14 +48,12 @@ typedef enum {
 } proto_vsf_key_e;
 
 typedef enum {
-    PROTO_RTSP_KEY_OPEN,
-    PROTO_RTSP_KEY_CLOSE,
+    PROTO_RTSP_KEY_SERVER,
     PROTO_RTSP_KEY_MAX,
 } proto_rtsp_key_e;
 
 typedef enum {
-    PROTO_WEB_KEY_OPEN,
-    PROTO_WEB_KEY_CLOSE,
+    PROTO_WEB_KEY_SERVER,
     PROTO_WEB_KEY_MAX,
 } proto_web_key_e;
 

@@ -13,6 +13,7 @@ add_executable(${PROJECT_NAME}
     src/rtsp/rtp-transport-tcp.c
     src/rtsp/rtp-transport-udp.c
     src/rtsp/rtsp-server.c
+    src/interface/svr_mgr.c
     cfg/cfg.c)
 
 target_link_libraries(${PROJECT_NAME}

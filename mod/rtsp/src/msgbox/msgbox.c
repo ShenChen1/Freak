@@ -3,11 +3,9 @@
 #include "inc/cfg.h"
 #include "log.h"
 
-extern int msgbox_rtsp_open(msgbox_param_t *param);
-extern int msgbox_rtsp_close(msgbox_param_t *param);
+extern int msgbox_rtsp_server(msgbox_param_t *param);
 static msgbox_handler_t s_msgbox[PROTO_RTSP_KEY_MAX] = {
-    [PROTO_RTSP_KEY_OPEN]  = msgbox_rtsp_open,
-    [PROTO_RTSP_KEY_CLOSE] = msgbox_rtsp_close,
+    [PROTO_RTSP_KEY_SERVER]  = msgbox_rtsp_server,
 };
 
 int msgbox_init()

@@ -96,7 +96,6 @@ static int msgbox_frame_num(msgbox_param_t *param)
         out = malloc(sizeof(int));
     }
 
-
     vsf_frame_mgr_t *obj = vsf_createFrameMgr();
     assert(obj && obj->num);
     ret = obj->num(obj);

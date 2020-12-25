@@ -5,8 +5,16 @@
 
 static rtsp_cfg_t s_cfg = {
     .server = {
-        .url = "0.0.0.0",
-        .port = 1234,
+        .num =1,
+        .cfgs[0] = {
+            .id = 0,
+            .ip = "0.0.0.0",
+            .port = 1234,
+        },
+        .caps[0] = {
+            .id = 0,
+            .dummy = 0x1234,
+        },
     },
 };
 

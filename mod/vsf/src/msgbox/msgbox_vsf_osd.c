@@ -96,7 +96,6 @@ static int msgbox_osd_num(msgbox_param_t *param)
         out = malloc(sizeof(int));
     }
 
-
     vsf_osd_mgr_t *obj = vsf_createOsdMgr();
     assert(obj && obj->num);
     ret = obj->num(obj);

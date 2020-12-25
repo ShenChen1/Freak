@@ -1,4 +1,19 @@
-JSONB_STRUCT_START(proto_web_server_t)
-JSONB_STRING(url, 32)
+JSONB_MACRO_DEFINE(WEB_ITEM_MAX, 1)
+
+JSONB_STRUCT_START(proto_web_svr_cfg_t)
+JSONB_FIELD(id, int)
+JSONB_FIELD(enable, int)
+JSONB_STRING(ip, 64)
 JSONB_FIELD(port, int)
-JSONB_STRUCT_END(proto_web_server_t)
+JSONB_STRUCT_END(proto_web_svr_cfg_t)
+
+JSONB_STRUCT_START(proto_web_svr_cap_t)
+JSONB_FIELD(id, int)
+JSONB_FIELD(dummy, int)
+JSONB_STRUCT_END(proto_web_svr_cap_t)
+
+JSONB_STRUCT_START(proto_web_svr_t)
+JSONB_FIELD(num, int)
+JSONB_FIELD_ARRAY(caps, WEB_ITEM_MAX, proto_web_svr_cap_t)
+JSONB_FIELD_ARRAY(cfgs, WEB_ITEM_MAX, proto_web_svr_cfg_t)
+JSONB_STRUCT_END(proto_web_svr_t)

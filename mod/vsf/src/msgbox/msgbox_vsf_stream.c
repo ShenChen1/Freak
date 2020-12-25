@@ -96,7 +96,6 @@ static int msgbox_stream_num(msgbox_param_t *param)
         out = malloc(sizeof(int));
     }
 
-
     vsf_stream_mgr_t *obj = vsf_createStreamMgr();
     assert(obj && obj->num);
     ret = obj->num(obj);

@@ -14,7 +14,8 @@ add_library(${PROJECT_NAME} SHARED
     interface/vsf/chn_mgr.c
     interface/vsf/frame_mgr.c
     interface/vsf/osd_mgr.c
-    interface/vsf/stream_mgr.c)
+    interface/vsf/stream_mgr.c
+    interface/rtsp/svr_mgr.c)
 
 target_link_libraries(${PROJECT_NAME}
     utils)
