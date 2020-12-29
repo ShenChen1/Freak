@@ -64,7 +64,7 @@ static int __web_svr_num(web_svr_mgr_t *self)
     web_svr_mgr_t *mgr       = self;
     web_svr_mgr_priv_t *priv = mgr->priv;
 
-    return priv->info->num;
+    return priv->info->num.num;
 }
 
 web_svr_mgr_t *web_createSvrMgr(void)

@@ -24,7 +24,7 @@ int main()
     nnm_rep_create(PROTO_WEB_COM_NODE, &init, &rep);
 
     int i, total;
-    web_svr_mgr_t *server = web_createSvrMgr();
+    web_svr_mgr_t *server = web_createSvrMgr_r();
     total = server->num(server);
     for (i = 0; i < total; i++) {
         proto_web_svr_cfg_t cfg = {.id = i};

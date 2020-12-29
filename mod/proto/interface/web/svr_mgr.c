@@ -5,6 +5,7 @@
 
 typedef struct {
     nnm_t req;
+    int proto;
 } web_svr_mgr_priv_t;
 
 static int __web_svr_destroy(web_svr_mgr_t *self)
@@ -20,17 +21,29 @@ static int __web_svr_destroy(web_svr_mgr_t *self)
 static int __web_svr_get(web_svr_mgr_t *self, proto_web_svr_cfg_t *cfg)
 {
     web_svr_mgr_priv_t *priv = self->priv;
-    uint8_t ibuf[PROTO_PACKAGE_MAXSIZE] = {};
-    proto_header_t *obuf = NULL;
-    size_t osize = 0;
+    proto_header_t *obuf   = NULL;
+    size_t osize           = 0;
+    size_t isize           = 0;
 
-    memset(cfg, 0, sizeof(proto_web_svr_cfg_t));
-    proto_package_fill(ibuf, cfg->id, PROTO_RTSP_KEY_SERVER, PROTO_ACTION_GET, PROTO_FORMAT_STRUCTE, cfg, sizeof(proto_web_svr_cfg_t));
+    uint8_t ibuf[PROTO_PACKAGE_MAXSIZE] = {};
+    proto_client_data_pre(priv->proto,
+                          jsonb_opt_proto_web_svr_cfg_t,
+                          cfg,
+                          sizeof(proto_web_svr_cfg_t),
+                          proto_package_data(ibuf),
+                          &isize);
+
+    proto_package_fill_header(ibuf, cfg->id, PROTO_RTSP_KEY_SERVER, PROTO_ACTION_GET, priv->proto, isize);
     nnm_req_exchange(priv->req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
     assert(obuf->key == PROTO_RTSP_KEY_SERVER);
     assert(!obuf->errcode);
 
-    memcpy(cfg, proto_package_data(obuf), sizeof(proto_web_svr_cfg_t));
+    proto_client_data_post(priv->proto,
+                           jsonb_opt_proto_web_svr_cfg_t,
+                           obuf->data,
+                           obuf->size,
+                           cfg,
+                           sizeof(proto_web_svr_cfg_t));
     nnm_free(obuf);
     return 0;
 }
@@ -38,16 +51,29 @@ static int __web_svr_get(web_svr_mgr_t *self, proto_web_svr_cfg_t *cfg)
 static int __web_svr_set(web_svr_mgr_t *self, proto_web_svr_cfg_t *cfg)
 {
     web_svr_mgr_priv_t *priv = self->priv;
-    uint8_t ibuf[PROTO_PACKAGE_MAXSIZE] = {};
-    proto_header_t *obuf = NULL;
-    size_t osize = 0;
+    proto_header_t *obuf   = NULL;
+    size_t osize           = 0;
+    size_t isize           = 0;
 
-    proto_package_fill(ibuf, cfg->id, PROTO_RTSP_KEY_SERVER, PROTO_ACTION_SET, PROTO_FORMAT_STRUCTE, cfg, sizeof(proto_web_svr_cfg_t));
+    uint8_t ibuf[PROTO_PACKAGE_MAXSIZE] = {};
+    proto_client_data_pre(priv->proto,
+                          jsonb_opt_proto_web_svr_cfg_t,
+                          cfg,
+                          sizeof(proto_web_svr_cfg_t),
+                          proto_package_data(ibuf),
+                          &isize);
+
+    proto_package_fill_header(ibuf, cfg->id, PROTO_RTSP_KEY_SERVER, PROTO_ACTION_SET, priv->proto, isize);
     nnm_req_exchange(priv->req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
     assert(obuf->key == PROTO_RTSP_KEY_SERVER);
     assert(!obuf->errcode);
 
-    assert(proto_package_size(obuf) == sizeof(proto_header_t));
+    proto_client_data_post(priv->proto,
+                           jsonb_opt_proto_web_svr_cfg_t,
+                           obuf->data,
+                           obuf->size,
+                           cfg,
+                           sizeof(proto_web_svr_cfg_t));
     nnm_free(obuf);
     return 0;
 }
@@ -55,43 +81,64 @@ static int __web_svr_set(web_svr_mgr_t *self, proto_web_svr_cfg_t *cfg)
 static int __web_svr_cap(web_svr_mgr_t *self, proto_web_svr_cap_t *cap)
 {
     web_svr_mgr_priv_t *priv = self->priv;
-    uint8_t ibuf[PROTO_PACKAGE_MAXSIZE] = {};
-    proto_header_t *obuf = NULL;
-    size_t osize = 0;
+    proto_header_t *obuf   = NULL;
+    size_t osize           = 0;
+    size_t isize           = 0;
 
-    memset(cap, 0, sizeof(proto_web_svr_cap_t));
-    proto_package_fill(ibuf, cap->id, PROTO_RTSP_KEY_SERVER, PROTO_ACTION_CAP, PROTO_FORMAT_STRUCTE, cap, sizeof(proto_web_svr_cap_t));
+    uint8_t ibuf[PROTO_PACKAGE_MAXSIZE] = {};
+    proto_client_data_pre(priv->proto,
+                          jsonb_opt_proto_web_svr_cap_t,
+                          cap,
+                          sizeof(proto_web_svr_cap_t),
+                          proto_package_data(ibuf),
+                          &isize);
+
+    proto_package_fill_header(ibuf, cap->id, PROTO_RTSP_KEY_SERVER, PROTO_ACTION_CAP, priv->proto, isize);
     nnm_req_exchange(priv->req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
     assert(obuf->key == PROTO_RTSP_KEY_SERVER);
     assert(!obuf->errcode);
 
-    memcpy(cap, proto_package_data(obuf), sizeof(proto_web_svr_cap_t));
+    proto_client_data_post(priv->proto,
+                           jsonb_opt_proto_web_svr_cfg_t,
+                           obuf->data,
+                           obuf->size,
+                           cap,
+                           sizeof(proto_web_svr_cap_t));
     nnm_free(obuf);
-
     return 0;
 }
 
 static int __web_svr_num(web_svr_mgr_t *self)
 {
-    int ret;
     web_svr_mgr_priv_t *priv = self->priv;
-    uint8_t ibuf[PROTO_PACKAGE_MAXSIZE] = {};
-    proto_header_t *obuf = NULL;
-    size_t osize = 0;
+    proto_header_t *obuf       = NULL;
+    size_t osize               = 0;
+    size_t isize               = 0;
+    proto_num_t num            = {};
 
-    memset(&ret, 0, sizeof(int));
-    proto_package_fill(ibuf, -1, PROTO_RTSP_KEY_SERVER, PROTO_ACTION_CAP, PROTO_FORMAT_STRUCTE, &ret, sizeof(int));
+    uint8_t ibuf[PROTO_PACKAGE_MAXSIZE] = {};
+    proto_client_data_pre(priv->proto,
+                          jsonb_opt_proto_num_t,
+                          &num, sizeof(proto_num_t),
+                          proto_package_data(ibuf),
+                          &isize);
+
+    proto_package_fill_header(ibuf, -1, PROTO_RTSP_KEY_SERVER, PROTO_ACTION_NUM, priv->proto, isize);
     nnm_req_exchange(priv->req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
     assert(obuf->key == PROTO_RTSP_KEY_SERVER);
     assert(!obuf->errcode);
 
-    memcpy(&ret, proto_package_data(obuf), sizeof(int));
+    proto_client_data_post(priv->proto,
+                           jsonb_opt_proto_num_t,
+                           obuf->data,
+                           obuf->size,
+                           &num,
+                           sizeof(proto_num_t));
     nnm_free(obuf);
-
-    return ret;
+    return num.num;
 }
 
-web_svr_mgr_t * __weak web_createSvrMgr()
+web_svr_mgr_t *__web_createSvrMgr(int proto)
 {
     int ret;
     web_svr_mgr_t *mgr       = NULL;
@@ -99,20 +146,31 @@ web_svr_mgr_t * __weak web_createSvrMgr()
 
     priv = malloc(sizeof(web_svr_mgr_priv_t));
     assert(priv);
-    ret = nnm_req_create(PROTO_VSF_COM_NODE, &priv->req);
+    ret = nnm_req_create(PROTO_WEB_COM_NODE, &priv->req);
     assert(!ret);
+    priv->proto = proto;
 
     mgr = malloc(sizeof(web_svr_mgr_t));
     if (mgr == NULL) {
         return NULL;
     }
 
-    mgr->priv = priv;
+    mgr->priv    = priv;
     mgr->destroy = __web_svr_destroy;
-    mgr->num = __web_svr_num;
-    mgr->cap = __web_svr_cap;
-    mgr->get = __web_svr_get;
-    mgr->set = __web_svr_set;
+    mgr->num     = __web_svr_num;
+    mgr->cap     = __web_svr_cap;
+    mgr->get     = __web_svr_get;
+    mgr->set     = __web_svr_set;
 
     return mgr;
+}
+
+web_svr_mgr_t *__weak web_createSvrMgr(void)
+{
+    return __web_createSvrMgr(PROTO_FORMAT_STRUCTE);
+}
+
+web_svr_mgr_t *web_createSvrMgr_r(void)
+{
+    return __web_createSvrMgr(PROTO_FORMAT_JSON);
 }

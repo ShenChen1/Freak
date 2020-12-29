@@ -15,5 +15,6 @@ typedef struct svr_mgr {
 } web_svr_mgr_t;
 
 web_svr_mgr_t *web_createSvrMgr(void);
+web_svr_mgr_t *web_createSvrMgr_r(void);
 
 #endif /* __WEB_SVR_MGR_H__ */
