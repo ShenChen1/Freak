@@ -33,7 +33,7 @@ ExternalProject_Add(build-${PROJECT_NAME}-sdk
     COMMAND make CROSS=${CMAKE_CROSS_PREFIX}- RELEASE=0 OUTPATH=${PROJECT_BINARY_DIR}/build -C libaio
     COMMAND make CROSS=${CMAKE_CROSS_PREFIX}- RELEASE=0 OUTPATH=${PROJECT_BINARY_DIR}/build -C source
     INSTALL_COMMAND true
-    COMMAND cp -av ${PROJECT_BINARY_DIR}/build/libutils.so ${PROJECT_BINARY_DIR}/build/libutils-media.so
+    COMMAND mv ${PROJECT_BINARY_DIR}/build/libutils.so ${PROJECT_BINARY_DIR}/build/libutils-media.so
     COMMAND cmake -E copy_directory ${PROJECT_BINARY_DIR}/build-${PROJECT_NAME}-sdk-prefix/src/build-${PROJECT_NAME}-sdk/libhttp/include/ ${PROJECT_BINARY_DIR}/build/include/libhttp
     COMMAND cmake -E copy_directory ${PROJECT_BINARY_DIR}/build-${PROJECT_NAME}-sdk-prefix/src/build-${PROJECT_NAME}-sdk/libaio/include/ ${PROJECT_BINARY_DIR}/build/include/libaio
     COMMAND cmake -E copy_directory ${PROJECT_BINARY_DIR}/build-${PROJECT_NAME}-sdk-prefix/src/build-${PROJECT_NAME}-sdk/include/ ${PROJECT_BINARY_DIR}/build/include

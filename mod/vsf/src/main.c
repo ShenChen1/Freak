@@ -59,7 +59,7 @@ int main()
     }
     osd->destroy(osd);
 
-    while (0) {
+    while (1) {
         infof("keep alive");
         sleep(1);
     }

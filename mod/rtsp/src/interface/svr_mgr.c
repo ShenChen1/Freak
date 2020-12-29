@@ -64,7 +64,7 @@ static int __rtsp_svr_num(rtsp_svr_mgr_t *self)
     rtsp_svr_mgr_t *mgr       = self;
     rtsp_svr_mgr_priv_t *priv = mgr->priv;
 
-    return priv->info->num;
+    return priv->info->num.num;
 }
 
 rtsp_svr_mgr_t *rtsp_createSvrMgr(void)

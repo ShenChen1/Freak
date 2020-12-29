@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
     nnm_rep_create(PROTO_RTSP_COM_NODE, &init, &rep);
 
     int i, total;
-    rtsp_svr_mgr_t *server = rtsp_createSvrMgr();
+    rtsp_svr_mgr_t *server = rtsp_createSvrMgr_r();
     total = server->num(server);
     for (i = 0; i < total; i++) {
         proto_rtsp_svr_cfg_t cfg = {.id = i};

@@ -1,3 +1,4 @@
+JSONB_INCLUDE_HEADER(proto_base.h)
 JSONB_MACRO_DEFINE(RTSP_ITEM_MAX, 1)
 
 JSONB_STRUCT_START(proto_rtsp_svr_cfg_t)
@@ -13,7 +14,7 @@ JSONB_FIELD(dummy, int)
 JSONB_STRUCT_END(proto_rtsp_svr_cap_t)
 
 JSONB_STRUCT_START(proto_rtsp_svr_t)
-JSONB_FIELD(num, int)
+JSONB_FIELD(num, proto_num_t)
 JSONB_FIELD_ARRAY(caps, RTSP_ITEM_MAX, proto_rtsp_svr_cap_t)
 JSONB_FIELD_ARRAY(cfgs, RTSP_ITEM_MAX, proto_rtsp_svr_cfg_t)
 JSONB_STRUCT_END(proto_rtsp_svr_t)

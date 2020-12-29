@@ -5,7 +5,7 @@
 
 static rtsp_cfg_t s_cfg = {
     .server = {
-        .num =1,
+        .num = { 1 },
         .cfgs[0] = {
             .id = 0,
             .enable = 1,

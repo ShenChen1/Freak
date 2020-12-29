@@ -15,5 +15,6 @@ typedef struct svr_mgr {
 } rtsp_svr_mgr_t;
 
 rtsp_svr_mgr_t *rtsp_createSvrMgr(void);
+rtsp_svr_mgr_t *rtsp_createSvrMgr_r(void);
 
 #endif /* __RTSP_SVR_MGR_H__ */
