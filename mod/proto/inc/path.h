@@ -6,6 +6,7 @@
 #define PROTO_RTSP_CFG_PATH "/tmp/rtsp-config.json"
 #define PROTO_VSF_CFG_PATH "/tmp/vsf-config.json"
 #define PROTO_WEB_CFG_PATH "/tmp/web-config.json"
+#define PROTO_APP_CFG_PATH "/tmp/app-config.json"
 
 #define PROTO_VSF_STREAM_FIFO "vsf-stream-"
 #define PROTO_VSF_FRAME_WORK_FIFO "vsf-frame-work-"

@@ -57,6 +57,10 @@ typedef enum {
     PROTO_WEB_KEY_MAX,
 } proto_web_key_e;
 
+typedef enum {
+    PROTO_APP_KEY_ALG,
+    PROTO_APP_KEY_MAX,
+} proto_app_key_e;
 #define proto_header_dump(_package)                               \
     (void)({                                                      \
         proto_header_t *p = (void *)(_package);                   \

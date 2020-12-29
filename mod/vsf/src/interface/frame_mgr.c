@@ -230,7 +230,7 @@ static int __vsf_get_frame_proc(void *data, void *args)
     vsf_frame_mgr_priv_t *priv = s_mgr->priv;
     proto_vsf_frame_cfg_t *cfg = args;
 
-#if 1
+#if 0
     /* Obtain current time. */
     char acFile[128];
     struct timeval tv;
@@ -252,6 +252,8 @@ static int __vsf_get_frame_proc(void *data, void *args)
     __vsf_frame_SaveYUVFile(pFile, frame);
     fclose(pFile);
 #endif
+    int sleeptime = (1000/cfg->fps) - 33;
+    usleep(sleeptime > 0 ? sleeptime : 1);
     return ufifo_put(priv->fifo[cfg->id][VSF_FRAME_CB_GET], frame, totalsize) != totalsize;
 }
 

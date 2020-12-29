@@ -1,0 +1,18 @@
+JSONB_MACRO_DEFINE(APP_ITEM_MAX, 3)
+
+JSONB_STRUCT_START(proto_app_alg_cfg_t)
+JSONB_FIELD(type, int)
+JSONB_FIELD(enable, int)
+JSONB_STRING(algpath, 64)
+JSONB_STRUCT_END(proto_app_alg_cfg_t)
+
+JSONB_STRUCT_START(proto_app_alg_cap_t)
+JSONB_FIELD(id, int)
+JSONB_FIELD(dummy, int)
+JSONB_STRUCT_END(proto_app_alg_cap_t)
+
+JSONB_STRUCT_START(proto_app_alg_t)
+JSONB_FIELD(num, int)
+JSONB_FIELD_ARRAY(caps, APP_ITEM_MAX, proto_app_alg_cap_t)
+JSONB_FIELD_ARRAY(cfgs, APP_ITEM_MAX, proto_app_alg_cfg_t)
+JSONB_STRUCT_END(proto_app_alg_t)
