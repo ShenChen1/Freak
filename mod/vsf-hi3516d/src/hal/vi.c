@@ -94,8 +94,8 @@ vsf_vi_t *VSF_createVi(int id)
     priv->pstViConfig = &mod->stViConfig;
 
     obj = malloc(sizeof(vsf_vi_t));
-    assert(priv);
-    memset(priv, 0, sizeof(vsf_vi_t));
+    assert(obj);
+    memset(obj, 0, sizeof(vsf_vi_t));
     obj->priv    = priv;
     obj->init    = __vi_init;
     obj->destroy = __vi_destroy;

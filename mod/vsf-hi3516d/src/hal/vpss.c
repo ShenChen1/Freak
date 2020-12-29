@@ -281,8 +281,8 @@ vsf_vpss_t *VSF_createVpss(int id)
     }
 
     obj = malloc(sizeof(vsf_vpss_t));
-    assert(priv);
-    memset(priv, 0, sizeof(vsf_vpss_t));
+    assert(obj);
+    memset(obj, 0, sizeof(vsf_vpss_t));
     obj->priv        = priv;
     obj->init        = __vpss_init;
     obj->destroy     = __vpss_destroy;
