@@ -26,10 +26,10 @@ int main()
     nnm_pub_create(PROTO_BSP_PUB_NODE, &pub);
 
     int i, total;
-    total = bsp_getDummyNum();
+    total = bsp_getDummyNum_r();
     for (i = 0; i < total; i++) {
-        bsp_dummy_t *dummy = bsp_createDummy(i);
-        proto_bsp_dummy_cfg_t cfg;
+        bsp_dummy_t *dummy = bsp_createDummy_r(i);
+        proto_bsp_dummy_cfg_t cfg = {};
         // get cfg
         dummy->get(dummy, &cfg);
         // set cfg

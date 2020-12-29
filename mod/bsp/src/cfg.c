@@ -5,7 +5,7 @@
 
 static bsp_cfg_t s_cfg = {
     .dummy = {
-        .num = 2,
+        .num = { 2 },
         .cfgs[0] = {
             .value = 0x1234,
         },

@@ -1,3 +1,4 @@
+JSONB_INCLUDE_HEADER(proto_base.h)
 JSONB_MACRO_DEFINE(BSP_ITEM_MAX, 8)
 
 JSONB_STRUCT_START(proto_bsp_dummy_cfg_t)
@@ -9,7 +10,7 @@ JSONB_FIELD(value, int)
 JSONB_STRUCT_END(proto_bsp_dummy_cap_t)
 
 JSONB_STRUCT_START(proto_bsp_dummy_t)
-JSONB_FIELD(num, int)
+JSONB_FIELD(num, proto_num_t)
 JSONB_FIELD_ARRAY(caps, BSP_ITEM_MAX, proto_bsp_dummy_cap_t)
 JSONB_FIELD_ARRAY(cfgs, BSP_ITEM_MAX, proto_bsp_dummy_cfg_t)
 JSONB_STRUCT_END(proto_bsp_dummy_t)

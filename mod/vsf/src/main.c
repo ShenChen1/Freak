@@ -26,16 +26,16 @@ int main()
     nnm_rep_create(PROTO_VSF_COM_NODE, &init, &rep);
 
     int i, total;
-    //vsf_frame_mgr_t *frame = vsf_createFrameMgr();
-    //total = frame->num(frame);
-    /*for (i = 0; i < total; i++) {
+    vsf_frame_mgr_t *frame = vsf_createFrameMgr();
+    total = frame->num(frame);
+    for (i = 0; i < total; i++) {
         proto_vsf_frame_cfg_t cfg = {.id = i};
         // get cfg
         frame->get(frame, &cfg);
         // set cfg
         frame->set(frame, &cfg);
     }
-    frame->destroy(frame);*/
+    frame->destroy(frame);
 
     vsf_stream_mgr_t *stream = vsf_createStreamMgr();
     total = stream->num(stream);

@@ -2,122 +2,68 @@
 #include "common.h"
 #include "inc/cfg.h"
 #include "inc/msgbox.h"
+#include "jsonb_c_base.h"
 
 static int msgbox_dummy_set(msgbox_param_t *param)
 {
     int ret;
-    proto_bsp_dummy_cfg_t *in = param->in;
+    proto_bsp_dummy_cfg_t cfg;
 
-    if (param->format == PROTO_FORMAT_JSON) {
-        in = malloc(sizeof(proto_bsp_dummy_cfg_t));
-        if (param->isize) {
-            cJSON *json = cJSON_Parse(param->in);
-            jsonb_opt_proto_bsp_dummy_cfg_t(JSONB_OPT_J2S, json, in, sizeof(proto_bsp_dummy_cfg_t));
-            cJSON_Delete(json);
-        }
-    }
+    proto_server_data_pre(param->format, jsonb_opt_proto_bsp_dummy_cfg_t, param->in, param->isize, &cfg, sizeof(proto_bsp_dummy_cfg_t));
 
     bsp_dummy_t *obj = bsp_createDummy(param->chn);
     assert(obj && obj->set);
-    ret = obj->set(obj, in);
-    if (!ret) {
-        cfg_get_member(dummy)->cfgs[param->chn] = *in;
-    }
-    *param->osize = 0;
+    ret = obj->set(obj, &cfg);
+    assert(ret == 0);
+    cfg_get_member(dummy)->cfgs[param->chn] = cfg;
 
-    if (param->format == PROTO_FORMAT_JSON) {
-        free(in);
-    }
-
+    proto_server_data_post(param->format, jsonb_opt_proto_bsp_dummy_cfg_t, &cfg, sizeof(proto_bsp_dummy_cfg_t), param->out, param->osize);
     return ret;
 }
 
 static int msgbox_dummy_get(msgbox_param_t *param)
 {
     int ret;
-    proto_bsp_dummy_cfg_t *out = param->out;
+    proto_bsp_dummy_cfg_t cfg;
 
-    if (param->format == PROTO_FORMAT_JSON) {
-        out = malloc(sizeof(proto_bsp_dummy_cfg_t));
-    }
+    proto_server_data_pre(param->format, jsonb_opt_proto_bsp_dummy_cfg_t, param->in, param->isize, &cfg, sizeof(proto_bsp_dummy_cfg_t));
 
     bsp_dummy_t *obj = bsp_createDummy(param->chn);
     assert(obj && obj->get);
-    ret = obj->get(obj, out);
-    *param->osize = sizeof(proto_bsp_dummy_cfg_t);
+    ret = obj->get(obj, &cfg);
+    assert(ret == 0);
 
-    if (param->format == PROTO_FORMAT_JSON) {
-        if (*param->osize) {
-            cJSON *json = cJSON_CreateObject();
-            jsonb_opt_proto_bsp_dummy_cfg_t(JSONB_OPT_S2J, json, out, sizeof(proto_bsp_dummy_cfg_t));
-            cJSON_PrintPreallocated(json, param->out, PROTO_PACKAGE_MAXSIZE, 0);
-            cJSON_Delete(json);
-            *param->osize = strlen(param->out) + 1;
-        }
-        free(out);
-    }
-
+    proto_server_data_post(param->format, jsonb_opt_proto_bsp_dummy_cfg_t, &cfg, sizeof(proto_bsp_dummy_cfg_t), param->out, param->osize);
     return ret;
 }
 
 static int msgbox_dummy_cap(msgbox_param_t *param)
 {
     int ret;
-    proto_bsp_dummy_cap_t *out = param->out;
+    proto_bsp_dummy_cap_t cap;
 
-    if (param->format == PROTO_FORMAT_JSON) {
-        out = malloc(sizeof(proto_bsp_dummy_cap_t));
-    }
+    proto_server_data_pre(param->format, jsonb_opt_proto_bsp_dummy_cap_t, param->in, param->isize, &cap, sizeof(proto_bsp_dummy_cap_t));
 
     bsp_dummy_t *obj = bsp_createDummy(param->chn);
     assert(obj && obj->cap);
-    ret = obj->cap(obj, out);
-    *param->osize = sizeof(proto_bsp_dummy_cap_t);
+    ret = obj->cap(obj, &cap);
+    assert(ret == 0);
 
-    if (param->format == PROTO_FORMAT_JSON) {
-        if (*param->osize) {
-            cJSON *json = cJSON_CreateObject();
-            jsonb_opt_proto_bsp_dummy_cap_t(JSONB_OPT_S2J, json, out, sizeof(proto_bsp_dummy_cap_t));
-            cJSON_PrintPreallocated(json, param->out, PROTO_PACKAGE_MAXSIZE, 0);
-            cJSON_Delete(json);
-            *param->osize = strlen(param->out) + 1;
-        }
-        free(out);
-    }
-
+    proto_server_data_post(param->format, jsonb_opt_proto_bsp_dummy_cap_t, &cap, sizeof(proto_bsp_dummy_cap_t), param->out, param->osize);
     return ret;
 }
 
 static int msgbox_dummy_num(msgbox_param_t *param)
 {
-    int ret;
-    int *out = param->out;
+    proto_num_t num;
 
-    if (param->format == PROTO_FORMAT_JSON) {
-        out = malloc(sizeof(int));
-    }
+    proto_server_data_pre(param->format, jsonb_opt_proto_num_t, param->in, param->isize, &num, sizeof(int));
 
-    ret = bsp_getDummyNum(param->chn);
-    if (ret >= 0) {
-        *out = ret;
-        ret = 0;
-    } else {
-        ret = EINVAL;
-    }
-    *param->osize = sizeof(int);
+    num.num = bsp_getDummyNum();
+    assert(num.num >= 0);
 
-    if (param->format == PROTO_FORMAT_JSON) {
-        if (*param->osize) {
-            cJSON *json = cJSON_CreateObject();
-            jsonb_opt_proto_bsp_dummy_cap_t(JSONB_OPT_S2J, json, out, sizeof(int));
-            cJSON_PrintPreallocated(json, param->out, PROTO_PACKAGE_MAXSIZE, 0);
-            cJSON_Delete(json);
-            *param->osize = strlen(param->out) + 1;
-        }
-        free(out);
-    }
-
-    return ret;
+    proto_server_data_post(param->format, jsonb_opt_proto_num_t, &num, sizeof(int), param->out, param->osize);
+    return 0;
 }
 
 int msgbox_dummy(msgbox_param_t *param)

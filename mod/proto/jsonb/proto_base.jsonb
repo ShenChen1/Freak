@@ -1,3 +1,7 @@
+JSONB_STRUCT_START(proto_num_t)
+JSONB_FIELD(num, int32_t)
+JSONB_STRUCT_END(proto_num_t)
+
 JSONB_STRUCT_START(proto_point_t)
 JSONB_FIELD(x, int32_t)
 JSONB_FIELD(y, int32_t)

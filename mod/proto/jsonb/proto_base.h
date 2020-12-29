@@ -1,6 +1,10 @@
 #ifndef __PROTO_BASE_JSONB_C_API_H__
 #define __PROTO_BASE_JSONB_C_API_H__
 #include "jsonb_c_type.h"
+extern void jsonb_opt_proto_num_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
+typedef struct {
+    int32_t num;
+} proto_num_t;
 extern void jsonb_opt_proto_point_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
     int32_t x;

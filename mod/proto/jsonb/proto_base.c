@@ -1,6 +1,21 @@
 #include "jsonb_c_type.h"
 #include "jsonb_c_base.h"
 #include "proto_base.h"
+void jsonb_opt_proto_num_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
+{
+    proto_num_t *element= e;
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) return;
+        json_child = cJSON_GetObjectItem(json, "num");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "num", json_child);
+    }
+    jsonb_opt_int32_t(opt, json_child, &element->num, sizeof(int32_t));
+}
+}
 void jsonb_opt_proto_point_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
 {
     proto_point_t *element= e;

@@ -5,9 +5,9 @@
 
 typedef struct {
     int id;
-    int value;
     proto_bsp_dummy_cap_t *cap;
-} dummy_priv_t;
+    proto_bsp_dummy_cfg_t *cfg;
+} bsp_dummy_priv_t;
 
 static bsp_dummy_t *s_dummy_obj[BSP_ITEM_MAX] = {};
 
@@ -20,34 +20,34 @@ static int __bsp_dummy_destroy(bsp_dummy_t *self)
 
 static int __bsp_dummy_cap(bsp_dummy_t *self, proto_bsp_dummy_cap_t *cap)
 {
-    dummy_priv_t *priv = self->priv;
+    bsp_dummy_priv_t *priv = self->priv;
 
-    memcpy(cap, priv->cap, sizeof(proto_bsp_dummy_cap_t));
+    *cap = *priv->cap;
     return 0;
 }
 
 static int __bsp_dummy_set(bsp_dummy_t *self, proto_bsp_dummy_cfg_t *cfg)
 {
-    dummy_priv_t *priv = self->priv;
+    bsp_dummy_priv_t *priv = self->priv;
 
-    priv->value = cfg->value;
+    *priv->cfg = *cfg;
     return 0;
 }
 
 static int __bsp_dummy_get(bsp_dummy_t *self, proto_bsp_dummy_cfg_t *cfg)
 {
-    dummy_priv_t *priv = self->priv;
+    bsp_dummy_priv_t *priv = self->priv;
 
-    cfg->value = priv->value;
+    *cfg = *priv->cfg;
     return 0;
 }
 
 bsp_dummy_t *bsp_createDummy(int id)
 {
     bsp_dummy_t *obj       = NULL;
-    dummy_priv_t *priv = NULL;
+    bsp_dummy_priv_t *priv = NULL;
 
-    if (id >= cfg_get_member(dummy)->num) {
+    if (id >= cfg_get_member(dummy)->num.num) {
         return NULL;
     }
 
@@ -56,11 +56,11 @@ bsp_dummy_t *bsp_createDummy(int id)
         return s_dummy_obj[id];
     }
 
-    priv = malloc(sizeof(dummy_priv_t));
+    priv = malloc(sizeof(bsp_dummy_priv_t));
     assert(priv);
-    priv->value = 0;
-    priv->id = id;
+    priv->id  = id;
     priv->cap = &cfg_get_member(dummy)->caps[priv->id];
+    priv->cfg = &cfg_get_member(dummy)->cfgs[priv->id];
 
     obj = malloc(sizeof(bsp_dummy_t));
     assert(obj);
@@ -77,5 +77,5 @@ bsp_dummy_t *bsp_createDummy(int id)
 
 int bsp_getDummyNum()
 {
-    return cfg_get_member(dummy)->num;
+    return cfg_get_member(dummy)->num.num;
 }

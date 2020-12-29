@@ -52,6 +52,7 @@ typedef struct dummy {
  *                      NULL on error
  */
 bsp_dummy_t *bsp_createDummy(int id);
+bsp_dummy_t *bsp_createDummy_r(int id);
 
 /**
  * @brief  get the number of dummy
@@ -59,5 +60,6 @@ bsp_dummy_t *bsp_createDummy(int id);
  * @return >=0 for the number, <0 otherwise.
  */
 int bsp_getDummyNum();
+int bsp_getDummyNum_r();
 
 #endif //__BSP_DUMMY_H__

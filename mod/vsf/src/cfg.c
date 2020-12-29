@@ -48,7 +48,7 @@ static vsf_cfg_t s_cfg = {
         },
     },
     .frame = {
-        .num = 3,
+        .num = 2,
         .cfgs[0] = {
             .id = 0,
             .enable = 0,
@@ -60,7 +60,7 @@ static vsf_cfg_t s_cfg = {
         .caps[0] = {
             .id = 0,
             .chn = 0,
-            .subchn = 0,
+            .subchn = 1,
         },
         .cfgs[1] = {
             .id = 1,
@@ -71,23 +71,10 @@ static vsf_cfg_t s_cfg = {
             .fps = 5,
         },
         .caps[1] = {
-            .id = 1,
+            .id = 0,
             .chn = 0,
-            .subchn = 1,
+            .subchn = 2,
         },
-	    .cfgs[2] = {
-	        .id = 2,
-	        .enable = 0,
-	        .format = VIDEO_FRAME_FORMAT_YUV420P_YVU,
-	        .width = 640,
-	        .height = 640,
-	        .fps = 15,
-	    },
-	    .caps[2] = {
-	        .id = 2,
-	        .chn = 0,
-	        .subchn = 2,
-	    },
     },
     .osd = {
         .num = 1,
