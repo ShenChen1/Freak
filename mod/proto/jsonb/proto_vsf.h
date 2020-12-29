@@ -20,7 +20,7 @@ typedef struct {
 } proto_vsf_chn_cap_t;
 extern void jsonb_opt_proto_vsf_chn_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
-    int num;
+    proto_num_t num;
     proto_vsf_chn_cap_t caps[VSF_CHN_MAX];
     proto_vsf_chn_cap_t cfgs[VSF_CHN_MAX];
 } proto_vsf_chn_t;
@@ -41,7 +41,7 @@ typedef struct {
 } proto_vsf_frame_cap_t;
 extern void jsonb_opt_proto_vsf_frame_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
-    int num;
+    proto_num_t num;
     proto_vsf_frame_cap_t caps[VSF_FRAME_MAX];
     proto_vsf_frame_cfg_t cfgs[VSF_FRAME_MAX];
 } proto_vsf_frame_t;
@@ -62,7 +62,7 @@ typedef struct {
 } proto_vsf_stream_cap_t;
 extern void jsonb_opt_proto_vsf_stream_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
-    int num;
+    proto_num_t num;
     proto_vsf_stream_cap_t caps[VSF_STREAM_MAX];
     proto_vsf_stream_cfg_t cfgs[VSF_STREAM_MAX];
 } proto_vsf_stream_t;
@@ -98,7 +98,7 @@ typedef struct {
 } proto_vsf_osd_cap_t;
 extern void jsonb_opt_proto_vsf_osd_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
-    int num;
+    proto_num_t num;
     proto_vsf_osd_cap_t caps[VSF_OSD_MAX];
     proto_vsf_osd_cfg_t cfgs[VSF_OSD_MAX];
 } proto_vsf_osd_t;

@@ -6,7 +6,7 @@
 
 static vsf_cfg_t s_cfg = {
     .stream = {
-        .num = 3,
+        .num = { 3 },
         .cfgs[0] = {
             .id = 0,
             .enable = 1,
@@ -48,7 +48,7 @@ static vsf_cfg_t s_cfg = {
         },
     },
     .frame = {
-        .num = 2,
+        .num = { 2 },
         .cfgs[0] = {
             .id = 0,
             .enable = 0,
@@ -77,7 +77,7 @@ static vsf_cfg_t s_cfg = {
         },
     },
     .osd = {
-        .num = 1,
+        .num = { 1 },
         .cfgs[0] = {
             .id = 0,
             .enable = 1,

@@ -26,7 +26,7 @@ int main()
     nnm_rep_create(PROTO_VSF_COM_NODE, &init, &rep);
 
     int i, total;
-    vsf_frame_mgr_t *frame = vsf_createFrameMgr();
+    vsf_frame_mgr_t *frame = vsf_createFrameMgr_r();
     total = frame->num(frame);
     for (i = 0; i < total; i++) {
         proto_vsf_frame_cfg_t cfg = {.id = i};
@@ -37,7 +37,7 @@ int main()
     }
     frame->destroy(frame);
 
-    vsf_stream_mgr_t *stream = vsf_createStreamMgr();
+    vsf_stream_mgr_t *stream = vsf_createStreamMgr_r();
     total = stream->num(stream);
     for (i = 0; i < total; i++) {
         proto_vsf_stream_cfg_t cfg = {.id = i};
@@ -48,7 +48,7 @@ int main()
     }
     stream->destroy(stream);
 
-    vsf_osd_mgr_t *osd = vsf_createOsdMgr();
+    vsf_osd_mgr_t *osd = vsf_createOsdMgr_r();
     total = osd->num(osd);
     for (i = 0; i < total; i++) {
         proto_vsf_osd_cfg_t cfg = {.id = i};
@@ -59,7 +59,7 @@ int main()
     }
     osd->destroy(osd);
 
-    while (1) {
+    while (0) {
         infof("keep alive");
         sleep(1);
     }

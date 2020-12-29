@@ -15,5 +15,6 @@ typedef struct stream_mgr {
 } vsf_stream_mgr_t;
 
 vsf_stream_mgr_t *vsf_createStreamMgr(void);
+vsf_stream_mgr_t *vsf_createStreamMgr_r(void);
 
 #endif //__VSF_STREAM_MGR_H__

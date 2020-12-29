@@ -238,10 +238,9 @@ static int __vsf_stream_set(vsf_stream_mgr_t *self, proto_vsf_stream_cfg_t *cfg)
     }
 
     vsf_venc_t *venc = VSF_createVenc(cfg->id);
-    // reg hook
-    assert(venc->regcallback);
-    venc->regcallback(venc, &cb);
-
+    if (venc && venc->regcallback) {
+        venc->regcallback(venc, &cb);
+    }
     return 0;
 }
 
@@ -268,7 +267,7 @@ static int __vsf_stream_num(vsf_stream_mgr_t *self)
     vsf_stream_mgr_t *mgr       = self;
     vsf_stream_mgr_priv_t *priv = mgr->priv;
 
-    return priv->info->num;
+    return priv->info->num.num;
 }
 
 vsf_stream_mgr_t *vsf_createStreamMgr()

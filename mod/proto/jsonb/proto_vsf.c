@@ -87,7 +87,7 @@ void jsonb_opt_proto_vsf_chn_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
         json_child = cJSON_CreateObject();
         cJSON_AddItemToObject(json, "num", json_child);
     }
-    jsonb_opt_int(opt, json_child, &element->num, sizeof(int));
+    jsonb_opt_proto_num_t(opt, json_child, &element->num, sizeof(proto_num_t));
 }
 {
     cJSON *json_child = NULL;
@@ -233,7 +233,7 @@ void jsonb_opt_proto_vsf_frame_t(jsonb_opt_e opt, cJSON *json, void *e, size_t s
         json_child = cJSON_CreateObject();
         cJSON_AddItemToObject(json, "num", json_child);
     }
-    jsonb_opt_int(opt, json_child, &element->num, sizeof(int));
+    jsonb_opt_proto_num_t(opt, json_child, &element->num, sizeof(proto_num_t));
 }
 {
     cJSON *json_child = NULL;
@@ -379,7 +379,7 @@ void jsonb_opt_proto_vsf_stream_t(jsonb_opt_e opt, cJSON *json, void *e, size_t 
         json_child = cJSON_CreateObject();
         cJSON_AddItemToObject(json, "num", json_child);
     }
-    jsonb_opt_int(opt, json_child, &element->num, sizeof(int));
+    jsonb_opt_proto_num_t(opt, json_child, &element->num, sizeof(proto_num_t));
 }
 {
     cJSON *json_child = NULL;
@@ -584,7 +584,7 @@ void jsonb_opt_proto_vsf_osd_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
         json_child = cJSON_CreateObject();
         cJSON_AddItemToObject(json, "num", json_child);
     }
-    jsonb_opt_int(opt, json_child, &element->num, sizeof(int));
+    jsonb_opt_proto_num_t(opt, json_child, &element->num, sizeof(proto_num_t));
 }
 {
     cJSON *json_child = NULL;

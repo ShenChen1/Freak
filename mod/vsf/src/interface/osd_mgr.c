@@ -27,7 +27,11 @@ static int __vsf_osd_set(vsf_osd_mgr_t *self, proto_vsf_osd_cfg_t *cfg)
     // vsf_osd_mgr_priv_t *priv = mgr->priv;
 
     vsf_rgn_t *rgn = VSF_createRgn(cfg->id);
-    return rgn->ctrl(rgn, cfg);
+    if (rgn && rgn->ctrl) {
+        return rgn->ctrl(rgn, cfg);
+    }
+
+    return 0;
 }
 
 static int __vsf_osd_get(vsf_osd_mgr_t *self, proto_vsf_osd_cfg_t *cfg)
@@ -53,7 +57,7 @@ static int __vsf_osd_num(vsf_osd_mgr_t *self)
     vsf_osd_mgr_t *mgr       = self;
     vsf_osd_mgr_priv_t *priv = mgr->priv;
 
-    return priv->info->num;
+    return priv->info->num.num;
 }
 
 vsf_osd_mgr_t *vsf_createOsdMgr()

@@ -328,8 +328,9 @@ static int __vsf_frame_set(vsf_frame_mgr_t *self, proto_vsf_frame_cfg_t *cfg)
     }
 
     vsf_vpss_t *vpss = VSF_createVpss(priv->info->caps[cfg->id].chn);
-    assert(vpss->regcallback);
-    vpss->regcallback(vpss, cfg->id, cb);
+    if (vpss && vpss->regcallback) {
+        vpss->regcallback(vpss, cfg->id, cb);
+    }
     return 0;
 }
 
@@ -356,7 +357,7 @@ static int __vsf_frame_num(vsf_frame_mgr_t *self)
     vsf_frame_mgr_t *mgr       = self;
     vsf_frame_mgr_priv_t *priv = mgr->priv;
 
-    return priv->info->num;
+    return priv->info->num.num;
 }
 
 vsf_frame_mgr_t *vsf_createFrameMgr()
