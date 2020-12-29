@@ -223,6 +223,11 @@ HI_S32 SAMPLE_COMM_SYS_GetPicSize(PIC_SIZE_E enPicSize, SIZE_S* pstSize)
             pstSize->u32Height = 1536;
             break;
 
+	case PIC_640x640:
+	    pstSize->u32Width  = 640;
+	    pstSize->u32Height = 640;
+	    break;
+
         default:
             return HI_FAILURE;
     }

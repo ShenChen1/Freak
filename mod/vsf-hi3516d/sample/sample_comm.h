@@ -152,6 +152,7 @@ typedef enum hiPIC_SIZE_E
     PIC_4000x3000,
     PIC_7680x4320,
     PIC_3840x8640,
+    PIC_640x640,
     PIC_BUTT
 } PIC_SIZE_E;
 
