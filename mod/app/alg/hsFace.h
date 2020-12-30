@@ -1,18 +1,17 @@
 #ifndef __HSFACE_H
 #define __HSFACE_H
 
-
 #pragma pack(1)
- 
-typedef struct{
+
+typedef struct {
     short type;
     int size;
     short reserved1;
     short reserved2;
     int offset;
 } BMPHeader;
- 
-typedef struct{
+
+typedef struct {
     int size;
     int width;
     int height;
@@ -25,15 +24,12 @@ typedef struct{
     int clrUsed;
     int clrImportant;
 } BMPInfoHeader;
- 
+
 #pragma pack()
 
-
-int saveBMPFile(unsigned char* src, int width, int height, const char* name);
+int saveBMPFile(unsigned char *src, int width, int height, const char *name);
 
 void *hs_fd_create(char *path);
 int hs_fd_destroy(void *args);
 
-
-
-#endif 
+#endif

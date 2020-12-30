@@ -2,9 +2,9 @@
 #include "log.h"
 #include "nnm.h"
 #include "inc/cfg.h"
-#include "inc/appalg.h"
 #include "inc/msgbox.h"
 #include "app/alg_mgr.h"
+
 static int __rep_recv(void *in, size_t isize, void **out, size_t *osize, void *arg)
 {
     *out = arg;
@@ -23,15 +23,19 @@ int main()
     nnm_rep_create(PROTO_APP_COM_NODE, &init, &rep);
 
     // init start
-	app_alg_mgr_t *app_mgr = app_createAlgMgr();
-	proto_app_alg_cfg_t cfg;
-	app_mgr->get(app_mgr,&cfg);
-	app_mgr->set(app_mgr,&cfg);
-    app_mgr->destroy(app_mgr);
+    int i, total;
+    app_alg_mgr_t *alg = app_createAlgMgr_r();
+    total = alg->num(alg);
+    for (i = 0; i < total; i++) {
+        proto_app_alg_cfg_t cfg = {.id = i};
+        alg->get(alg, &cfg);
+        alg->set(alg, &cfg);
+    }
+    alg->destroy(alg);
 
     while (1) {
         infof("keep alive");
-        sleep(15);
+        sleep(1);
     }
 
     nnm_rep_destory(rep);

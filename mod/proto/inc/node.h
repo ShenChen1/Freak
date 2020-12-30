@@ -8,4 +8,5 @@
 #define PROTO_VSF_COM_NODE "ipc:///tmp/vsf-com.ipc"
 #define PROTO_WEB_COM_NODE "ipc:///tmp/web-com.ipc"
 #define PROTO_APP_COM_NODE "ipc:///tmp/app-com.ipc"
+
 #endif /* __NODE_H__ */

@@ -1,17 +1,16 @@
 #include "common.h"
 #include "json-cfg.h"
 #include "log.h"
-#include "algtype.h"
 #include "cfg/cfg.h"
 
 static app_cfg_t s_cfg = {
     .alginfo = {
-        .num =1,
+        .num = { 1 },
         .cfgs[0] = {
-            .type = FREAK_FR,
+            .id = 0,
+            .type = ALG_TYPE_FR,
             .enable = 1,
-			.algpath = "./data/",
-
+            .algpath = "./data/",
         },
         .caps[0] = {
             .id = 0,

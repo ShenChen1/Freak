@@ -8,6 +8,17 @@ void jsonb_opt_proto_app_alg_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
         if (cJSON_IsNull(json)) return;
+        json_child = cJSON_GetObjectItem(json, "id");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "id", json_child);
+    }
+    jsonb_opt_int(opt, json_child, &element->id, sizeof(int));
+}
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "type");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
@@ -76,7 +87,7 @@ void jsonb_opt_proto_app_alg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
         json_child = cJSON_CreateObject();
         cJSON_AddItemToObject(json, "num", json_child);
     }
-    jsonb_opt_int(opt, json_child, &element->num, sizeof(int));
+    jsonb_opt_proto_num_t(opt, json_child, &element->num, sizeof(proto_num_t));
 }
 {
     cJSON *json_child = NULL;

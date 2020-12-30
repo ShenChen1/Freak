@@ -15,5 +15,6 @@ typedef struct alg_mgr {
 } app_alg_mgr_t;
 
 app_alg_mgr_t *app_createAlgMgr(void);
+app_alg_mgr_t *app_createAlgMgr_r(void);
 
 #endif /* __APP_ALG_MGR_H__ */

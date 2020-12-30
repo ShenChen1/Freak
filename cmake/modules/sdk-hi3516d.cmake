@@ -43,3 +43,6 @@ list(APPEND LIB_SDK_NAME "sns_imx327")
 list(APPEND LIB_SDK_NAME "sns_imx307_2l")
 list(APPEND LIB_SDK_NAME "sns_imx307")
 list(APPEND LIB_SDK_NAME "sns_imx327_2l")
+
+list(APPEND LIB_SDK_NAME "tracker")
+list(APPEND LIB_SDK_NAME "nnieface")

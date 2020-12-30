@@ -1,5 +1,5 @@
 JSONB_INCLUDE_HEADER(proto_app.h)
 
 JSONB_STRUCT_START(app_cfg_t)
-JSONB_FIELD(alginfo,proto_app_alg_t)
+JSONB_FIELD(alginfo, proto_app_alg_t)
 JSONB_STRUCT_END(app_cfg_t)
