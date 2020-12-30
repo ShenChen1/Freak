@@ -2,7 +2,7 @@
 #include "common.h"
 #include "json-cfg.h"
 
-static const char s_path[] = "/tmp/sdk-config.json";
+static const char s_path[] = "/tmp/sdk-vsf-config.json";
 static sdk_cfg_t s_cfg = {
     .s32SysNum = 1,
     .as32SysId = {0},
@@ -55,7 +55,7 @@ static sdk_cfg_t s_cfg = {
         .ViPipe = 0,
         .ViChn = 0,
         .abChnEnable = {1, 1, 1},
-        .aenSize = {PIC_1080P, PIC_1080P, PIC_640x640},
+        .aenSize = {PIC_1080P, PIC_1080P, PIC_1080P},
         .au32Depth = {1, 2, 2},
         .enSnsSize = PIC_1080P,
     },

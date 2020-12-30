@@ -1,14 +1,9 @@
 #include "inc/hsFace.h"
-#include "algtype.h"
-#include "common.h"
-#include "hi_comm_ive.h"
 #include "inc/basetype.h"
 #include "inc/nnie_face_api.h"
-#include "inc/sample_comm.h"
+#include "common.h"
 #include "log.h"
 #include "media.h"
-#include "mpi_ive.h"
-#include "proto.h"
 #include "ufifo.h"
 
 typedef struct {
@@ -19,7 +14,6 @@ typedef struct {
     uint8_t data[1024]; // img manager
 } hs_face_info_t;
 
-static void *hs_fd_task(void *args);
 extern int tracker_id(int FrameIndex, RESULT_BAG *result_bag, RESULT_BAG *result_out);
 
 static unsigned int recsize(unsigned char *p1, unsigned int n1, unsigned char *p2)
@@ -190,44 +184,6 @@ int saveBMPFile(unsigned char *src, int width, int height, const char *name)
     fp = NULL;
 
     return 0;
-}
-
-void *hs_fd_create(char *path)
-{
-    infof("fd_init");
-    hs_face_info_t *priv = malloc(sizeof(hs_face_info_t));
-    if (priv == NULL)
-        return NULL;
-    memset(priv, 0, sizeof(hs_face_info_t));
-    float threshold   = 0.6;
-    int isLog         = 0;
-    char *pcModelName = "/userdata/data/nnie_model/face/mnet_640_inst.wk";
-    NNIE_FACE_DETECTOR_INIT(pcModelName, threshold, isLog);
-
-    ufifo_init_t init = {
-    .lock = UFIFO_LOCK_NONE,
-    .opt  = UFIFO_OPT_ATTACH,
-    .attach = { .shared = 0, },
-    .hook = { recsize, rectag, recput, recget },
-	};
-    char name[64];
-    snprintf(name, sizeof(name), PROTO_VSF_FRAME_WORK_FIFO "%d-%d", 0, 2);
-    ufifo_open(name, &init, &priv->fifo_get);
-
-    snprintf(name, sizeof(name), PROTO_VSF_FRAME_FREE_FIFO "%d-%d", 0, 2);
-    ufifo_open(name, &init, &priv->fifo_free);
-    pthread_create(&priv->s_hMdThread, NULL, hs_fd_task, (void *)priv);
-
-    return priv;
-}
-
-int hs_fd_destroy(void *args)
-{
-    hs_face_info_t *priv = (hs_face_info_t *)args;
-
-    priv->s_bStopSignal = HI_TRUE;
-    return pthread_join(priv->s_hMdThread, NULL);
-    NNIE_FACE_DETECTOR_RELEASE();
 }
 
 static void *hs_fd_task(void *args)
@@ -409,4 +365,42 @@ static void *hs_fd_task(void *args)
     }
     HI_MPI_SYS_MmzFree(stDstData.au64PhyAddr[0], (HI_VOID *)(size_t)stDstData.au64VirAddr[0]);
     return 0;
+}
+
+void *hs_fd_create(char *path)
+{
+    infof("fd_init");
+    hs_face_info_t *priv = malloc(sizeof(hs_face_info_t));
+    if (priv == NULL)
+        return NULL;
+    memset(priv, 0, sizeof(hs_face_info_t));
+    float threshold   = 0.6;
+    int isLog         = 0;
+    char *pcModelName = "/userdata/data/nnie_model/face/mnet_640_inst.wk";
+    NNIE_FACE_DETECTOR_INIT(pcModelName, threshold, isLog);
+
+    ufifo_init_t init = {
+        .lock = UFIFO_LOCK_NONE,
+        .opt  = UFIFO_OPT_ATTACH,
+        .attach = { .shared = 0, },
+        .hook = { recsize, rectag, recput, recget },
+	};
+    char name[64];
+    snprintf(name, sizeof(name), PROTO_VSF_FRAME_WORK_FIFO "%d-%d", 0, 2);
+    ufifo_open(name, &init, &priv->fifo_get);
+
+    snprintf(name, sizeof(name), PROTO_VSF_FRAME_FREE_FIFO "%d-%d", 0, 2);
+    ufifo_open(name, &init, &priv->fifo_free);
+    pthread_create(&priv->s_hMdThread, NULL, hs_fd_task, (void *)priv);
+
+    return priv;
+}
+
+int hs_fd_destroy(void *args)
+{
+    hs_face_info_t *priv = (hs_face_info_t *)args;
+
+    priv->s_bStopSignal = HI_TRUE;
+    return pthread_join(priv->s_hMdThread, NULL);
+    NNIE_FACE_DETECTOR_RELEASE();
 }

@@ -7,6 +7,7 @@ ExternalProject_Add(${PROJECT_NAME}
     INSTALL_COMMAND true
     COMMAND mkdir -p ${FREAK_HOME_PATH}/mod/vsf-hi3516d/sample/
     COMMAND cmake -E copy_directory ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-prefix/src/${PROJECT_NAME}/sample/common ${FREAK_HOME_PATH}/mod/vsf-hi3516d/sample/
+    COMMAND cmake -E copy_directory ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-prefix/src/${PROJECT_NAME}/sample/common ${FREAK_HOME_PATH}/mod/alg-hi3516d/sample/
     COMMAND cp -av ${PROJECT_SOURCE_DIR}/libnnieface.so ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-prefix/src/${PROJECT_NAME}/lib/
     COMMAND cp -av ${PROJECT_SOURCE_DIR}/libtracker.so ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-prefix/src/${PROJECT_NAME}/lib/
     BUILD_IN_SOURCE 1)

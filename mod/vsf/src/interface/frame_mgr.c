@@ -127,6 +127,7 @@ static unsigned int recget(unsigned char *p1, unsigned int n1, unsigned char *p2
     return sizeof(media_record_t) + sizeof(video_frame_t);
 }
 
+#ifdef DEBUG
 static void __vsf_frame_SaveYUVFile(FILE *pfd, video_frame_t *pVBuf)
 {
     uint8_t *pY_map = NULL;
@@ -222,6 +223,7 @@ static void __vsf_frame_SaveYUVFile(FILE *pfd, video_frame_t *pVBuf)
     physunmap(pY_map, u32Size);
     pY_map = NULL;
 }
+#endif
 
 static int __vsf_get_frame_proc(void *data, void *args)
 {
@@ -230,7 +232,7 @@ static int __vsf_get_frame_proc(void *data, void *args)
     vsf_frame_mgr_priv_t *priv = s_mgr->priv;
     proto_vsf_frame_cfg_t *cfg = args;
 
-#if 0
+#ifdef DEBUG
     /* Obtain current time. */
     char acFile[128];
     struct timeval tv;

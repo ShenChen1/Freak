@@ -2,6 +2,7 @@
 #define __VSF_STREAM_MGR_H__
 
 #include "proto_vsf.h"
+#include "video_stream.h"
 
 typedef struct stream_mgr {
     void *priv;

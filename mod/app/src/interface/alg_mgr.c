@@ -17,12 +17,6 @@ static int __app_alg_destroy(app_alg_mgr_t *self)
 
 static int __app_alg_set(app_alg_mgr_t *self, proto_app_alg_cfg_t *cfg)
 {
-    if (cfg->enable) {
-        app_alg_init(cfg->type);
-    } else {
-        app_alg_deinit(cfg->type);
-    }
-
     return 0;
 }
 

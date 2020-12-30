@@ -16,12 +16,13 @@ target_link_libraries(${PROJECT_NAME}
     -l${LIB_CJSON_NAME}
     -l${LIB_NANOMSG_NAME}
     -l${LIB_UFIFO_NAME}
-    ${LIB_SDK_NAME}
+    ${LIB_ALG_SDK_NAME}
     utils
     proto
     -lstdc++)
 include_directories(${PROJECT_SOURCE_DIR})
 add_dependencies(${PROJECT_NAME} ${LIB_UFIFO_NAME})
+add_dependencies(${PROJECT_NAME} alg-${CMAKE_CHIP_NAME})
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_BINDIR})
 jsonb(${PROJECT_NAME} cfg ${PROJECT_SOURCE_DIR}/cfg/cfg.jsonb ${PROJECT_SOURCE_DIR}/cfg)

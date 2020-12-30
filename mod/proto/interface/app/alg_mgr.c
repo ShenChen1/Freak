@@ -146,7 +146,7 @@ app_alg_mgr_t *__app_createAlgMgr(int proto)
 
     priv = malloc(sizeof(app_alg_mgr_priv_t));
     assert(priv);
-    ret = nnm_req_create(PROTO_VSF_COM_NODE, &priv->req);
+    ret = nnm_req_create(PROTO_APP_COM_NODE, &priv->req);
     assert(!ret);
     priv->proto = proto;
 

@@ -9,10 +9,11 @@ add_compile_options(-g -Os -Wall -Werror)
 add_subdirectory(utils)
 add_subdirectory(proto)
 add_subdirectory(vsf-${CMAKE_CHIP_NAME}) # special vsf
+add_subdirectory(alg-${CMAKE_CHIP_NAME}) # special alg
 
 link_libraries(-lrt -lpthread)
 add_subdirectory(bsp)
 add_subdirectory(vsf)
 add_subdirectory(rtsp)
 add_subdirectory(web)
-add_subdirectory(app) 
+add_subdirectory(app)
