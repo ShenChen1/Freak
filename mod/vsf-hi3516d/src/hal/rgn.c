@@ -50,7 +50,7 @@ static int __rgn_destroy(vsf_rgn_t *self)
 
 static int __rgn_ctrl(vsf_rgn_t *self, void *param)
 {
-    return -1;
+    return 0;
 }
 
 vsf_rgn_t *VSF_createRgn(int id)

@@ -3,6 +3,7 @@
 #include "media.h"
 #include "inc/hal/vpss.h"
 #include "inc/sdk_cfg.h"
+
 typedef struct {
     int chn;
     vsf_frame_cb_t cb[VSF_FRAME_CB_MAX];
@@ -77,6 +78,7 @@ static void *__vpss_get_chn_frame_proc(void *p)
             goto end;
         }
 
+        tracef("proc frame %d-%d: %u %u!", priv->info->VpssGrp, chn->chn, pstVideoFrame->stVFrame.u32Width, pstVideoFrame->stVFrame.u32Height);
         if (chn->cb[VSF_FRAME_CB_GET].func) {
             video_frame_t frame;
             __transfor_frame_info(&pstVideoFrame->stVFrame, &frame, pstVideoFrame);
@@ -233,6 +235,49 @@ static int __vpss_destroy(vsf_vpss_t *self)
     return 0;
 }
 
+static int __vpss_ctrl(vsf_vpss_t *self, int id, vsf_frame_cfg_t *cfg)
+{
+    vsf_vpss_t *obj       = self;
+    vsf_vpss_priv_t *priv = obj->priv;
+
+    HI_S32 s32Ret;
+    VPSS_CHN_ATTR_S stVpssChnAttr;
+
+    s32Ret = HI_MPI_VPSS_GetChnAttr(priv->info->VpssGrp, id, &stVpssChnAttr);
+    if (s32Ret != HI_SUCCESS) {
+        errorf("HI_MPI_VPSS_GetChnAttr failed with %#x\n", s32Ret);
+        return -1;
+    }
+
+    HI_U32 u32FrameRate = 0;
+    SAMPLE_COMM_VI_GetFrameRateBySensor(sdk_cfg_get_member(astViInfo[priv->info->VpssGrp])->stSnsInfo.enSnsType, &u32FrameRate);
+
+    stVpssChnAttr.u32Width = cfg->width;
+    stVpssChnAttr.u32Height = cfg->height;
+    stVpssChnAttr.stFrameRate.s32SrcFrameRate = u32FrameRate;
+    stVpssChnAttr.stFrameRate.s32DstFrameRate = cfg->fps;
+
+    s32Ret = HI_MPI_VPSS_DisableChn(priv->info->VpssGrp, id);
+    if (s32Ret != HI_SUCCESS) {
+        errorf("HI_MPI_VPSS_DisableChn failed with %#x\n", s32Ret);
+        return -1;
+    }
+
+    s32Ret = HI_MPI_VPSS_SetChnAttr(priv->info->VpssGrp, id, &stVpssChnAttr);
+    if (s32Ret != HI_SUCCESS) {
+        errorf("HI_MPI_VPSS_SetChnAttr failed with %#x\n", s32Ret);
+        return -1;
+    }
+
+    s32Ret = HI_MPI_VPSS_EnableChn(priv->info->VpssGrp, id);
+    if (s32Ret != HI_SUCCESS) {
+        errorf("HI_MPI_VPSS_EnableChn failed with %#x\n", s32Ret);
+        return -1;
+    }
+
+    return 0;
+}
+
 static int __vpss_regcallback(vsf_vpss_t *self, int id, vsf_frame_cb_t *cb)
 {
     vsf_vpss_t *obj       = self;
@@ -286,6 +331,7 @@ vsf_vpss_t *VSF_createVpss(int id)
     obj->priv        = priv;
     obj->init        = __vpss_init;
     obj->destroy     = __vpss_destroy;
+    obj->ctrl        = __vpss_ctrl;
     obj->regcallback = __vpss_regcallback;
 
     mod->objs[id] = obj;

@@ -14,11 +14,18 @@ typedef enum {
     VSF_FRAME_CB_MAX,
 } vsf_frame_cb_e;
 
+typedef struct {
+    int format;
+    int width;
+    int height;
+    int fps;
+} vsf_frame_cfg_t;
 typedef struct vpss {
     void *priv;
     int (*init)(struct vpss *self);
     int (*destroy)(struct vpss *self);
 
+    int (*ctrl)(struct vpss *self, int id, vsf_frame_cfg_t *cfg);
     int (*regcallback)(struct vpss *self, int id, vsf_frame_cb_t cb[VSF_FRAME_CB_MAX]);
 } vsf_vpss_t;
 

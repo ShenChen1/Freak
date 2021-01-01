@@ -321,6 +321,17 @@ static int __vsf_frame_set(vsf_frame_mgr_t *self, proto_vsf_frame_cfg_t *cfg)
         }
     }
 
+    vsf_vpss_t *vpss = VSF_createVpss(priv->info->caps[cfg->id].chn);
+    if (vpss && vpss->ctrl) {
+        vsf_frame_cfg_t _cfg = {
+            .format = cfg->format,
+            .width = cfg->width,
+            .height = cfg->height,
+            .fps = cfg->fps,
+        };
+        vpss->ctrl(vpss, priv->info->caps[cfg->id].subchn, &_cfg);
+    }
+
     vsf_frame_cb_t cb[VSF_FRAME_CB_MAX] = {};
     if (cfg->enable) {
         cb[VSF_FRAME_CB_GET].args  = &priv->info->cfgs[cfg->id];
@@ -329,10 +340,10 @@ static int __vsf_frame_set(vsf_frame_mgr_t *self, proto_vsf_frame_cfg_t *cfg)
         cb[VSF_FRAME_CB_FREE].func = __vsf_free_frame_proc;
     }
 
-    vsf_vpss_t *vpss = VSF_createVpss(priv->info->caps[cfg->id].chn);
     if (vpss && vpss->regcallback) {
-        vpss->regcallback(vpss, cfg->id, cb);
+        vpss->regcallback(vpss, priv->info->caps[cfg->id].subchn, cb);
     }
+
     return 0;
 }
 

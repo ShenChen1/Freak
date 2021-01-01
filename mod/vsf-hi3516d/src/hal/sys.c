@@ -26,15 +26,13 @@ static int __sys_init(vsf_sys_t *self)
 
     int i, s32Ret;
     HI_U64 u64BlkSize;
-    SIZE_S stSize = {};
     VB_CONFIG_S stVbConf = {};
     sdk_sys_vb_info_t *vb_info = &priv->info->stVbConf;
 
     stVbConf.u32MaxPoolCnt = vb_info->u32MaxPoolCnt;
     for (i = 0; i < vb_info->u32MaxPoolCnt; i++) {
-        SAMPLE_COMM_SYS_GetPicSize(vb_info->astCommPool[i].enSize, &stSize);
-        u64BlkSize = COMMON_GetPicBufferSize(stSize.u32Width,
-                                             stSize.u32Height,
+        u64BlkSize = COMMON_GetPicBufferSize(vb_info->astCommPool[i].u32Width,
+                                             vb_info->astCommPool[i].u32Height,
                                              PIXEL_FORMAT_YVU_SEMIPLANAR_422,
                                              DATA_BITWIDTH_8,
                                              COMPRESS_MODE_SEG,

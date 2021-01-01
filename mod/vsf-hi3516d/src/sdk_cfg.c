@@ -8,14 +8,21 @@ static sdk_cfg_t s_cfg = {
     .as32SysId = {0},
     .astSysInfo[0] = {
         .stVbConf = {
-            .u32MaxPoolCnt = 2,
+            .u32MaxPoolCnt = 3,
             .astCommPool[0] = {
                 .u32BlkCnt = 10,
-                .enSize = PIC_1080P,
+                .u32Width = 1920,
+                .u32Height = 1080,
             },
             .astCommPool[1] = {
                 .u32BlkCnt = 10,
-                .enSize = PIC_720P,
+                .u32Width = 1280,
+                .u32Height = 720,
+            },
+            .astCommPool[2] = {
+                .u32BlkCnt = 10,
+                .u32Width = 640,
+                .u32Height = 640,
             },
         },
     },
@@ -23,7 +30,7 @@ static sdk_cfg_t s_cfg = {
     .as32ViId = {0},
     .astViInfo[0] = {
         .stSnsInfo = {
-            .enSnsType = SENSOR0_TYPE,
+            .enSnsType = SONY_IMX327_2L_MIPI_2M_30FPS_12BIT,
             .s32SnsId = 0,
             .s32BusId = 0,
             .MipiDev = 0,

@@ -5,7 +5,8 @@ JSONB_INCLUDE_HEADER(proto_vsf.h)
 
 JSONB_STRUCT_START(sdk_sys_vb_pool_info_t)
 JSONB_FIELD(u32BlkCnt, uint32_t)
-JSONB_FIELD(enSize, uint32_t)
+JSONB_FIELD(u32Width, uint32_t)
+JSONB_FIELD(u32Height, uint32_t)
 JSONB_STRUCT_END(sdk_sys_vb_pool_info_t)
 
 JSONB_STRUCT_START(sdk_sys_vb_info_t)

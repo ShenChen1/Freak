@@ -19,12 +19,23 @@ void jsonb_opt_sdk_sys_vb_pool_info_t(jsonb_opt_e opt, cJSON *json, void *e, siz
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
         if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "enSize");
+        json_child = cJSON_GetObjectItem(json, "u32Width");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "enSize", json_child);
+        cJSON_AddItemToObject(json, "u32Width", json_child);
     }
-    jsonb_opt_uint32_t(opt, json_child, &element->enSize, sizeof(uint32_t));
+    jsonb_opt_uint32_t(opt, json_child, &element->u32Width, sizeof(uint32_t));
+}
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) return;
+        json_child = cJSON_GetObjectItem(json, "u32Height");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "u32Height", json_child);
+    }
+    jsonb_opt_uint32_t(opt, json_child, &element->u32Height, sizeof(uint32_t));
 }
 }
 void jsonb_opt_sdk_sys_vb_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)

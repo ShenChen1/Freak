@@ -6,7 +6,8 @@
 extern void jsonb_opt_sdk_sys_vb_pool_info_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
     uint32_t u32BlkCnt;
-    uint32_t enSize;
+    uint32_t u32Width;
+    uint32_t u32Height;
 } sdk_sys_vb_pool_info_t;
 extern void jsonb_opt_sdk_sys_vb_info_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
