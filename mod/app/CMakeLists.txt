@@ -10,6 +10,7 @@ add_executable(${PROJECT_NAME}
     src/msgbox/msgbox.c
     src/msgbox/msgbox_alg.c
     src/interface/alg_mgr.c
+    src/hal/face.c
     cfg/cfg.c)
 
 target_link_libraries(${PROJECT_NAME}
@@ -17,6 +18,9 @@ target_link_libraries(${PROJECT_NAME}
     -l${LIB_NANOMSG_NAME}
     -l${LIB_UFIFO_NAME}
     ${LIB_ALG_SDK_NAME}
+    -Wl,--whole-archive
+    alg-${CMAKE_CHIP_NAME}
+    -Wl,--no-whole-archive
     utils
     proto
     -lstdc++)

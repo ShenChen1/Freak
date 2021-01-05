@@ -8,9 +8,7 @@ add_compile_options(-ffunction-sections -fdata-sections)
 add_link_options(-Wl,--gc-sections)
 
 add_library(${PROJECT_NAME} STATIC
-    src/hal/hsFace.c
-    src/sdk_cfg.c
-    cfg/sdk_cfg.c)
+    src/hal/face.c)
 
 target_link_libraries(${PROJECT_NAME}
     utils
@@ -18,5 +16,3 @@ target_link_libraries(${PROJECT_NAME}
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/../app/)
 add_dependencies(${PROJECT_NAME} sdk-${CMAKE_CHIP_NAME})
-
-jsonb(${PROJECT_NAME} sdkcfg ${PROJECT_SOURCE_DIR}/cfg/sdk_cfg.jsonb ${PROJECT_SOURCE_DIR}/cfg)

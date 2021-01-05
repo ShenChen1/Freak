@@ -66,8 +66,8 @@ static vsf_cfg_t s_cfg = {
             .id = 1,
             .enable = 0,
             .format = VIDEO_FRAME_FORMAT_YUV420P_YVU,
-            .width = 1280,
-            .height = 720,
+            .width = 640,
+            .height = 640,
             .fps = 5,
         },
         .caps[1] = {
