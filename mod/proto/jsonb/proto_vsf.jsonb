@@ -83,9 +83,16 @@ JSONB_FIELD(points, proto_point_t)
 JSONB_STRING(text, 64)
 JSONB_STRUCT_END(proto_vsf_osd_text_t)
 
+JSONB_STRUCT_START(proto_vsf_osd_objs_t)
+JSONB_FIELD(num, uint32_t)
+JSONB_STRING_ARRAY(labels, 32, 32)
+JSONB_FIELD_ARRAY(rects, 32, proto_rect_t)
+JSONB_STRUCT_END(proto_vsf_osd_objs_t)
+
 JSONB_UNION_START(proto_vsf_osd_union_t)
 JSONB_UNION_FIELD(mask, proto_vsf_osd_mask_t)
 JSONB_UNION_FIELD(text, proto_vsf_osd_text_t)
+JSONB_UNION_FIELD(objs, proto_vsf_osd_objs_t)
 JSONB_UNION_END(proto_vsf_osd_union_t)
 
 JSONB_STRUCT_START(proto_vsf_osd_cfg_t)

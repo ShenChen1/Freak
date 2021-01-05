@@ -76,12 +76,19 @@ typedef struct {
     proto_point_t points;
     char text[64];
 } proto_vsf_osd_text_t;
+extern void jsonb_opt_proto_vsf_osd_objs_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
+typedef struct {
+    uint32_t num;
+    char labels[32][32];
+    proto_rect_t rects[32];
+} proto_vsf_osd_objs_t;
 extern void jsonb_opt_proto_vsf_osd_union_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
     char condition[32];
     union {
         proto_vsf_osd_mask_t mask;
         proto_vsf_osd_text_t text;
+        proto_vsf_osd_objs_t objs;
     };
 } proto_vsf_osd_union_t;
 extern void jsonb_opt_proto_vsf_osd_cfg_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);

@@ -23,12 +23,12 @@ static int __vsf_osd_destroy(vsf_osd_mgr_t *self)
 
 static int __vsf_osd_set(vsf_osd_mgr_t *self, proto_vsf_osd_cfg_t *cfg)
 {
-    // vsf_osd_mgr_t *mgr       = self;
-    // vsf_osd_mgr_priv_t *priv = mgr->priv;
+    vsf_osd_mgr_t *mgr       = self;
+    vsf_osd_mgr_priv_t *priv = mgr->priv;
 
     vsf_rgn_t *rgn = VSF_createRgn(cfg->id);
     if (rgn && rgn->ctrl) {
-        return rgn->ctrl(rgn, cfg);
+        return rgn->ctrl(rgn, priv->info->caps[cfg->id].chn, cfg);
     }
 
     return 0;

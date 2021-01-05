@@ -77,13 +77,14 @@ static vsf_cfg_t s_cfg = {
         },
     },
     .osd = {
-        .num = { 1 },
+        .num = { 2 },
         .cfgs[0] = {
             .id = 0,
             .enable = 1,
             .info = {
                 .condition = "mask",
                 .mask = {
+                    .color = 0x0000ffff,
                     .points[0] = {100, 100},
                     .points[1] = {400, 400},
                     .points[2] = {100, 400},
@@ -94,7 +95,26 @@ static vsf_cfg_t s_cfg = {
         .caps[0] = {
             .id = 0,
             .chn = 0,
-            .subchn = 1,
+            .subchn = 0,
+        },
+        .cfgs[1] = {
+            .id = 1,
+            .enable = 1,
+            .info = {
+                .condition = "mask",
+                .mask = {
+                    .color = 0x0000ff00,
+                    .points[0] = {100, 100},
+                    .points[1] = {300, 300},
+                    .points[2] = {100, 300},
+                    .points[3] = {300, 100},
+                },
+            },
+        },
+        .caps[1] = {
+            .id = 1,
+            .chn = 0,
+            .subchn = 0,
         },
     },
 };

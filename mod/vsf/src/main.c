@@ -61,7 +61,32 @@ int main()
 
     while (1) {
         infof("keep alive");
-        sleep(1);
+        usleep(50);
+
+        vsf_osd_mgr_t *osd = vsf_createOsdMgr();
+        proto_vsf_osd_cfg_t cfg = {
+            .id = 4,
+            .enable = 1,
+            .info = {
+                .condition = "objs",
+                .objs = {
+                    .num = 20,
+                },
+            },
+        };
+
+        for (i = 0; i < cfg.info.objs.num; i++) {
+            cfg.info.objs.rects[i].x = 100 * total + i *10;
+            cfg.info.objs.rects[i].y = 100 * total + i *10;
+            cfg.info.objs.rects[i].Width = total + 80 * i;
+            cfg.info.objs.rects[i].height = total + 80 * i;
+        }
+
+        // set cfg
+        osd->set(osd, &cfg);
+        osd->destroy(osd);
+
+        total = (total + 1) % 80;
     }
 
     nnm_rep_destory(rep);
