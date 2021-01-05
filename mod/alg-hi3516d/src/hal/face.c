@@ -1,129 +1,33 @@
-#include "inc/hsFace.h"
+#include "inc/hal/face.h"
 #include "inc/basetype.h"
 #include "inc/nnie_face_api.h"
 #include "common.h"
 #include "log.h"
 #include "media.h"
 #include "ufifo.h"
+#include "hi_comm_ive.h"
+#include "mpi_ive.h"
+#include "sample/sample_comm.h"
 
 typedef struct {
     ufifo_t *fifo_get;
     ufifo_t *fifo_free;
     pthread_t s_hMdThread;
-    HI_BOOL s_bStopSignal;
+	float threshold;
+    int isLog;
+	HI_BOOL s_bStopSignal;
+	app_alg_cb_t cb[APP_ALG_CB_MAX];
     uint8_t data[1024]; // img manager
-} hs_face_info_t;
+} app_face_priv_t;
+
+typedef struct {
+    app_face_t *objs;
+} app_face_mod_t;
+
+static app_face_mod_t s_mod = {0};
 
 extern int tracker_id(int FrameIndex, RESULT_BAG *result_bag, RESULT_BAG *result_out);
 
-static unsigned int recsize(unsigned char *p1, unsigned int n1, unsigned char *p2)
-{
-    unsigned int size = sizeof(media_record_t);
-
-    if (n1 >= size) {
-        media_record_t *rec = (media_record_t *)p1;
-        size = rec->size;
-    } else {
-        media_record_t rec;
-        char *p = (char *)(&rec);
-        memcpy(p, p1, n1);
-        memcpy(p + n1, p2, size - n1);
-        size = rec.size;
-    }
-
-    return size;
-}
-
-static unsigned int rectag(unsigned char *p1, unsigned int n1, unsigned char *p2)
-{
-    unsigned int tag;
-    unsigned int size = sizeof(media_record_t);
-
-    if (n1 >= size) {
-        media_record_t *rec = (media_record_t *)p1;
-        tag = rec->tag;
-    } else {
-        media_record_t rec;
-        char *p = (char *)(&rec);
-        memcpy(p, p1, n1);
-        memcpy(p + n1, p2, size - n1);
-        tag = rec.tag;
-    }
-
-    return tag;
-}
-
-static unsigned int recput(unsigned char *p1, unsigned int n1, unsigned char *p2, void *arg)
-{
-    size_t totalsize     = sizeof(media_record_t) + sizeof(video_frame_t);
-    media_record_t rec   = {};
-    video_frame_t *frame = arg;
-    unsigned int a = 0, l = 0, _n1 = n1;
-    unsigned char *p = NULL, *_p1 = p1, *_p2 = p2;
-
-    rec.size = totalsize;
-    rec.tag  = (0xdeadbeef << 8 | 1);
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-    rec.ts = ts.tv_sec * 1000 + ts.tv_nsec / 1000000;
-
-    // copy header
-    p = (unsigned char *)(&rec);
-    a = sizeof(media_record_t);
-    l = min(a, _n1);
-    memcpy(_p1, p, l);
-    memcpy(_p2, p + l, a - l);
-    _n1 -= l;
-    _p1 += l;
-    _p2 += a - l;
-
-    // copy data
-    p = (unsigned char *)(frame);
-    a = sizeof(video_frame_t);
-    l = min(a, _n1);
-    memcpy(_p1, p, l);
-    memcpy(_p2, p + l, a - l);
-    _n1 -= l;
-    _p1 += l;
-    _p2 += a - l;
-
-    tracef("frame:%u", frame->u32TimeRef);
-    return totalsize;
-}
-
-static unsigned int recget(unsigned char *p1, unsigned int n1, unsigned char *p2, void *arg)
-{
-    media_record_t *rec  = arg;
-    video_frame_t *frame = arg;
-    unsigned int a = 0, l = 0, _n1 = n1;
-    unsigned char *p = NULL, *_p1 = p1, *_p2 = p2;
-
-    // copy header
-    p = (unsigned char *)(rec);
-    a = sizeof(media_record_t);
-    l = min(a, _n1);
-    memcpy(p, _p1, l);
-    memcpy(p + _n1, _p2, a - l);
-    _n1 -= l;
-    _p1 += l;
-    _p2 += a - l;
-
-    // check header
-    assert(rec->tag >= (0xdeadbeef << 8));
-
-    // copy data
-    p = (unsigned char *)(frame);
-    a = sizeof(video_frame_t);
-    l = min(a, _n1);
-    memcpy(p, _p1, l);
-    memcpy(p + l, _p2, a - l);
-    _n1 -= l;
-    _p1 += l;
-    _p2 += a - l;
-
-    tracef("frame:%u", frame->u32TimeRef);
-    return sizeof(media_record_t) + sizeof(video_frame_t);
-}
 
 int saveBMPFile(unsigned char *src, int width, int height, const char *name)
 {
@@ -193,10 +97,10 @@ static void *hs_fd_task(void *args)
     IVE_SRC_IMAGE_S stSrcData;
     IVE_HANDLE hIveHandle;
 
-    int i, framecnt, Size0, Size1, u32Size = 0;
+    int  i, framecnt, Size0, Size1, u32Size = 0;
     HI_S32 s32Ret        = 0;
     HI_BOOL bInstant     = HI_TRUE;
-    hs_face_info_t *priv = (hs_face_info_t *)args;
+    app_face_priv_t *priv = (app_face_priv_t *)args;
     video_frame_t *frame = (video_frame_t *)priv->data;
     HI_U64 alg_phy_addr;
     HI_U64 alg_vir_addr;
@@ -206,18 +110,16 @@ static void *hs_fd_task(void *args)
     Size1    = 0;
     while (HI_FALSE == priv->s_bStopSignal) {
 
-        memset(frame, 0, sizeof(video_frame_t));
-        if (priv->fifo_get) {
-
-            ufifo_get_block(priv->fifo_get, frame, sizeof(priv->data));
+        if (priv->cb[APP_ALG_CB_FRAME_GET].func) {
+			s32Ret = priv->cb[APP_ALG_CB_FRAME_GET].func(frame,priv->cb[APP_ALG_CB_FRAME_GET].args);
         }
 
-        if (frame->u64PrivateData == 0) {
+        if (HI_SUCCESS != s32Ret) {
             printf("get failed!\n");
             continue;
         }
 
-        // to do img manager
+        // TO DO: img manager
 
         if (VIDEO_FRAME_FORMAT_YUV420SP_VU == frame->enPixelFormat
             || VIDEO_FRAME_FORMAT_YUV420SP_UV == frame->enPixelFormat) {
@@ -359,48 +261,94 @@ static void *hs_fd_task(void *args)
 
         HI_MPI_SYS_Munmap(pVirAddr0, Size0);
         HI_MPI_SYS_Munmap(pVirAddr0, Size1);
-
-        size_t totalsize = sizeof(media_record_t) + sizeof(video_frame_t);
-        ufifo_put(priv->fifo_free, frame, totalsize);
+		
+        if (priv->cb[APP_ALG_CB_FRAME_FREE].func) {
+			s32Ret = priv->cb[APP_ALG_CB_FRAME_FREE].func(frame,priv->cb[APP_ALG_CB_FRAME_FREE].args);
+        }
     }
     HI_MPI_SYS_MmzFree(stDstData.au64PhyAddr[0], (HI_VOID *)(size_t)stDstData.au64VirAddr[0]);
     return 0;
 }
 
-void *hs_fd_create(char *path)
+static int __hs_fd_init(app_face_t *self,char *path)
 {
+	app_face_t *obj = self;
+	app_face_priv_t *priv = obj->priv;
     infof("fd_init");
-    hs_face_info_t *priv = malloc(sizeof(hs_face_info_t));
-    if (priv == NULL)
-        return NULL;
-    memset(priv, 0, sizeof(hs_face_info_t));
-    float threshold   = 0.6;
-    int isLog         = 0;
+
+	priv->isLog = 0;
+	priv->threshold = 0.6;
+    priv->s_bStopSignal = HI_FALSE;
+
     char *pcModelName = "/userdata/data/nnie_model/face/mnet_640_inst.wk";
-    NNIE_FACE_DETECTOR_INIT(pcModelName, threshold, isLog);
-
-    ufifo_init_t init = {
-        .lock = UFIFO_LOCK_NONE,
-        .opt  = UFIFO_OPT_ATTACH,
-        .attach = { .shared = 0, },
-        .hook = { recsize, rectag, recput, recget },
-	};
-    char name[64];
-    snprintf(name, sizeof(name), PROTO_VSF_FRAME_WORK_FIFO "%d-%d", 0, 2);
-    ufifo_open(name, &init, &priv->fifo_get);
-
-    snprintf(name, sizeof(name), PROTO_VSF_FRAME_FREE_FIFO "%d-%d", 0, 2);
-    ufifo_open(name, &init, &priv->fifo_free);
-    pthread_create(&priv->s_hMdThread, NULL, hs_fd_task, (void *)priv);
-
-    return priv;
+    NNIE_FACE_DETECTOR_INIT(pcModelName, priv->threshold, priv->isLog);
+	pthread_create(&priv->s_hMdThread, NULL, hs_fd_task, (void *)priv);
+    return 0;
 }
 
-int hs_fd_destroy(void *args)
+static int __hs_fd_regcallback(app_face_t *self, int type, app_alg_cb_t *cb)
 {
-    hs_face_info_t *priv = (hs_face_info_t *)args;
+    app_face_t *obj       = self;
+    app_face_priv_t *priv = obj->priv;
+
+    if (cb == NULL) {
+        priv->cb[APP_ALG_CB_FRAME_GET].args  = NULL;
+        priv->cb[APP_ALG_CB_FRAME_GET].func  = NULL;
+        priv->cb[APP_ALG_CB_FRAME_FREE].args = NULL;
+        priv->cb[APP_ALG_CB_FRAME_FREE].func = NULL;
+		priv->cb[APP_ALG_CB_RESULT_OUT].args = NULL;
+        priv->cb[APP_ALG_CB_RESULT_OUT].func = NULL;
+    } else {
+        priv->cb[APP_ALG_CB_FRAME_GET].args  = cb[APP_ALG_CB_FRAME_GET].args;
+        priv->cb[APP_ALG_CB_FRAME_GET].func  = cb[APP_ALG_CB_FRAME_GET].func;
+        priv->cb[APP_ALG_CB_FRAME_FREE].args = cb[APP_ALG_CB_FRAME_FREE].args;
+        priv->cb[APP_ALG_CB_FRAME_FREE].func = cb[APP_ALG_CB_FRAME_FREE].func;
+		priv->cb[APP_ALG_CB_RESULT_OUT].args = cb[APP_ALG_CB_RESULT_OUT].args;
+        priv->cb[APP_ALG_CB_RESULT_OUT].func = cb[APP_ALG_CB_RESULT_OUT].func;
+    }
+
+    return 0;
+}
+
+static int __hs_fd_destroy(app_face_t *self)
+{
+	app_face_t *obj = self;
+	app_face_priv_t *priv = obj->priv;
 
     priv->s_bStopSignal = HI_TRUE;
-    return pthread_join(priv->s_hMdThread, NULL);
+    pthread_join(priv->s_hMdThread, NULL);
     NNIE_FACE_DETECTOR_RELEASE();
+	return 0;
 }
+
+
+app_face_t *APP_createFaceAlg(void)
+{
+    app_face_mod_t *mod   = &s_mod;
+    app_face_t *obj       = NULL;
+    app_face_priv_t *priv = NULL;
+
+    obj = mod->objs;
+    if (obj) {
+        return obj;
+    }
+
+    priv = malloc(sizeof(app_face_priv_t));
+    assert(priv);
+    memset(priv, 0, sizeof(app_face_priv_t));
+    priv->s_bStopSignal = HI_TRUE;
+
+    obj = malloc(sizeof(app_face_t));
+    if (obj == NULL) {
+        return NULL;
+    }
+
+    obj->priv        = priv;
+    obj->init        = __hs_fd_init;
+    obj->destroy     = __hs_fd_destroy;
+    obj->regcallback = __hs_fd_regcallback;
+
+    mod->objs = obj;
+    return obj;
+}
+
