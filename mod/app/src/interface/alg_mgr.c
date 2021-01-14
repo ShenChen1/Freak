@@ -1,16 +1,15 @@
 #include "app/alg_mgr.h"
-#include "vsf/frame_mgr.h"
 #include "common.h"
 #include "inc/cfg.h"
+#include "inc/hal/face.h"
 #include "log.h"
+#include "media.h"
 #include "proto.h"
 #include "ufifo.h"
-#include "media.h"
-#include "inc/hal/face.h"
-
+#include "vsf/frame_mgr.h"
 
 typedef struct {
-	ufifo_t *fifo[APP_ITEM_MAX][APP_ALG_CB_MAX];
+    ufifo_t *fifo[APP_ITEM_MAX][APP_ALG_CB_MAX];
     proto_app_alg_t *info;
 } app_alg_mgr_priv_t;
 
@@ -22,7 +21,7 @@ static unsigned int recsize(unsigned char *p1, unsigned int n1, unsigned char *p
 
     if (n1 >= size) {
         media_record_t *rec = (media_record_t *)p1;
-        size = rec->size;
+        size                = rec->size;
     } else {
         media_record_t rec;
         char *p = (char *)(&rec);
@@ -41,7 +40,7 @@ static unsigned int rectag(unsigned char *p1, unsigned int n1, unsigned char *p2
 
     if (n1 >= size) {
         media_record_t *rec = (media_record_t *)p1;
-        tag = rec->tag;
+        tag                 = rec->tag;
     } else {
         media_record_t rec;
         char *p = (char *)(&rec);
@@ -127,17 +126,17 @@ static unsigned int recget(unsigned char *p1, unsigned int n1, unsigned char *p2
 
 static int __app_alg_get_frame(void *data, void *args)
 {
-    size_t totalsize           = sizeof(media_record_t) + sizeof(video_frame_t);
+    size_t totalsize         = sizeof(media_record_t) + sizeof(video_frame_t);
     app_alg_mgr_priv_t *priv = s_mgr->priv;
     proto_app_alg_cfg_t *cfg = args;
-				//printf("get %p\n",priv->fifo[cfg->id][APP_ALG_CB_FRAME_GET]);
+    // printf("get %p\n",priv->fifo[cfg->id][APP_ALG_CB_FRAME_GET]);
     return ufifo_get_block(priv->fifo[cfg->id][APP_ALG_CB_FRAME_GET], data, totalsize) != totalsize;
 }
 
 static int __app_alg_free_frame(void *data, void *args)
 {
-    video_frame_t *frame       = data;
-    size_t totalsize           = sizeof(media_record_t) + sizeof(video_frame_t);
+    video_frame_t *frame     = data;
+    size_t totalsize         = sizeof(media_record_t) + sizeof(video_frame_t);
     app_alg_mgr_priv_t *priv = s_mgr->priv;
     proto_app_alg_cfg_t *cfg = args;
 
@@ -146,8 +145,8 @@ static int __app_alg_free_frame(void *data, void *args)
 
 static int __app_alg_result(void *data, void *args)
 {
-    //proto_app_alg_cfg_t *cfg = args;
-	//get result and send to osd
+    // proto_app_alg_cfg_t *cfg = args;
+    // get result and send to osd
     return 0;
 }
 
@@ -159,79 +158,71 @@ static int __app_alg_destroy(app_alg_mgr_t *self)
 
 static int __app_alg_set(app_alg_mgr_t *self, proto_app_alg_cfg_t *cfg)
 {
-	app_alg_mgr_t *mgr       = self;
-    	app_alg_mgr_priv_t *priv = mgr->priv;
-	switch(cfg->type)
-	{
-		case ALG_TYPE_FR:
-		{
-			if(cfg->enable)	
-			{
-				//send msg2vsf
-				vsf_frame_mgr_t *frame_mgr = vsf_createFrameMgr_r();
-				proto_vsf_frame_cfg_t cfg_send = {.id = 1};
-				frame_mgr->get(frame_mgr,&cfg_send);
-				cfg_send.id = 1;
-				cfg_send.enable = 1;
-				cfg_send.format = VIDEO_FRAME_FORMAT_YUV420P_YVU;
-				cfg_send.width = 640;
-				cfg_send.height = 640;
-				cfg_send.fps = 15;
+    app_alg_mgr_t *mgr       = self;
+    app_alg_mgr_priv_t *priv = mgr->priv;
+    switch (cfg->type) {
+    case ALG_TYPE_FR: {
+        if (cfg->enable) {
+            // send msg2vsf
+            vsf_frame_mgr_t *frame_mgr     = vsf_createFrameMgr_r();
+            proto_vsf_frame_cfg_t cfg_send = { .id = 1 };
+            frame_mgr->get(frame_mgr, &cfg_send);
+            cfg_send.id     = 1;
+            cfg_send.enable = 1;
+            cfg_send.format = VIDEO_FRAME_FORMAT_YUV420P_YVU;
+            cfg_send.width  = 640;
+            cfg_send.height = 640;
+            cfg_send.fps    = 15;
 
-				frame_mgr->set(frame_mgr,&cfg_send);
-				frame_mgr->destroy(frame_mgr);
-				
-				char name[64];
-				ufifo_init_t init = {
-			        .lock = UFIFO_LOCK_NONE,
-			        .opt  = UFIFO_OPT_ATTACH,
-			        .attach = { .shared = 0, },
-			        .hook = { recsize, rectag, recput, recget },
-				};
-    			snprintf(name, sizeof(name), PROTO_VSF_FRAME_WORK_FIFO "%d-%d", 0, 2);//chn0-2 for a wihle,
-    			ufifo_open(name, &init, &priv->fifo[cfg->id][APP_ALG_CB_FRAME_GET]);
+            frame_mgr->set(frame_mgr, &cfg_send);
+            frame_mgr->destroy(frame_mgr);
 
-    			snprintf(name, sizeof(name), PROTO_VSF_FRAME_FREE_FIFO "%d-%d", 0, 2);
-    			ufifo_open(name, &init, &priv->fifo[cfg->id][APP_ALG_CB_FRAME_FREE]);
+            char name[64];
+            ufifo_init_t init = {
+                    .lock = UFIFO_LOCK_NONE,
+                    .opt  = UFIFO_OPT_ATTACH,
+                    .attach = { .shared = 0, },
+                    .hook = { recsize, rectag, recput, recget },
+            };
+            snprintf(name, sizeof(name), PROTO_VSF_FRAME_WORK_FIFO "%d-%d", 0, 2); // chn0-2 for a wihle,
+            ufifo_open(name, &init, &priv->fifo[cfg->id][APP_ALG_CB_FRAME_GET]);
 
-				app_alg_cb_t cb[APP_ALG_CB_MAX] = {};
-		        cb[APP_ALG_CB_FRAME_GET].args  = &priv->info->cfgs[cfg->id];
-		        cb[APP_ALG_CB_FRAME_GET].func  = __app_alg_get_frame;
-		        cb[APP_ALG_CB_FRAME_FREE].args = &priv->info->cfgs[cfg->id];
-		        cb[APP_ALG_CB_FRAME_FREE].func = __app_alg_free_frame;
-				cb[APP_ALG_CB_RESULT_OUT].args = &priv->info->cfgs[cfg->id];
-		        cb[APP_ALG_CB_RESULT_OUT].func = __app_alg_result;
-				app_face_t * hFace = APP_createFaceAlg();
-				if (hFace && hFace->regcallback) {
-			        hFace->regcallback(hFace, cfg->id, cb);
-			    }
+            snprintf(name, sizeof(name), PROTO_VSF_FRAME_FREE_FIFO "%d-%d", 0, 2);
+            ufifo_open(name, &init, &priv->fifo[cfg->id][APP_ALG_CB_FRAME_FREE]);
 
+            app_alg_cb_t cb[APP_ALG_CB_MAX] = {};
+            cb[APP_ALG_CB_FRAME_GET].args   = &priv->info->cfgs[cfg->id];
+            cb[APP_ALG_CB_FRAME_GET].func   = __app_alg_get_frame;
+            cb[APP_ALG_CB_FRAME_FREE].args  = &priv->info->cfgs[cfg->id];
+            cb[APP_ALG_CB_FRAME_FREE].func  = __app_alg_free_frame;
+            cb[APP_ALG_CB_RESULT_OUT].args  = &priv->info->cfgs[cfg->id];
+            cb[APP_ALG_CB_RESULT_OUT].func  = __app_alg_result;
+            app_face_t *hFace               = APP_createFaceAlg();
+            if (hFace && hFace->regcallback) {
+                hFace->regcallback(hFace, cfg->id, cb);
+            }
 
-				hFace->init(hFace,cfg->algpath);
-			}
-			else
-			{
+            hFace->init(hFace, cfg->algpath);
+        } else {
 
-				if (priv->fifo[cfg->id][APP_ALG_CB_FRAME_GET]) {
-				    ufifo_close(priv->fifo[cfg->id][APP_ALG_CB_FRAME_GET]);
-				    priv->fifo[cfg->id][APP_ALG_CB_FRAME_GET] = NULL;
-				}
-				if (priv->fifo[cfg->id][APP_ALG_CB_FRAME_FREE]) {
-				    ufifo_close(priv->fifo[cfg->id][APP_ALG_CB_FRAME_FREE]);
-				    priv->fifo[cfg->id][APP_ALG_CB_FRAME_FREE] = NULL;
-				}
+            if (priv->fifo[cfg->id][APP_ALG_CB_FRAME_GET]) {
+                ufifo_close(priv->fifo[cfg->id][APP_ALG_CB_FRAME_GET]);
+                priv->fifo[cfg->id][APP_ALG_CB_FRAME_GET] = NULL;
+            }
+            if (priv->fifo[cfg->id][APP_ALG_CB_FRAME_FREE]) {
+                ufifo_close(priv->fifo[cfg->id][APP_ALG_CB_FRAME_FREE]);
+                priv->fifo[cfg->id][APP_ALG_CB_FRAME_FREE] = NULL;
+            }
 
-				app_face_t * hFace = APP_createFaceAlg();
-				if(hFace)
-					hFace->destroy(hFace);
-			}
+            app_face_t *hFace = APP_createFaceAlg();
+            if (hFace)
+                hFace->destroy(hFace);
+        }
 
-
-		}
-		break;
-		default:
-			break;
-	}
+    } break;
+    default:
+        break;
+    }
     return 0;
 }
 

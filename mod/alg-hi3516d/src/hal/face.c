@@ -1,22 +1,22 @@
 #include "inc/hal/face.h"
+#include "common.h"
+#include "hi_comm_ive.h"
 #include "inc/basetype.h"
 #include "inc/nnie_face_api.h"
-#include "common.h"
 #include "log.h"
 #include "media.h"
-#include "ufifo.h"
-#include "hi_comm_ive.h"
 #include "mpi_ive.h"
 #include "sample/sample_comm.h"
+#include "ufifo.h"
 
 typedef struct {
     ufifo_t *fifo_get;
     ufifo_t *fifo_free;
     pthread_t s_hMdThread;
-	float threshold;
+    float threshold;
     int isLog;
-	HI_BOOL s_bStopSignal;
-	app_alg_cb_t cb[APP_ALG_CB_MAX];
+    HI_BOOL s_bStopSignal;
+    app_alg_cb_t cb[APP_ALG_CB_MAX];
     uint8_t data[1024]; // img manager
 } app_face_priv_t;
 
@@ -24,10 +24,9 @@ typedef struct {
     app_face_t *objs;
 } app_face_mod_t;
 
-static app_face_mod_t s_mod = {0};
+static app_face_mod_t s_mod = { 0 };
 
 extern int tracker_id(int FrameIndex, RESULT_BAG *result_bag, RESULT_BAG *result_out);
-
 
 int saveBMPFile(unsigned char *src, int width, int height, const char *name)
 {
@@ -97,11 +96,11 @@ static void *hs_fd_task(void *args)
     IVE_SRC_IMAGE_S stSrcData;
     IVE_HANDLE hIveHandle;
 
-    int  i, framecnt, Size0, Size1, u32Size = 0;
-    HI_S32 s32Ret        = 0;
-    HI_BOOL bInstant     = HI_TRUE;
+    int i, framecnt, Size0, Size1, u32Size = 0;
+    HI_S32 s32Ret         = 0;
+    HI_BOOL bInstant      = HI_TRUE;
     app_face_priv_t *priv = (app_face_priv_t *)args;
-    video_frame_t *frame = (video_frame_t *)priv->data;
+    video_frame_t *frame  = (video_frame_t *)priv->data;
     HI_U64 alg_phy_addr;
     HI_U64 alg_vir_addr;
 
@@ -111,7 +110,7 @@ static void *hs_fd_task(void *args)
     while (HI_FALSE == priv->s_bStopSignal) {
 
         if (priv->cb[APP_ALG_CB_FRAME_GET].func) {
-			s32Ret = priv->cb[APP_ALG_CB_FRAME_GET].func(frame,priv->cb[APP_ALG_CB_FRAME_GET].args);
+            s32Ret = priv->cb[APP_ALG_CB_FRAME_GET].func(frame, priv->cb[APP_ALG_CB_FRAME_GET].args);
         }
 
         if (HI_SUCCESS != s32Ret) {
@@ -261,28 +260,28 @@ static void *hs_fd_task(void *args)
 
         HI_MPI_SYS_Munmap(pVirAddr0, Size0);
         HI_MPI_SYS_Munmap(pVirAddr0, Size1);
-		
+
         if (priv->cb[APP_ALG_CB_FRAME_FREE].func) {
-			s32Ret = priv->cb[APP_ALG_CB_FRAME_FREE].func(frame,priv->cb[APP_ALG_CB_FRAME_FREE].args);
+            s32Ret = priv->cb[APP_ALG_CB_FRAME_FREE].func(frame, priv->cb[APP_ALG_CB_FRAME_FREE].args);
         }
     }
     HI_MPI_SYS_MmzFree(stDstData.au64PhyAddr[0], (HI_VOID *)(size_t)stDstData.au64VirAddr[0]);
     return 0;
 }
 
-static int __hs_fd_init(app_face_t *self,char *path)
+static int __hs_fd_init(app_face_t *self, char *path)
 {
-	app_face_t *obj = self;
-	app_face_priv_t *priv = obj->priv;
+    app_face_t *obj       = self;
+    app_face_priv_t *priv = obj->priv;
     infof("fd_init");
 
-	priv->isLog = 0;
-	priv->threshold = 0.6;
+    priv->isLog         = 0;
+    priv->threshold     = 0.6;
     priv->s_bStopSignal = HI_FALSE;
 
     char *pcModelName = "/userdata/data/nnie_model/face/mnet_640_inst.wk";
     NNIE_FACE_DETECTOR_INIT(pcModelName, priv->threshold, priv->isLog);
-	pthread_create(&priv->s_hMdThread, NULL, hs_fd_task, (void *)priv);
+    pthread_create(&priv->s_hMdThread, NULL, hs_fd_task, (void *)priv);
     return 0;
 }
 
@@ -296,14 +295,14 @@ static int __hs_fd_regcallback(app_face_t *self, int type, app_alg_cb_t *cb)
         priv->cb[APP_ALG_CB_FRAME_GET].func  = NULL;
         priv->cb[APP_ALG_CB_FRAME_FREE].args = NULL;
         priv->cb[APP_ALG_CB_FRAME_FREE].func = NULL;
-		priv->cb[APP_ALG_CB_RESULT_OUT].args = NULL;
+        priv->cb[APP_ALG_CB_RESULT_OUT].args = NULL;
         priv->cb[APP_ALG_CB_RESULT_OUT].func = NULL;
     } else {
         priv->cb[APP_ALG_CB_FRAME_GET].args  = cb[APP_ALG_CB_FRAME_GET].args;
         priv->cb[APP_ALG_CB_FRAME_GET].func  = cb[APP_ALG_CB_FRAME_GET].func;
         priv->cb[APP_ALG_CB_FRAME_FREE].args = cb[APP_ALG_CB_FRAME_FREE].args;
         priv->cb[APP_ALG_CB_FRAME_FREE].func = cb[APP_ALG_CB_FRAME_FREE].func;
-		priv->cb[APP_ALG_CB_RESULT_OUT].args = cb[APP_ALG_CB_RESULT_OUT].args;
+        priv->cb[APP_ALG_CB_RESULT_OUT].args = cb[APP_ALG_CB_RESULT_OUT].args;
         priv->cb[APP_ALG_CB_RESULT_OUT].func = cb[APP_ALG_CB_RESULT_OUT].func;
     }
 
@@ -312,15 +311,14 @@ static int __hs_fd_regcallback(app_face_t *self, int type, app_alg_cb_t *cb)
 
 static int __hs_fd_destroy(app_face_t *self)
 {
-	app_face_t *obj = self;
-	app_face_priv_t *priv = obj->priv;
+    app_face_t *obj       = self;
+    app_face_priv_t *priv = obj->priv;
 
     priv->s_bStopSignal = HI_TRUE;
     pthread_join(priv->s_hMdThread, NULL);
     NNIE_FACE_DETECTOR_RELEASE();
-	return 0;
+    return 0;
 }
-
 
 app_face_t *APP_createFaceAlg(void)
 {
@@ -351,4 +349,3 @@ app_face_t *APP_createFaceAlg(void)
     mod->objs = obj;
     return obj;
 }
-

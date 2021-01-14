@@ -217,7 +217,7 @@ static int __rgn_ctrl_objs(vsf_rgn_t *self, int chn, void *param)
             int box_h     = cfg->info.objs.rects[n].height * height / 8192;
             uint16_t *box = &data[box_y * stride / 2 + box_x];
 
-            infof("[%d]: %d %d %d %d", n, box_x, box_y, box_w, box_h);
+            debugf("[%d]: %d %d %d %d", n, box_x, box_y, box_w, box_h);
             if (box_w * box_h == 0) {
                 continue;
             }
