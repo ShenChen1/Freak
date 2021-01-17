@@ -4,7 +4,7 @@
 enum {
     HTTP_SERVER_STATUS_SETUP   = 0,
     HTTP_SERVER_STATUS_RUNNING = 1,
-    HTTP_SERVER_STATUS_EXIT    = 3,
+    HTTP_SERVER_STATUS_EXIT    = 2,
     HTTP_SERVER_STATUS_MAX,
 };
 
@@ -18,11 +18,43 @@ typedef struct {
 
 static void ev_handler(struct mg_connection *nc, int ev, void *p)
 {
-    if (ev == MG_EV_HTTP_REQUEST) {
-        struct mg_serve_http_opts opts = {};
-        opts.document_root             = "."; // Serve current directory
-        opts.enable_directory_listing  = "yes";
-        mg_serve_http(nc, (struct http_message *)p, opts);
+    switch (ev) {
+        case MG_EV_HTTP_REQUEST: {
+            struct http_message *hm = p;
+            infof("MG_EV_HTTP_REQUEST [%s:%d], nc:%p, user_data:%p\n",
+                hm->message.p, hm->message.len, nc, nc->user_data);
+
+            struct mg_serve_http_opts opts = {};
+            opts.document_root             = "/var/www";
+            mg_serve_http(nc, hm, opts);
+            break;
+        }
+
+        case MG_EV_WEBSOCKET_HANDSHAKE_REQUEST: {
+            struct http_message *hm = p;
+            infof("MG_EV_WEBSOCKET_HANDSHAKE_REQUEST [%s:%d], nc:%p, user_data:%p\n",
+                hm->message.p, hm->message.len, nc, nc->user_data);
+            break;
+        }
+
+        case MG_EV_WEBSOCKET_FRAME: {
+            struct websocket_message *wm = p;
+            infof("MG_EV_WEBSOCKET_FRAME [%s:%d], nc:%p, user_data:%p\n",
+                wm->data, wm->size, nc, nc->user_data);
+            break;
+        }
+
+        case MG_EV_WEBSOCKET_HANDSHAKE_DONE: {
+            struct http_message *hm = p;
+            infof("MG_EV_WEBSOCKET_HANDSHAKE_DONE [%s:%d], nc:%p, user_data:%p\n",
+                hm->message.p, hm->message.len, nc, nc->user_data);
+            break;
+        }
+
+        case MG_EV_CLOSE: {
+            infof("MG_EV_CLOSE [%p], nc:%p, user_data:%p\n", p, nc, nc->user_data);
+            break;
+        }
     }
 }
 
