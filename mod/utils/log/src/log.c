@@ -70,7 +70,7 @@ int log_printf(log_lv_t level, const char *fmt, ...)
 {
     int n;
     va_list ap;
-    char buf[1024];
+    char buf[2048];
 
     if (level > s_level) {
         return 0;

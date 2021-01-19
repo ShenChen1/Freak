@@ -12,6 +12,8 @@ typedef struct osd_mgr {
     int (*get)(struct osd_mgr *self, proto_vsf_osd_cfg_t *cfg);
     int (*set)(struct osd_mgr *self, proto_vsf_osd_cfg_t *cfg);
 
+    int (*tgr)(struct osd_mgr *self, proto_vsf_osd_tgr_t *tgr);
+
 } vsf_osd_mgr_t;
 
 vsf_osd_mgr_t *vsf_createOsdMgr(void);

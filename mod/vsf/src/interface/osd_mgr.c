@@ -52,6 +52,19 @@ static int __vsf_osd_cap(vsf_osd_mgr_t *self, proto_vsf_osd_cap_t *cap)
     return 0;
 }
 
+static int __vsf_osd_tgr(vsf_osd_mgr_t *self, proto_vsf_osd_tgr_t *tgr)
+{
+    vsf_osd_mgr_t *mgr       = self;
+    vsf_osd_mgr_priv_t *priv = mgr->priv;
+
+    vsf_rgn_t *rgn = VSF_createRgn(tgr->id);
+    if (rgn && rgn->trigger) {
+        return rgn->trigger(rgn, priv->info->caps[tgr->id].chn, tgr);
+    }
+
+    return 0;
+}
+
 static int __vsf_osd_num(vsf_osd_mgr_t *self)
 {
     vsf_osd_mgr_t *mgr       = self;
@@ -83,6 +96,7 @@ vsf_osd_mgr_t *vsf_createOsdMgr()
     mgr->get     = __vsf_osd_get;
     mgr->cap     = __vsf_osd_cap;
     mgr->num     = __vsf_osd_num;
+    mgr->tgr     = __vsf_osd_tgr;
 
     s_mgr = mgr;
     return mgr;

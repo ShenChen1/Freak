@@ -140,7 +140,7 @@ static int __rgn_ctrl_objs(vsf_rgn_t *self, int chn, void *param)
     HI_S32 s32Ret            = 0;
     vsf_rgn_t *obj           = self;
     vsf_rgn_priv_t *priv     = obj->priv;
-    proto_vsf_osd_cfg_t *cfg = param;
+    proto_vsf_osd_tgr_t *tgr = param;
 
     priv->stChn.enModId  = HI_ID_VENC;
     priv->stChn.s32DevId = 0;
@@ -157,7 +157,7 @@ static int __rgn_ctrl_objs(vsf_rgn_t *self, int chn, void *param)
     priv->stRegion.unAttr.stOverlay.stSize.u32Height = stChnAttr.stVencAttr.u32PicHeight;
     priv->stRegion.unAttr.stOverlay.u32CanvasNum     = 2;
 
-    priv->stChnAttr.bShow                               = cfg->enable;
+    priv->stChnAttr.bShow                               = tgr->info.objs.num > 0;
     priv->stChnAttr.enType                              = OVERLAY_RGN;
     priv->stChnAttr.unChnAttr.stOverlayChn.stPoint.s32X = 0;
     priv->stChnAttr.unChnAttr.stOverlayChn.stPoint.s32Y = 0;
@@ -191,6 +191,7 @@ static int __rgn_ctrl_objs(vsf_rgn_t *self, int chn, void *param)
     if (HI_SUCCESS != s32Ret) {
         errorf("HI_MPI_RGN_GetCanvasInfo faild with%#x!", s32Ret);
     }
+#if 1
     {
         int n, i;
         uint16_t color  = argb8888_1555(0x01FF0000);
@@ -200,21 +201,21 @@ static int __rgn_ctrl_objs(vsf_rgn_t *self, int chn, void *param)
         uint32_t stride = stRgnCanvasInfo.u32Stride;
         memset(data, 0, stRgnCanvasInfo.stSize.u32Height * stRgnCanvasInfo.u32Stride);
 
-        for (n = 0; n < cfg->info.objs.num; n++) {
+        for (n = 0; n < tgr->info.objs.num; n++) {
 
-            cfg->info.objs.rects[n].x = max(cfg->info.objs.rects[n].x, 0);
-            cfg->info.objs.rects[n].x = min(cfg->info.objs.rects[n].x, 8192);
-            cfg->info.objs.rects[n].y = max(cfg->info.objs.rects[n].y, 0);
-            cfg->info.objs.rects[n].y = min(cfg->info.objs.rects[n].y, 8192);
-            cfg->info.objs.rects[n].Width = max(cfg->info.objs.rects[n].Width, 0);
-            cfg->info.objs.rects[n].Width = min(cfg->info.objs.rects[n].Width, 8192 - cfg->info.objs.rects[n].x);
-            cfg->info.objs.rects[n].height = max(cfg->info.objs.rects[n].height, 0);
-            cfg->info.objs.rects[n].height = min(cfg->info.objs.rects[n].height, 8192 - cfg->info.objs.rects[n].y);
+            tgr->info.objs.rects[n].x = max(tgr->info.objs.rects[n].x, 0);
+            tgr->info.objs.rects[n].x = min(tgr->info.objs.rects[n].x, 8192);
+            tgr->info.objs.rects[n].y = max(tgr->info.objs.rects[n].y, 0);
+            tgr->info.objs.rects[n].y = min(tgr->info.objs.rects[n].y, 8192);
+            tgr->info.objs.rects[n].w = max(tgr->info.objs.rects[n].w, 0);
+            tgr->info.objs.rects[n].w = min(tgr->info.objs.rects[n].w, 8192 - tgr->info.objs.rects[n].x);
+            tgr->info.objs.rects[n].h = max(tgr->info.objs.rects[n].h, 0);
+            tgr->info.objs.rects[n].h = min(tgr->info.objs.rects[n].h, 8192 - tgr->info.objs.rects[n].y);
 
-            int box_x     = cfg->info.objs.rects[n].x * width / 8192;
-            int box_y     = cfg->info.objs.rects[n].y * height / 8192;
-            int box_w     = cfg->info.objs.rects[n].Width * width / 8192;
-            int box_h     = cfg->info.objs.rects[n].height * height / 8192;
+            int box_x     = tgr->info.objs.rects[n].x * width / 8192;
+            int box_y     = tgr->info.objs.rects[n].y * height / 8192;
+            int box_w     = tgr->info.objs.rects[n].w * width / 8192;
+            int box_h     = tgr->info.objs.rects[n].h * height / 8192;
             uint16_t *box = &data[box_y * stride / 2 + box_x];
 
             debugf("[%d]: %d %d %d %d", n, box_x, box_y, box_w, box_h);
@@ -244,6 +245,7 @@ static int __rgn_ctrl_objs(vsf_rgn_t *self, int chn, void *param)
             }
         }
     }
+#endif
     s32Ret |= HI_MPI_RGN_UpdateCanvas(priv->id);
     if (HI_SUCCESS != s32Ret) {
         errorf("HI_MPI_RGN_UpdateCanvas faild with%#x!", s32Ret);
@@ -263,7 +265,19 @@ int __rgn_ctrl(vsf_rgn_t *self, int chn, void *param)
         return __rgn_ctrl_mask(self, chn, param);
     } else if (!strncmp(cfg->info.condition, "text", sizeof("text"))) {
         return -1;
-    } else if (!strncmp(cfg->info.condition, "objs", sizeof("objs"))) {
+    }
+
+    return -1;
+}
+
+int __rgn_trigger(vsf_rgn_t *self, int chn, void *param)
+{
+    vsf_rgn_t *obj           = self;
+    vsf_rgn_priv_t *priv     = obj->priv;
+    proto_vsf_osd_tgr_t *tgr = param;
+
+    assert(priv->id == tgr->id);
+    if (!strncmp(tgr->info.condition, "objs", sizeof("objs"))) {
         return __rgn_ctrl_objs(self, chn, param);
     }
 
@@ -298,6 +312,7 @@ vsf_rgn_t *VSF_createRgn(int id)
     obj->init    = __rgn_init;
     obj->destroy = __rgn_destroy;
     obj->ctrl    = __rgn_ctrl;
+    obj->trigger = __rgn_trigger;
 
     mod->objs[id] = obj;
     return obj;

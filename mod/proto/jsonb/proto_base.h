@@ -19,7 +19,7 @@ extern void jsonb_opt_proto_rect_t(jsonb_opt_e opt, cJSON *json, void *element, 
 typedef struct {
     int32_t x;
     int32_t y;
-    uint32_t Width;
-    uint32_t height;
+    uint32_t w;
+    uint32_t h;
 } proto_rect_t;
 #endif /* __PROTO_BASE_JSONB_C_API_H__ */

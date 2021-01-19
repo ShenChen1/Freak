@@ -6,7 +6,7 @@
 #include "node.h"
 #include "path.h"
 
-#define PROTO_PACKAGE_MAXSIZE (1024)
+#define PROTO_PACKAGE_MAXSIZE (2048)
 
 typedef struct {
     uint8_t version;
@@ -28,6 +28,7 @@ typedef enum {
     PROTO_ACTION_CAP,
     PROTO_ACTION_GET,
     PROTO_ACTION_SET,
+    PROTO_ACTION_TGR,
 } proto_action_e;
 
 typedef enum {
@@ -78,6 +79,8 @@ typedef enum {
             infof("- action:    %s", "CAP");                      \
         if (p->action == PROTO_ACTION_NUM)                        \
             infof("- action:    %s", "NUM");                      \
+        if (p->action == PROTO_ACTION_TGR)                        \
+            infof("- action:    %s", "TGR");                      \
         infof("- errcode:   %u", p->errcode);                     \
         infof("- format:    %s", p->format ? "JSON" : "STRUCTE"); \
         infof("- size:      %u", p->size);                        \

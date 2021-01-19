@@ -7,6 +7,7 @@ typedef struct rgn {
     int (*destroy)(struct rgn *self);
 
     int (*ctrl)(struct rgn *self, int chn, void *cfg);
+    int (*trigger)(struct rgn *self, int chn, void *cfg);
 } vsf_rgn_t;
 
 vsf_rgn_t *VSF_createRgn(int id);

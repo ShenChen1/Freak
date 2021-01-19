@@ -51,6 +51,22 @@ static int msgbox_osd_cap(msgbox_param_t *param)
     return ret;
 }
 
+static int msgbox_osd_tgr(msgbox_param_t *param)
+{
+    int ret;
+    proto_vsf_osd_tgr_t tgr;
+
+    proto_server_data_pre(param->format, jsonb_opt_proto_vsf_osd_tgr_t, param->in, param->isize, &tgr, sizeof(proto_vsf_osd_tgr_t));
+
+    vsf_osd_mgr_t *obj = vsf_createOsdMgr();
+    assert(obj && obj->tgr);
+    ret = obj->tgr(obj, &tgr);
+    assert(ret == 0);
+
+    proto_server_data_post(param->format, jsonb_opt_proto_vsf_osd_tgr_t, &tgr, sizeof(proto_vsf_osd_tgr_t), param->out, param->osize);
+    return ret;
+}
+
 static int msgbox_osd_num(msgbox_param_t *param)
 {
     proto_num_t num;
@@ -78,6 +94,8 @@ int msgbox_vsf_osd(msgbox_param_t *param)
         ret = msgbox_osd_cap(param);
     } else if (param->action == PROTO_ACTION_NUM) {
         ret = msgbox_osd_num(param);
+    } else if (param->action == PROTO_ACTION_TGR) {
+        ret = msgbox_osd_tgr(param);
     } else {
         assert(0);
     }

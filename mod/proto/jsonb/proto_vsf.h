@@ -76,26 +76,19 @@ typedef struct {
     proto_point_t points;
     char text[64];
 } proto_vsf_osd_text_t;
-extern void jsonb_opt_proto_vsf_osd_objs_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
-typedef struct {
-    uint32_t num;
-    char labels[32][32];
-    proto_rect_t rects[32];
-} proto_vsf_osd_objs_t;
-extern void jsonb_opt_proto_vsf_osd_union_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
+extern void jsonb_opt_proto_vsf_osd_cfg_union_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
     char condition[32];
     union {
         proto_vsf_osd_mask_t mask;
         proto_vsf_osd_text_t text;
-        proto_vsf_osd_objs_t objs;
     };
-} proto_vsf_osd_union_t;
+} proto_vsf_osd_cfg_union_t;
 extern void jsonb_opt_proto_vsf_osd_cfg_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
     int id;
     int enable;
-    proto_vsf_osd_union_t info;
+    proto_vsf_osd_cfg_union_t info;
 } proto_vsf_osd_cfg_t;
 extern void jsonb_opt_proto_vsf_osd_cap_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
@@ -109,4 +102,21 @@ typedef struct {
     proto_vsf_osd_cap_t caps[VSF_OSD_MAX];
     proto_vsf_osd_cfg_t cfgs[VSF_OSD_MAX];
 } proto_vsf_osd_t;
+extern void jsonb_opt_proto_vsf_osd_objs_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
+typedef struct {
+    uint32_t num;
+    proto_rect_t rects[32];
+} proto_vsf_osd_objs_t;
+extern void jsonb_opt_proto_vsf_osd_tgr_union_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
+typedef struct {
+    char condition[32];
+    union {
+        proto_vsf_osd_objs_t objs;
+    };
+} proto_vsf_osd_tgr_union_t;
+extern void jsonb_opt_proto_vsf_osd_tgr_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
+typedef struct {
+    int id;
+    proto_vsf_osd_tgr_union_t info;
+} proto_vsf_osd_tgr_t;
 #endif /* __PROTO_VSF_JSONB_C_API_H__ */

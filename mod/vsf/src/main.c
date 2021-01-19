@@ -63,10 +63,9 @@ int main()
         infof("keep alive");
         usleep(50);
 
-        vsf_osd_mgr_t *osd = vsf_createOsdMgr();
-        proto_vsf_osd_cfg_t cfg = {
+        vsf_osd_mgr_t *osd = vsf_createOsdMgr_r();
+        proto_vsf_osd_tgr_t tgr = {
             .id = 4,
-            .enable = 1,
             .info = {
                 .condition = "objs",
                 .objs = {
@@ -75,15 +74,15 @@ int main()
             },
         };
 
-        for (i = 0; i < cfg.info.objs.num; i++) {
-            cfg.info.objs.rects[i].x = 100 * total + i *10;
-            cfg.info.objs.rects[i].y = 100 * total + i *10;
-            cfg.info.objs.rects[i].Width = total + 80 * i;
-            cfg.info.objs.rects[i].height = total + 80 * i;
+        for (i = 0; i < tgr.info.objs.num; i++) {
+            tgr.info.objs.rects[i].x = 100 * total + i *10;
+            tgr.info.objs.rects[i].y = 100 * total + i *10;
+            tgr.info.objs.rects[i].w = total + 80 * i;
+            tgr.info.objs.rects[i].h = total + 80 * i;
         }
 
-        // set cfg
-        osd->set(osd, &cfg);
+        // set tgr
+        osd->tgr(osd, &tgr);
         osd->destroy(osd);
 
         total = (total + 1) % 80;
