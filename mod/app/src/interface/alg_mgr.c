@@ -7,9 +7,11 @@
 #include "proto.h"
 #include "ufifo.h"
 #include "vsf/frame_mgr.h"
-
+#include "vsf/osd_mgr.h"
+#include "proto_app.h"
 typedef struct {
     ufifo_t *fifo[APP_ITEM_MAX][APP_ALG_CB_MAX];
+    void *hosd[APP_ITEM_MAX];
     proto_app_alg_t *info;
 } app_alg_mgr_priv_t;
 
@@ -147,6 +149,27 @@ static int __app_alg_result(void *data, void *args)
 {
     // proto_app_alg_cfg_t *cfg = args;
     // get result and send to osd
+    vsf_osd_mgr_t *osd = args;
+    proto_app_alg_result_t *result = data;
+    int i = 0;
+    proto_vsf_osd_tgr_t tgr = {
+    .id = 4,
+    .info = {
+        .condition = "objs",
+        .objs = {
+            .num = result->num,
+        },
+      },
+    };
+    for (i = 0; i < tgr.info.objs.num; i++) {
+        tgr.info.objs.rects[i].x = result->objs[i].rect.x;
+        tgr.info.objs.rects[i].y = result->objs[i].rect.y;
+        tgr.info.objs.rects[i].w = result->objs[i].rect.w;
+        tgr.info.objs.rects[i].h = result->objs[i].rect.h;
+    }
+
+    osd->tgr(osd, &tgr);
+
     return 0;
 }
 
@@ -189,13 +212,16 @@ static int __app_alg_set(app_alg_mgr_t *self, proto_app_alg_cfg_t *cfg)
 
             snprintf(name, sizeof(name), PROTO_VSF_FRAME_FREE_FIFO "%d-%d", 0, 2);
             ufifo_open(name, &init, &priv->fifo[cfg->id][APP_ALG_CB_FRAME_FREE]);
+            
+            vsf_osd_mgr_t *osd = vsf_createOsdMgr();
+            priv->hosd[cfg->id] = osd;
 
             app_alg_cb_t cb[APP_ALG_CB_MAX] = {};
             cb[APP_ALG_CB_FRAME_GET].args   = &priv->info->cfgs[cfg->id];
             cb[APP_ALG_CB_FRAME_GET].func   = __app_alg_get_frame;
             cb[APP_ALG_CB_FRAME_FREE].args  = &priv->info->cfgs[cfg->id];
             cb[APP_ALG_CB_FRAME_FREE].func  = __app_alg_free_frame;
-            cb[APP_ALG_CB_RESULT_OUT].args  = &priv->info->cfgs[cfg->id];
+            cb[APP_ALG_CB_RESULT_OUT].args  = priv->hosd[cfg->id];
             cb[APP_ALG_CB_RESULT_OUT].func  = __app_alg_result;
             app_face_t *hFace               = APP_createFaceAlg();
             if (hFace && hFace->regcallback) {
@@ -213,7 +239,11 @@ static int __app_alg_set(app_alg_mgr_t *self, proto_app_alg_cfg_t *cfg)
                 ufifo_close(priv->fifo[cfg->id][APP_ALG_CB_FRAME_FREE]);
                 priv->fifo[cfg->id][APP_ALG_CB_FRAME_FREE] = NULL;
             }
-
+            if(priv->hosd[cfg->id])
+            {
+                vsf_osd_mgr_t *osd = priv->hosd[cfg->id];
+                osd->destroy(osd);
+            }
             app_face_t *hFace = APP_createFaceAlg();
             if (hFace)
                 hFace->destroy(hFace);

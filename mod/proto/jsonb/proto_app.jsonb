@@ -1,8 +1,9 @@
 JSONB_INCLUDE_HEADER(proto_base.h)
-JSONB_MACRO_DEFINE(APP_ITEM_MAX, 3)
 
 /////////////////////////////////////////////////////////////////////////////////
-
+JSONB_MACRO_DEFINE(ALG_KEY_POINT_NUM, 5)
+JSONB_MACRO_DEFINE(ALG_OBJ_NUM_MAX, 32)
+JSONB_MACRO_DEFINE(APP_ITEM_MAX, 3)
 JSONB_MACRO_DEFINE(ALG_TYPE_FR, 0)
 JSONB_MACRO_DEFINE(ALG_TYPE_OD, 1)
 
@@ -25,3 +26,14 @@ JSONB_FIELD_ARRAY(cfgs, APP_ITEM_MAX, proto_app_alg_cfg_t)
 JSONB_STRUCT_END(proto_app_alg_t)
 
 /////////////////////////////////////////////////////////////////////////////////
+JSONB_STRUCT_START(proto_app_alg_obj_t)
+JSONB_FIELD(id, int)
+JSONB_FIELD(score, int)
+JSONB_FIELD(rect, proto_rect_t)
+JSONB_FIELD_ARRAY(keypoints, ALG_KEY_POINT_NUM, proto_point_t)
+JSONB_STRUCT_END(proto_app_alg_obj_t)
+
+JSONB_STRUCT_START(proto_app_alg_result_t)
+JSONB_FIELD(num, int)
+JSONB_FIELD_ARRAY(objs, ALG_OBJ_NUM_MAX, proto_app_alg_obj_t)
+JSONB_STRUCT_END(proto_app_alg_result_t)

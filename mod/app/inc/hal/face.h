@@ -1,5 +1,6 @@
 #ifndef __HSFACE_H
 #define __HSFACE_H
+#include "proto.h"
 
 #pragma pack(1)
 

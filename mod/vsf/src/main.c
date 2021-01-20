@@ -61,9 +61,9 @@ int main()
 
     while (1) {
         infof("keep alive");
-        usleep(50);
+        sleep(1);
 
-        vsf_osd_mgr_t *osd = vsf_createOsdMgr_r();
+        /*vsf_osd_mgr_t *osd = vsf_createOsdMgr_r();
         proto_vsf_osd_tgr_t tgr = {
             .id = 4,
             .info = {
@@ -85,7 +85,7 @@ int main()
         osd->tgr(osd, &tgr);
         osd->destroy(osd);
 
-        total = (total + 1) % 80;
+        total = (total + 1) % 80;*/
     }
 
     nnm_rep_destory(rep);

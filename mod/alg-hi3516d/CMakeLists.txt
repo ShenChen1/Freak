@@ -14,5 +14,6 @@ target_link_libraries(${PROJECT_NAME}
     utils
     proto)
 include_directories(${PROJECT_SOURCE_DIR})
+include_directories(${FREAK_TOOLS_PATH}/jsonb-c/inc/)
 include_directories(${PROJECT_SOURCE_DIR}/../app/)
 add_dependencies(${PROJECT_NAME} sdk-${CMAKE_CHIP_NAME})
