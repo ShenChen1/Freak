@@ -25,7 +25,7 @@ static void ev_handler(struct mg_connection *nc, int ev, void *p)
                 hm->message.p, hm->message.len, nc, nc->user_data);
 
             struct mg_serve_http_opts opts = {};
-            opts.document_root             = "/var/www";
+            opts.document_root = "/var/www";
             mg_serve_http(nc, hm, opts);
             break;
         }

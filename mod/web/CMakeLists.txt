@@ -4,7 +4,8 @@ add_definitions(-DMODULE_NAME="${PROJECT_NAME}")
 add_executable(${PROJECT_NAME}
     src/main.c
     src/cfg.c
-    src/http.c
+    src/web/web-http.c
+    src/web/web-session.c
     src/msgbox/msgbox.c
     src/msgbox/msgbox_http.c
     src/interface/svr_mgr.c
