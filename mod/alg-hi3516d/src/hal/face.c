@@ -1,18 +1,18 @@
 #include "inc/hal/face.h"
-#include "common.h"
-#include "hi_comm_ive.h"
 #include "inc/basetype.h"
 #include "inc/nnie_face_api.h"
+#include "inc/sdk_common.h"
 #include "log.h"
 #include "media.h"
-#include "mpi_ive.h"
-#include "sample/sample_comm.h"
+#include "proto_app.h"
 #include "ufifo.h"
 
 typedef struct {
     ufifo_t *fifo_get;
     ufifo_t *fifo_free;
+    que_t *resultQue;
     pthread_t s_hMdThread;
+    pthread_t s_rsltThread;
     float threshold;
     int isLog;
     HI_BOOL s_bStopSignal;
@@ -23,12 +23,12 @@ typedef struct {
 typedef struct {
     app_face_t *objs;
 } app_face_mod_t;
-
+#define RESULT_NUM_MAX 32
 static app_face_mod_t s_mod = { 0 };
 
 extern int tracker_id(int FrameIndex, RESULT_BAG *result_bag, RESULT_BAG *result_out);
 
-int saveBMPFile(unsigned char *src, int width, int height, const char *name)
+static int saveBMPFile(unsigned char *src, int width, int height, const char *name)
 {
     BMPHeader hdr;
     BMPInfoHeader infoHdr;
@@ -89,6 +89,23 @@ int saveBMPFile(unsigned char *src, int width, int height, const char *name)
     return 0;
 }
 
+static void *hs_fd_result_task(void *args)
+{
+    app_face_priv_t *priv           = args;
+    proto_app_alg_result_t *results = NULL;
+    int ret                         = 0;
+
+    while (HI_FALSE == priv->s_bStopSignal) {
+        // block mode
+        ret = que_get(priv->resultQue, (ptr_t *)&results, 1);
+        if (!ret) {
+            priv->cb[APP_ALG_CB_RESULT_OUT].func((void *)results, priv->cb[APP_ALG_CB_RESULT_OUT].args);
+            free(results);
+        }
+    }
+    return 0;
+}
+
 static void *hs_fd_task(void *args)
 {
     IVE_CSC_CTRL_S stCscCtrl;
@@ -96,17 +113,20 @@ static void *hs_fd_task(void *args)
     IVE_SRC_IMAGE_S stSrcData;
     IVE_HANDLE hIveHandle;
 
-    int i, framecnt, Size0, Size1, u32Size = 0;
-    HI_S32 s32Ret         = 0;
-    HI_BOOL bInstant      = HI_TRUE;
-    app_face_priv_t *priv = (app_face_priv_t *)args;
-    video_frame_t *frame  = (video_frame_t *)priv->data;
+    int i;
+    int framecnt = 0;
+    int Size0    = 0;
+    int Size1    = 0;
+    int u32Size  = 0;
+
+    HI_S32 s32Ret                   = 0;
+    HI_BOOL bInstant                = HI_TRUE;
+    proto_app_alg_result_t *results = NULL;
+    app_face_priv_t *priv           = args;
+    video_frame_t *frame            = (void *)priv->data;
     HI_U64 alg_phy_addr;
     HI_U64 alg_vir_addr;
 
-    framecnt = 0;
-    Size0    = 0;
-    Size1    = 0;
     while (HI_FALSE == priv->s_bStopSignal) {
 
         if (priv->cb[APP_ALG_CB_FRAME_GET].func) {
@@ -134,7 +154,6 @@ static void *hs_fd_task(void *args)
 
         alg_vir_addr = (HI_U64)(size_t)pVirAddr0;
         alg_phy_addr = frame->u64PhyAddr[0];
-
         if (0 == framecnt) {
             s32Ret = HI_MPI_SYS_MmzAlloc_Cached(&stDstData.au64PhyAddr[0],
                                                 (HI_VOID **)&stDstData.au64VirAddr[0],
@@ -143,16 +162,12 @@ static void *hs_fd_task(void *args)
                                                 Size0 * 3); // 640*640×3
             if (HI_SUCCESS != s32Ret) {
                 HI_MPI_SYS_MmzFree(stSrcData.au64PhyAddr[0], (HI_VOID *)(size_t)stSrcData.au64VirAddr[0]);
-                printf("HI_MPI_SYS_MmzAlloc_Cached Failed!");
+                infof("HI_MPI_SYS_MmzAlloc_Cached Failed!");
                 return NULL;
             }
         }
 
-        // struct timespec ts1, ts2;
-        // clock_gettime(CLOCK_MONOTONIC, &ts1);
-
         if (VIDEO_FRAME_FORMAT_YUV420SP_VU == frame->enPixelFormat) {
-
             stCscCtrl.enMode         = IVE_CSC_MODE_VIDEO_BT601_YUV2RGB;
             stSrcData.enType         = IVE_IMAGE_TYPE_YUV420SP;
             stSrcData.au64PhyAddr[0] = frame->u64PhyAddr[0];      // 0
@@ -185,9 +200,7 @@ static void *hs_fd_task(void *args)
             stDstData.au64PhyAddr[2] = stDstData.au64PhyAddr[0] + u32Size * 2;
             stDstData.au64VirAddr[1] = stDstData.au64VirAddr[0] + u32Size;
             stDstData.au64VirAddr[2] = stDstData.au64VirAddr[0] + u32Size * 2;
-
-            s32Ret = HI_MPI_IVE_CSC(&hIveHandle, &stSrcData, &stDstData, &stCscCtrl, bInstant);
-
+            s32Ret                   = HI_MPI_IVE_CSC(&hIveHandle, &stSrcData, &stDstData, &stCscCtrl, bInstant);
             if (HI_SUCCESS != s32Ret) {
                 printf("s32Ret:%d \n", s32Ret);
                 return NULL;
@@ -205,10 +218,6 @@ static void *hs_fd_task(void *args)
         NNIE_FD_RESULT result;
         memset(&result, 0, sizeof(NNIE_FD_RESULT));
         NNIE_FACE_DETECTOR_GET_NEW(&frame_alg, &result);
-        // clock_gettime(CLOCK_MONOTONIC, &ts2);
-
-        /*printf(" cost:%ld ms\n"
-            , (ts2.tv_sec*1000 + ts2.tv_nsec/1000000) - (ts1.tv_sec*1000 + ts1.tv_nsec/1000000));*/
 
         RESULT_BAG result_bag;
         RESULT_BAG result_out;
@@ -216,19 +225,6 @@ static void *hs_fd_task(void *args)
         memset(&result_out, 0, sizeof(RESULT_BAG));
 
         for (i = 0; i < result.fd_num; i++) {
-            printf("result rect: %d, %f, %f, %f, %f\n",
-                   i,
-                   result.fd[i].ul.x,
-                   result.fd[i].ul.y,
-                   result.fd[i].lr.x,
-                   result.fd[i].lr.y);
-            // key point
-            printf("result lds:  %f, %f\n", result.fd[i].keyPoint[0].x, result.fd[i].keyPoint[0].y);
-            printf("result lds:  %f, %f\n", result.fd[i].keyPoint[1].x, result.fd[i].keyPoint[1].y);
-            printf("result lds:  %f, %f\n", result.fd[i].keyPoint[2].x, result.fd[i].keyPoint[2].y);
-            printf("result lds:  %f, %f\n", result.fd[i].keyPoint[3].x, result.fd[i].keyPoint[3].y);
-            printf("result lds:  %f, %f\n", result.fd[i].keyPoint[4].x, result.fd[i].keyPoint[4].y);
-            /*\B4\A5\B1ߴ\A6\C0\ED*/
             result.fd[i].ul.x = result.fd[i].ul.x < 0 ? 0 : result.fd[i].ul.x;
             result.fd[i].ul.y = result.fd[i].ul.y < 0 ? 0 : result.fd[i].ul.y;
             result.fd[i].lr.x = result.fd[i].lr.x > 640 ? 640 : result.fd[i].lr.x;
@@ -244,19 +240,27 @@ static void *hs_fd_task(void *args)
         if (result_bag.obj_num > 0) {
             framecnt++;
         }
-        /* \B8\FA\D7\D9һ\B6\A8Ҫÿ֡\B5\F7\D3\C3 */
+
         tracker_id(framecnt, &result_bag, &result_out);
-        // printf("RESULT num %d\n", result_out.obj_num);
 
-        /*if(result_bag.obj_num > 0)
-        {
-
-                for(i = 0; i < result_out.obj_num; i++)
-                {
-                  printf("RESULT rect: %d, %d, %d, %d, %d\n", result_out.obj[i].ID
-        ,result_out.obj[i].width,result_out.obj[i].heigth,result_out.obj[i].centerx,result_out.obj[i].centery);
-                }
-        }*/
+        if (priv->cb[APP_ALG_CB_RESULT_OUT].func) {
+            results      = malloc(sizeof(proto_app_alg_result_t));
+            results->num = result_bag.obj_num;
+            for (i = 0; i < result_out.obj_num; i++) {
+                results->objs[i].id     = result_out.obj[i].ID;
+                results->objs[i].rect.x = result_out.obj[i].centerx - result_out.obj[i].width / 2;
+                results->objs[i].rect.y = result_out.obj[i].centery - result_out.obj[i].heigth / 2;
+                results->objs[i].rect.w = result_out.obj[i].width;
+                results->objs[i].rect.h = result_out.obj[i].heigth;
+                // to do keypoint
+                results->objs[i].rect.x = results->objs[i].rect.x * 8192 / 640;
+                results->objs[i].rect.y = results->objs[i].rect.y * 8192 / 640;
+                results->objs[i].rect.w = results->objs[i].rect.w * 8192 / 640;
+                results->objs[i].rect.h = results->objs[i].rect.h * 8192 / 640;
+            }
+            // no block
+            que_put(priv->resultQue, results, 0);
+        }
 
         HI_MPI_SYS_Munmap(pVirAddr0, Size0);
         HI_MPI_SYS_Munmap(pVirAddr0, Size1);
@@ -265,6 +269,7 @@ static void *hs_fd_task(void *args)
             s32Ret = priv->cb[APP_ALG_CB_FRAME_FREE].func(frame, priv->cb[APP_ALG_CB_FRAME_FREE].args);
         }
     }
+
     HI_MPI_SYS_MmzFree(stDstData.au64PhyAddr[0], (HI_VOID *)(size_t)stDstData.au64VirAddr[0]);
     return 0;
 }
@@ -281,7 +286,10 @@ static int __hs_fd_init(app_face_t *self, char *path)
 
     char *pcModelName = "/userdata/data/nnie_model/face/mnet_640_inst.wk";
     NNIE_FACE_DETECTOR_INIT(pcModelName, priv->threshold, priv->isLog);
+    que_create(RESULT_NUM_MAX, &priv->resultQue);
+
     pthread_create(&priv->s_hMdThread, NULL, hs_fd_task, (void *)priv);
+    pthread_create(&priv->s_rsltThread, NULL, hs_fd_result_task, (void *)priv);
     return 0;
 }
 
@@ -316,7 +324,9 @@ static int __hs_fd_destroy(app_face_t *self)
 
     priv->s_bStopSignal = HI_TRUE;
     pthread_join(priv->s_hMdThread, NULL);
+    pthread_join(priv->s_rsltThread, NULL);
     NNIE_FACE_DETECTOR_RELEASE();
+    que_delete(priv->resultQue);
     return 0;
 }
 
