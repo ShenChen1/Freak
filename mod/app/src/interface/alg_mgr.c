@@ -11,7 +11,7 @@
 #include "vsf/osd_mgr.h"
 
 typedef struct {
-    ufifo_t *fifo[APP_ITEM_MAX][APP_ALG_CB_MAX];
+    ufifo_t *fifo[APP_ITEM_MAX];
     void *hosd[APP_ITEM_MAX];
     proto_app_alg_t *info;
 } app_alg_mgr_priv_t;
@@ -136,16 +136,6 @@ static int __app_alg_get_frame(void *data, void *args)
     return ufifo_get_block(priv->fifo[cfg->id][APP_ALG_CB_FRAME_GET], data, totalsize) != totalsize;
 }
 
-static int __app_alg_free_frame(void *data, void *args)
-{
-    video_frame_t *frame     = data;
-    size_t totalsize         = sizeof(media_record_t) + sizeof(video_frame_t);
-    app_alg_mgr_priv_t *priv = s_mgr->priv;
-    proto_app_alg_cfg_t *cfg = args;
-
-    return ufifo_put(priv->fifo[cfg->id][APP_ALG_CB_FRAME_FREE], frame, totalsize) != totalsize;
-}
-
 static int __app_alg_result(void *data, void *args)
 {
     // proto_app_alg_cfg_t *cfg = args;
@@ -208,13 +198,10 @@ static int __app_alg_set(app_alg_mgr_t *self, proto_app_alg_cfg_t *cfg)
                         .lock = UFIFO_LOCK_NONE,
                         .opt  = UFIFO_OPT_ATTACH,
                         .attach = { .shared = 0, },
-                        .hook = { recsize, rectag, recput, recget },
+                        .hook = { recsize, rectag, NULL, recget },
                 };
-                snprintf(name, sizeof(name), PROTO_VSF_FRAME_WORK_FIFO "%d-%d", 0, 2); // chn0-2 for a wihle,
-                ufifo_open(name, &init, &priv->fifo[cfg->id][APP_ALG_CB_FRAME_GET]);
-
-                snprintf(name, sizeof(name), PROTO_VSF_FRAME_FREE_FIFO "%d-%d", 0, 2);
-                ufifo_open(name, &init, &priv->fifo[cfg->id][APP_ALG_CB_FRAME_FREE]);
+                snprintf(name, sizeof(name), PROTO_VSF_FRAME_FIFO "%d-%d", 0, 2); // chn0-2 for a wihle,
+                ufifo_open(name, &init, &priv->fifo[cfg->id]);
 
                 vsf_osd_mgr_t *osd  = vsf_createOsdMgr();
                 priv->hosd[cfg->id] = osd;
@@ -222,8 +209,6 @@ static int __app_alg_set(app_alg_mgr_t *self, proto_app_alg_cfg_t *cfg)
                 app_alg_cb_t cb[APP_ALG_CB_MAX] = {};
                 cb[APP_ALG_CB_FRAME_GET].args   = &priv->info->cfgs[cfg->id];
                 cb[APP_ALG_CB_FRAME_GET].func   = __app_alg_get_frame;
-                cb[APP_ALG_CB_FRAME_FREE].args  = &priv->info->cfgs[cfg->id];
-                cb[APP_ALG_CB_FRAME_FREE].func  = __app_alg_free_frame;
                 cb[APP_ALG_CB_RESULT_OUT].args  = priv->hosd[cfg->id];
                 cb[APP_ALG_CB_RESULT_OUT].func  = __app_alg_result;
 
@@ -236,12 +221,8 @@ static int __app_alg_set(app_alg_mgr_t *self, proto_app_alg_cfg_t *cfg)
                 }
             } else {
                 if (priv->fifo[cfg->id][APP_ALG_CB_FRAME_GET]) {
-                    ufifo_close(priv->fifo[cfg->id][APP_ALG_CB_FRAME_GET]);
+                    ufifo_close(priv->fifo[cfg->id]);
                     priv->fifo[cfg->id][APP_ALG_CB_FRAME_GET] = NULL;
-                }
-                if (priv->fifo[cfg->id][APP_ALG_CB_FRAME_FREE]) {
-                    ufifo_close(priv->fifo[cfg->id][APP_ALG_CB_FRAME_FREE]);
-                    priv->fifo[cfg->id][APP_ALG_CB_FRAME_FREE] = NULL;
                 }
                 if (priv->hosd[cfg->id]) {
                     vsf_osd_mgr_t *osd = priv->hosd[cfg->id];

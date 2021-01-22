@@ -6,8 +6,8 @@
 
 typedef struct {
     int chn;
-    vsf_frame_cb_t cb[VSF_FRAME_CB_MAX];
-    pthread_t thread[VSF_FRAME_CB_MAX];
+    vsf_frame_cb_t cb;
+    pthread_t thread;
     void *group;
 } vsf_vpss_chn_t;
 
@@ -67,66 +67,28 @@ static void *__vpss_get_chn_frame_proc(void *p)
     vsf_vpss_priv_t *priv = chn->group;
 
     while (1) {
-        VIDEO_FRAME_INFO_S *pstVideoFrame = calloc(1, sizeof(VIDEO_FRAME_INFO_S));
-        if (pstVideoFrame == NULL) {
-            warnf("alloc mem failed");
-            continue;
-        }
-        s32Ret = HI_MPI_VPSS_GetChnFrame(priv->info->VpssGrp, chn->chn, pstVideoFrame, 1000);
+        VIDEO_FRAME_INFO_S stVideoFrame = {};
+
+        s32Ret = HI_MPI_VPSS_GetChnFrame(priv->info->VpssGrp, chn->chn, &stVideoFrame, 1000);
         if (HI_SUCCESS != s32Ret) {
             errorf("HI_MPI_VPSS_GetChnFrame %d-%d err:0x%x\n", priv->info->VpssGrp, chn->chn, s32Ret);
-            goto end;
+            continue;
         }
 
-        tracef("proc frame %d-%d: %u %u!", priv->info->VpssGrp, chn->chn, pstVideoFrame->stVFrame.u32Width, pstVideoFrame->stVFrame.u32Height);
-        if (chn->cb[VSF_FRAME_CB_GET].func) {
+        tracef("proc frame %d-%d: %u %u!", priv->info->VpssGrp, chn->chn, stVideoFrame.stVFrame.u32Width, stVideoFrame.stVFrame.u32Height);
+        if (chn->cb.func) {
             video_frame_t frame;
-            __transfor_frame_info(&pstVideoFrame->stVFrame, &frame, pstVideoFrame);
+            __transfor_frame_info(&stVideoFrame.stVFrame, &frame, &stVideoFrame);
             tracef("frame:%u", frame.u32TimeRef);
-            s32Ret = chn->cb[VSF_FRAME_CB_GET].func(&frame, chn->cb[VSF_FRAME_CB_GET].args);
+            s32Ret = chn->cb.func(&frame, chn->cb.args);
             if (HI_SUCCESS != s32Ret) {
                 errorf("proc frame %d-%d failed!", priv->info->VpssGrp, chn->chn);
-            } else {
-                continue;
             }
         }
 
-        s32Ret = HI_MPI_VPSS_ReleaseChnFrame(priv->info->VpssGrp, chn->chn, pstVideoFrame);
+        s32Ret = HI_MPI_VPSS_ReleaseChnFrame(priv->info->VpssGrp, chn->chn, &stVideoFrame);
         if (HI_SUCCESS != s32Ret) {
             errorf("HI_MPI_VPSS_ReleaseChnFrame %d-%d err:0x%x\n", priv->info->VpssGrp, chn->chn, s32Ret);
-        }
-
-    end:
-        free(pstVideoFrame);
-    }
-
-    return NULL;
-}
-
-static void *__vpss_free_chn_frame_proc(void *p)
-{
-    HI_S32 s32Ret;
-    vsf_vpss_chn_t *chn   = p;
-    vsf_vpss_priv_t *priv = chn->group;
-
-    while (1) {
-        if (chn->cb[VSF_FRAME_CB_FREE].func) {
-            video_frame_t frame;
-            s32Ret = chn->cb[VSF_FRAME_CB_FREE].func(&frame, chn->cb[VSF_FRAME_CB_FREE].args);
-            if (HI_SUCCESS != s32Ret) {
-                errorf("proc frame %d-%d failed!", priv->info->VpssGrp, chn->chn);
-                continue;
-            }
-
-            tracef("frame:%u", frame.u32TimeRef);
-            VIDEO_FRAME_INFO_S *pstVideoFrame = (void *)(size_t)frame.u64PrivateData;
-            s32Ret = HI_MPI_VPSS_ReleaseChnFrame(priv->info->VpssGrp, chn->chn, pstVideoFrame);
-            if (HI_SUCCESS != s32Ret) {
-                errorf("HI_MPI_VPSS_ReleaseChnFrame %d-%d err:0x%x\n", priv->info->VpssGrp, chn->chn, s32Ret);
-            }
-            free(pstVideoFrame);
-        } else {
-            usleep(1000 * 1000);
         }
     }
 
@@ -213,9 +175,8 @@ static int __vpss_init(vsf_vpss_t *self)
     }
 
     for (i = 0; i < VPSS_MAX_PHY_CHN_NUM; i++) {
-        pthread_create(&priv->chn[i].thread[VSF_FRAME_CB_GET], NULL, __vpss_get_chn_frame_proc, &priv->chn[i]);
-        pthread_create(&priv->chn[i].thread[VSF_FRAME_CB_FREE], NULL, __vpss_free_chn_frame_proc, &priv->chn[i]);
-    }
+        pthread_create(&priv->chn[i].thread, NULL, __vpss_get_chn_frame_proc, &priv->chn[i]);
+     }
 
     return s32Ret;
 }
@@ -284,15 +245,11 @@ static int __vpss_regcallback(vsf_vpss_t *self, int id, vsf_frame_cb_t *cb)
     vsf_vpss_priv_t *priv = obj->priv;
 
     if (cb == NULL) {
-        priv->chn[id].cb[VSF_FRAME_CB_GET].args  = NULL;
-        priv->chn[id].cb[VSF_FRAME_CB_GET].func  = NULL;
-        priv->chn[id].cb[VSF_FRAME_CB_FREE].args = NULL;
-        priv->chn[id].cb[VSF_FRAME_CB_FREE].func = NULL;
+        priv->chn[id].cb.args  = NULL;
+        priv->chn[id].cb.func  = NULL;
     } else {
-        priv->chn[id].cb[VSF_FRAME_CB_GET].args  = cb[VSF_FRAME_CB_GET].args;
-        priv->chn[id].cb[VSF_FRAME_CB_GET].func  = cb[VSF_FRAME_CB_GET].func;
-        priv->chn[id].cb[VSF_FRAME_CB_FREE].args = cb[VSF_FRAME_CB_FREE].args;
-        priv->chn[id].cb[VSF_FRAME_CB_FREE].func = cb[VSF_FRAME_CB_FREE].func;
+        priv->chn[id].cb.args  = cb->args;
+        priv->chn[id].cb.func  = cb->func;
     }
 
     return 0;

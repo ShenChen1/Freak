@@ -9,7 +9,6 @@
 #define PROTO_APP_CFG_PATH "/tmp/app-config.json"
 
 #define PROTO_VSF_STREAM_FIFO "vsf-stream-"
-#define PROTO_VSF_FRAME_WORK_FIFO "vsf-frame-work-"
-#define PROTO_VSF_FRAME_FREE_FIFO "vsf-frame-free-"
+#define PROTO_VSF_FRAME_FIFO "vsf-frame-"
 
 #endif /* __PATH_H__ */

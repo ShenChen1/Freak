@@ -36,7 +36,6 @@ typedef struct {
 
 typedef enum {
     APP_ALG_CB_FRAME_GET,
-    APP_ALG_CB_FRAME_FREE,
     APP_ALG_CB_RESULT_OUT,
     APP_ALG_CB_MAX,
 } app_alg_cb_e;

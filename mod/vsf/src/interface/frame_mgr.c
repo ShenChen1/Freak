@@ -10,7 +10,7 @@
 #include "ufifo.h"
 
 typedef struct {
-    ufifo_t *fifo[VSF_FRAME_MAX][VSF_FRAME_CB_MAX];
+    ufifo_t *fifo[VSF_FRAME_MAX];
     proto_vsf_frame_t *info;
 } vsf_frame_mgr_priv_t;
 
@@ -57,9 +57,9 @@ static unsigned int rectag(unsigned char *p1, unsigned int n1, unsigned char *p2
 
 static unsigned int recput(unsigned char *p1, unsigned int n1, unsigned char *p2, void *arg)
 {
-    size_t totalsize     = sizeof(media_record_t) + sizeof(video_frame_t);
-    media_record_t rec   = {};
     video_frame_t *frame = arg;
+    size_t totalsize     = sizeof(media_record_t) + sizeof(video_frame_t) + (frame->u64ExtVirAddr[0] - frame->u64HeaderVirAddr[0]);
+    media_record_t rec   = {};
     unsigned int a = 0, l = 0, _n1 = n1;
     unsigned char *p = NULL, *_p1 = p1, *_p2 = p2;
 
@@ -79,7 +79,7 @@ static unsigned int recput(unsigned char *p1, unsigned int n1, unsigned char *p2
     _p1 += l;
     _p2 += a - l;
 
-    // copy data
+    // copy info
     p = (unsigned char *)(frame);
     a = sizeof(video_frame_t);
     l = min(a, _n1);
@@ -89,42 +89,21 @@ static unsigned int recput(unsigned char *p1, unsigned int n1, unsigned char *p2
     _p1 += l;
     _p2 += a - l;
 
+    // copy data
+    uint32_t uSize = frame->u64ExtVirAddr[0] - frame->u64HeaderVirAddr[0];
+    uint8_t *pMap = physmap(frame->u64PhyAddr[0], uSize);
+    p = pMap;
+    a = uSize;
+    l = min(a, _n1);
+    memcpy(_p1, p, l);
+    memcpy(_p2, p + l, a - l);
+    _n1 -= l;
+    _p1 += l;
+    _p2 += a - l;
+    physunmap(pMap, uSize);
+
     tracef("frame:%u", frame->u32TimeRef);
     return totalsize;
-}
-
-static unsigned int recget(unsigned char *p1, unsigned int n1, unsigned char *p2, void *arg)
-{
-    media_record_t *rec  = arg;
-    video_frame_t *frame = arg;
-    unsigned int a = 0, l = 0, _n1 = n1;
-    unsigned char *p = NULL, *_p1 = p1, *_p2 = p2;
-
-    // copy header
-    p = (unsigned char *)(rec);
-    a = sizeof(media_record_t);
-    l = min(a, _n1);
-    memcpy(p, _p1, l);
-    memcpy(p + _n1, _p2, a - l);
-    _n1 -= l;
-    _p1 += l;
-    _p2 += a - l;
-
-    // check header
-    assert(rec->tag >= (0xdeadbeef << 8));
-
-    // copy data
-    p = (unsigned char *)(frame);
-    a = sizeof(video_frame_t);
-    l = min(a, _n1);
-    memcpy(p, _p1, l);
-    memcpy(p + l, _p2, a - l);
-    _n1 -= l;
-    _p1 += l;
-    _p2 += a - l;
-
-    tracef("frame:%u", frame->u32TimeRef);
-    return sizeof(media_record_t) + sizeof(video_frame_t);
 }
 
 #ifdef DEBUG
@@ -228,7 +207,7 @@ static void __vsf_frame_SaveYUVFile(FILE *pfd, video_frame_t *pVBuf)
 static int __vsf_get_frame_proc(void *data, void *args)
 {
     video_frame_t *frame       = data;
-    size_t totalsize           = sizeof(media_record_t) + sizeof(video_frame_t);
+    size_t totalsize           = sizeof(media_record_t) + sizeof(video_frame_t) + (frame->u64ExtVirAddr[0] - frame->u64HeaderVirAddr[0]);
     vsf_frame_mgr_priv_t *priv = s_mgr->priv;
     proto_vsf_frame_cfg_t *cfg = args;
 
@@ -254,19 +233,8 @@ static int __vsf_get_frame_proc(void *data, void *args)
     __vsf_frame_SaveYUVFile(pFile, frame);
     fclose(pFile);
 #endif
-    int sleeptime = (1000/cfg->fps) - 33;
-    usleep(sleeptime > 0 ? sleeptime : 1);
-    return ufifo_put(priv->fifo[cfg->id][VSF_FRAME_CB_GET], frame, totalsize) != totalsize;
-}
 
-static int __vsf_free_frame_proc(void *data, void *args)
-{
-    video_frame_t *frame       = data;
-    size_t totalsize           = sizeof(media_record_t) + sizeof(video_frame_t);
-    vsf_frame_mgr_priv_t *priv = s_mgr->priv;
-    proto_vsf_frame_cfg_t *cfg = args;
-
-    return ufifo_get_block(priv->fifo[cfg->id][VSF_FRAME_CB_FREE], frame, totalsize) != totalsize;
+    return ufifo_put(priv->fifo[cfg->id], frame, totalsize) != totalsize;
 }
 
 static int __vsf_frame_destroy(vsf_frame_mgr_t *self)
@@ -286,38 +254,24 @@ static int __vsf_frame_set(vsf_frame_mgr_t *self, proto_vsf_frame_cfg_t *cfg)
         ufifo_init_t init = {
             .lock  = UFIFO_LOCK_NONE,
             .opt   = UFIFO_OPT_ALLOC,
-            .alloc = { cfg->width * cfg->height * cfg->fps + 1024 },
-            .hook  = { recsize, rectag, recput, recget },
+            .alloc = { 3 * cfg->width * cfg->height * cfg->fps * 2 + 1024 },
+            .hook  = { recsize, rectag, recput },
         };
 
-        if (!priv->fifo[cfg->id][VSF_FRAME_CB_GET]) {
+        if (!priv->fifo[cfg->id]) {
             snprintf(name,
                      sizeof(name),
-                     PROTO_VSF_FRAME_WORK_FIFO "%d-%d",
+                     PROTO_VSF_FRAME_FIFO "%d-%d",
                      priv->info->caps[cfg->id].chn,
                      priv->info->caps[cfg->id].subchn);
-            ret = ufifo_open(name, &init, &priv->fifo[cfg->id][VSF_FRAME_CB_GET]);
+            ret = ufifo_open(name, &init, &priv->fifo[cfg->id]);
             assert(!ret);
-            assert(priv->fifo[cfg->id][VSF_FRAME_CB_GET]);
-        }
-        if (!priv->fifo[cfg->id][VSF_FRAME_CB_FREE]) {
-            snprintf(name,
-                     sizeof(name),
-                     PROTO_VSF_FRAME_FREE_FIFO "%d-%d",
-                     priv->info->caps[cfg->id].chn,
-                     priv->info->caps[cfg->id].subchn);
-            ret = ufifo_open(name, &init, &priv->fifo[cfg->id][VSF_FRAME_CB_FREE]);
-            assert(!ret);
-            assert(priv->fifo[cfg->id][VSF_FRAME_CB_FREE]);
+            assert(priv->fifo[cfg->id]);
         }
     } else {
-        if (priv->fifo[cfg->id][VSF_FRAME_CB_GET]) {
-            ufifo_close(priv->fifo[cfg->id][VSF_FRAME_CB_GET]);
-            priv->fifo[cfg->id][VSF_FRAME_CB_GET] = NULL;
-        }
-        if (priv->fifo[cfg->id][VSF_FRAME_CB_FREE]) {
-            ufifo_close(priv->fifo[cfg->id][VSF_FRAME_CB_FREE]);
-            priv->fifo[cfg->id][VSF_FRAME_CB_FREE] = NULL;
+        if (priv->fifo[cfg->id]) {
+            ufifo_close(priv->fifo[cfg->id]);
+            priv->fifo[cfg->id] = NULL;
         }
     }
 
@@ -332,16 +286,14 @@ static int __vsf_frame_set(vsf_frame_mgr_t *self, proto_vsf_frame_cfg_t *cfg)
         vpss->ctrl(vpss, priv->info->caps[cfg->id].subchn, &_cfg);
     }
 
-    vsf_frame_cb_t cb[VSF_FRAME_CB_MAX] = {};
+    vsf_frame_cb_t cb = {};
     if (cfg->enable) {
-        cb[VSF_FRAME_CB_GET].args  = &priv->info->cfgs[cfg->id];
-        cb[VSF_FRAME_CB_GET].func  = __vsf_get_frame_proc;
-        cb[VSF_FRAME_CB_FREE].args = &priv->info->cfgs[cfg->id];
-        cb[VSF_FRAME_CB_FREE].func = __vsf_free_frame_proc;
+        cb.args  = &priv->info->cfgs[cfg->id];
+        cb.func  = __vsf_get_frame_proc;
     }
 
     if (vpss && vpss->regcallback) {
-        vpss->regcallback(vpss, priv->info->caps[cfg->id].subchn, cb);
+        vpss->regcallback(vpss, priv->info->caps[cfg->id].subchn, &cb);
     }
 
     return 0;

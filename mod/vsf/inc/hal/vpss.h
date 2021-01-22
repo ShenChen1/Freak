@@ -8,12 +8,6 @@ typedef struct {
     vsf_frame_proc_t func;
 } vsf_frame_cb_t;
 
-typedef enum {
-    VSF_FRAME_CB_GET,
-    VSF_FRAME_CB_FREE,
-    VSF_FRAME_CB_MAX,
-} vsf_frame_cb_e;
-
 typedef struct {
     int format;
     int width;
@@ -26,7 +20,7 @@ typedef struct vpss {
     int (*destroy)(struct vpss *self);
 
     int (*ctrl)(struct vpss *self, int id, vsf_frame_cfg_t *cfg);
-    int (*regcallback)(struct vpss *self, int id, vsf_frame_cb_t cb[VSF_FRAME_CB_MAX]);
+    int (*regcallback)(struct vpss *self, int id, vsf_frame_cb_t *cb);
 } vsf_vpss_t;
 
 vsf_vpss_t *VSF_createVpss(int id);
