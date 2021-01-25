@@ -32,7 +32,6 @@ static void *hs_fd_result_task(void *args)
 {
     app_face_priv_t *priv           = args;
     proto_app_alg_result_t *results = NULL;
-    int ret                         = 0;
 
     while (HI_FALSE == priv->s_bStopSignal) {
         // block mode
@@ -269,9 +268,8 @@ app_face_t *APP_createFaceAlg(void)
     priv->s_bStopSignal = HI_TRUE;
 
     obj = malloc(sizeof(app_face_t));
-    if (obj == NULL) {
-        return NULL;
-    }
+    assert(obj);
+    memset(obj, 0, sizeof(app_face_t));
 
     obj->priv        = priv;
     obj->init        = __hs_fd_init;
