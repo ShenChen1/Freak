@@ -11,8 +11,14 @@
 #include "vsf/osd_mgr.h"
 
 typedef struct {
-    ufifo_t *fifo[APP_ITEM_MAX];
-    void *hosd[APP_ITEM_MAX];
+    void *data;
+    size_t size;
+} buf_t;
+
+typedef struct {
+    ufifo_t *fifos[APP_ITEM_MAX];
+    void *osds[APP_ITEM_MAX];
+    buf_t bufs[APP_ITEM_MAX];
     proto_app_alg_t *info;
 } app_alg_mgr_priv_t;
 
@@ -55,48 +61,9 @@ static unsigned int rectag(unsigned char *p1, unsigned int n1, unsigned char *p2
     return tag;
 }
 
-static unsigned int recput(unsigned char *p1, unsigned int n1, unsigned char *p2, void *arg)
-{
-    size_t totalsize     = sizeof(media_record_t) + sizeof(video_frame_t);
-    media_record_t rec   = {};
-    video_frame_t *frame = arg;
-    unsigned int a = 0, l = 0, _n1 = n1;
-    unsigned char *p = NULL, *_p1 = p1, *_p2 = p2;
-
-    rec.size = totalsize;
-    rec.tag  = (0xdeadbeef << 8 | 1);
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-    rec.ts = ts.tv_sec * 1000 + ts.tv_nsec / 1000000;
-
-    // copy header
-    p = (unsigned char *)(&rec);
-    a = sizeof(media_record_t);
-    l = min(a, _n1);
-    memcpy(_p1, p, l);
-    memcpy(_p2, p + l, a - l);
-    _n1 -= l;
-    _p1 += l;
-    _p2 += a - l;
-
-    // copy data
-    p = (unsigned char *)(frame);
-    a = sizeof(video_frame_t);
-    l = min(a, _n1);
-    memcpy(_p1, p, l);
-    memcpy(_p2, p + l, a - l);
-    _n1 -= l;
-    _p1 += l;
-    _p2 += a - l;
-
-    tracef("frame:%u", frame->u32TimeRef);
-    return totalsize;
-}
-
 static unsigned int recget(unsigned char *p1, unsigned int n1, unsigned char *p2, void *arg)
 {
     media_record_t *rec  = arg;
-    video_frame_t *frame = arg;
     unsigned int a = 0, l = 0, _n1 = n1;
     unsigned char *p = NULL, *_p1 = p1, *_p2 = p2;
 
@@ -114,8 +81,8 @@ static unsigned int recget(unsigned char *p1, unsigned int n1, unsigned char *p2
     assert(rec->tag >= (0xdeadbeef << 8));
 
     // copy data
-    p = (unsigned char *)(frame);
-    a = sizeof(video_frame_t);
+    p = (unsigned char *)(rec->buf);
+    a = rec->size - sizeof(media_record_t);
     l = min(a, _n1);
     memcpy(p, _p1, l);
     memcpy(p + l, _p2, a - l);
@@ -123,17 +90,27 @@ static unsigned int recget(unsigned char *p1, unsigned int n1, unsigned char *p2
     _p1 += l;
     _p2 += a - l;
 
-    tracef("frame:%u", frame->u32TimeRef);
-    return sizeof(media_record_t) + sizeof(video_frame_t);
+    return rec->size;
 }
 
 static int __app_alg_get_frame(void *data, void *args)
 {
-    size_t totalsize         = sizeof(media_record_t) + sizeof(video_frame_t);
+    int ret;
     app_alg_mgr_priv_t *priv = s_mgr->priv;
     proto_app_alg_cfg_t *cfg = args;
+    media_record_t *rec = (media_record_t *)priv->bufs[cfg->id].data;
 
-    return ufifo_get_block(priv->fifo[cfg->id][APP_ALG_CB_FRAME_GET], data, totalsize) != totalsize;
+    ret = ufifo_get_block(priv->fifos[cfg->id], priv->bufs[cfg->id].data, priv->bufs[cfg->id].size);
+    assert(ret > 0 && ret <= priv->bufs[cfg->id].size);
+
+    void **_data = (void **)data;
+    *_data = (void *)rec->buf;
+    return 0;
+}
+
+static int __app_alg_free_frame(void *data, void *args)
+{
+    return 0;
 }
 
 static int __app_alg_result(void *data, void *args)
@@ -179,37 +156,42 @@ static int __app_alg_set(app_alg_mgr_t *self, proto_app_alg_cfg_t *cfg)
     switch (cfg->type) {
         case ALG_TYPE_FR: {
             if (cfg->enable) {
-                // send msg2vsf
-                vsf_frame_mgr_t *frame_mgr     = vsf_createFrameMgr_r();
-                proto_vsf_frame_cfg_t cfg_send = { .id = 1 };
-                frame_mgr->get(frame_mgr, &cfg_send);
-                cfg_send.id     = 1;
-                cfg_send.enable = 1;
-                cfg_send.format = VIDEO_FRAME_FORMAT_YUV420P_YVU;
-                cfg_send.width  = 640;
-                cfg_send.height = 640;
-                cfg_send.fps    = 15;
-
-                frame_mgr->set(frame_mgr, &cfg_send);
+                vsf_frame_mgr_t *frame_mgr      = vsf_createFrameMgr_r();
+                proto_vsf_frame_cap_t frame_cap = { .id = priv->info->caps[cfg->id].frame };
+                frame_mgr->cap(frame_mgr, &frame_cap);
+                proto_vsf_frame_cfg_t frame_cfg = { .id = priv->info->caps[cfg->id].frame };
+                frame_mgr->get(frame_mgr, &frame_cfg);
+                frame_cfg.enable = 1;
+                frame_cfg.format = VIDEO_FRAME_FORMAT_YUV420P_YVU;
+                frame_cfg.width  = 640;
+                frame_cfg.height = 640;
+                frame_cfg.fps    = 15;
+                frame_mgr->set(frame_mgr, &frame_cfg);
                 frame_mgr->destroy(frame_mgr);
 
                 char name[64];
                 ufifo_init_t init = {
-                        .lock = UFIFO_LOCK_NONE,
-                        .opt  = UFIFO_OPT_ATTACH,
-                        .attach = { .shared = 0, },
-                        .hook = { recsize, rectag, NULL, recget },
+                            .lock = UFIFO_LOCK_NONE,
+                            .opt  = UFIFO_OPT_ATTACH,
+                            .attach = { .shared = 0, },
+                            .hook = { recsize, rectag, NULL, recget },
                 };
-                snprintf(name, sizeof(name), PROTO_VSF_FRAME_FIFO "%d-%d", 0, 2); // chn0-2 for a wihle,
-                ufifo_open(name, &init, &priv->fifo[cfg->id]);
+                snprintf(name, sizeof(name), PROTO_VSF_FRAME_FIFO "%d-%d", frame_cap.chn, frame_cap.subchn);
+                ufifo_open(name, &init, &priv->fifos[cfg->id]);
+                ufifo_newest(priv->fifos[cfg->id], (0xdeadbeef << 8) | 1);
 
-                vsf_osd_mgr_t *osd  = vsf_createOsdMgr();
-                priv->hosd[cfg->id] = osd;
+                vsf_osd_mgr_t *osd  = vsf_createOsdMgr_r();
+                priv->osds[cfg->id] = osd;
+
+                priv->bufs[cfg->id].size = frame_cfg.width * frame_cfg.height * 3 + 1024;
+                priv->bufs[cfg->id].data = malloc(priv->bufs[cfg->id].size);
 
                 app_alg_cb_t cb[APP_ALG_CB_MAX] = {};
                 cb[APP_ALG_CB_FRAME_GET].args   = &priv->info->cfgs[cfg->id];
                 cb[APP_ALG_CB_FRAME_GET].func   = __app_alg_get_frame;
-                cb[APP_ALG_CB_RESULT_OUT].args  = priv->hosd[cfg->id];
+                cb[APP_ALG_CB_FRAME_FREE].args  = &priv->info->cfgs[cfg->id];
+                cb[APP_ALG_CB_FRAME_FREE].func  = __app_alg_free_frame;
+                cb[APP_ALG_CB_RESULT_OUT].args  = priv->osds[cfg->id];
                 cb[APP_ALG_CB_RESULT_OUT].func  = __app_alg_result;
 
                 app_face_t *hFace = APP_createFaceAlg();
@@ -220,17 +202,25 @@ static int __app_alg_set(app_alg_mgr_t *self, proto_app_alg_cfg_t *cfg)
                     hFace->init(hFace, cfg->algpath);
                 }
             } else {
-                if (priv->fifo[cfg->id][APP_ALG_CB_FRAME_GET]) {
-                    ufifo_close(priv->fifo[cfg->id]);
-                    priv->fifo[cfg->id][APP_ALG_CB_FRAME_GET] = NULL;
+                if (priv->fifos[cfg->id]) {
+                    ufifo_close(priv->fifos[cfg->id]);
+                    priv->fifos[cfg->id] = NULL;
                 }
-                if (priv->hosd[cfg->id]) {
-                    vsf_osd_mgr_t *osd = priv->hosd[cfg->id];
+
+                if (priv->bufs[cfg->id].data) {
+                    free(priv->bufs[cfg->id].data);
+                    priv->bufs[cfg->id].data = NULL;
+                }
+
+                vsf_osd_mgr_t *osd = priv->osds[cfg->id];
+                if (osd && osd->destroy) {
                     osd->destroy(osd);
                 }
+
                 app_face_t *hFace = APP_createFaceAlg();
-                if (hFace && hFace->destroy)
+                if (hFace && hFace->destroy) {
                     hFace->destroy(hFace);
+                }
             }
             break;
         }

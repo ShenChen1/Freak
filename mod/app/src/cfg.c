@@ -14,7 +14,7 @@ static app_cfg_t s_cfg = {
         },
         .caps[0] = {
             .id = 0,
-            .dummy = 0x1234,
+            .frame = 1,
         },
     },
 };

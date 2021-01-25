@@ -101,7 +101,7 @@ static unsigned int recget(unsigned char *p1, unsigned int n1, unsigned char *p2
 
     // copy data
     p = (unsigned char *)(rec->buf);
-    a = rec->size;
+    a = rec->size - sizeof(media_record_t);
     l = min(a, _n1);
     memcpy(p, _p1, l);
     memcpy(p + l, _p2, a - l);
