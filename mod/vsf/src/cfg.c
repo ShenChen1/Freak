@@ -71,7 +71,7 @@ static vsf_cfg_t s_cfg = {
             .fps = 5,
         },
         .caps[1] = {
-            .id = 0,
+            .id = 1,
             .chn = 0,
             .subchn = 2,
         },

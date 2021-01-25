@@ -62,30 +62,6 @@ int main()
     while (1) {
         infof("keep alive");
         sleep(1);
-
-        /*vsf_osd_mgr_t *osd = vsf_createOsdMgr_r();
-        proto_vsf_osd_tgr_t tgr = {
-            .id = 4,
-            .info = {
-                .condition = "objs",
-                .objs = {
-                    .num = 20,
-                },
-            },
-        };
-
-        for (i = 0; i < tgr.info.objs.num; i++) {
-            tgr.info.objs.rects[i].x = 100 * total + i *10;
-            tgr.info.objs.rects[i].y = 100 * total + i *10;
-            tgr.info.objs.rects[i].w = total + 80 * i;
-            tgr.info.objs.rects[i].h = total + 80 * i;
-        }
-
-        // set tgr
-        osd->tgr(osd, &tgr);
-        osd->destroy(osd);
-
-        total = (total + 1) % 80;*/
     }
 
     nnm_rep_destory(rep);

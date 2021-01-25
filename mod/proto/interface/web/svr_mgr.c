@@ -99,7 +99,7 @@ static int __web_svr_cap(web_svr_mgr_t *self, proto_web_svr_cap_t *cap)
     assert(!obuf->errcode);
 
     proto_client_data_post(priv->proto,
-                           jsonb_opt_proto_web_svr_cfg_t,
+                           jsonb_opt_proto_web_svr_cap_t,
                            obuf->data,
                            obuf->size,
                            cap,

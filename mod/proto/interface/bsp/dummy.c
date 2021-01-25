@@ -40,7 +40,7 @@ static int __bsp_dummy_cap(bsp_dummy_t *self, proto_bsp_dummy_cap_t *cap)
     assert(!obuf->errcode);
 
     proto_client_data_post(priv->proto,
-                           jsonb_opt_proto_bsp_dummy_cfg_t,
+                           jsonb_opt_proto_bsp_dummy_cap_t,
                            obuf->data,
                            obuf->size,
                            cap,

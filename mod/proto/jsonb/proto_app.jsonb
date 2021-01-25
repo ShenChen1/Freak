@@ -16,7 +16,7 @@ JSONB_STRUCT_END(proto_app_alg_cfg_t)
 
 JSONB_STRUCT_START(proto_app_alg_cap_t)
 JSONB_FIELD(id, int)
-JSONB_FIELD(dummy, int)
+JSONB_FIELD(frame, int)
 JSONB_STRUCT_END(proto_app_alg_cap_t)
 
 JSONB_STRUCT_START(proto_app_alg_t)

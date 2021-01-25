@@ -99,7 +99,7 @@ static int __rtsp_svr_cap(rtsp_svr_mgr_t *self, proto_rtsp_svr_cap_t *cap)
     assert(!obuf->errcode);
 
     proto_client_data_post(priv->proto,
-                           jsonb_opt_proto_rtsp_svr_cfg_t,
+                           jsonb_opt_proto_rtsp_svr_cap_t,
                            obuf->data,
                            obuf->size,
                            cap,

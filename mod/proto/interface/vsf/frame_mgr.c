@@ -99,7 +99,7 @@ static int __vsf_frame_cap(vsf_frame_mgr_t *self, proto_vsf_frame_cap_t *cap)
     assert(!obuf->errcode);
 
     proto_client_data_post(priv->proto,
-                           jsonb_opt_proto_vsf_frame_cfg_t,
+                           jsonb_opt_proto_vsf_frame_cap_t,
                            obuf->data,
                            obuf->size,
                            cap,

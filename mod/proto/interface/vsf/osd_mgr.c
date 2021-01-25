@@ -99,7 +99,7 @@ static int __vsf_osd_cap(vsf_osd_mgr_t *self, proto_vsf_osd_cap_t *cap)
     assert(!obuf->errcode);
 
     proto_client_data_post(priv->proto,
-                           jsonb_opt_proto_vsf_osd_cfg_t,
+                           jsonb_opt_proto_vsf_osd_cap_t,
                            obuf->data,
                            obuf->size,
                            cap,

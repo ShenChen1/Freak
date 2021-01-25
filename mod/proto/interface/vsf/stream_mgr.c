@@ -99,7 +99,7 @@ static int __vsf_stream_cap(vsf_stream_mgr_t *self, proto_vsf_stream_cap_t *cap)
     assert(!obuf->errcode);
 
     proto_client_data_post(priv->proto,
-                           jsonb_opt_proto_vsf_stream_cfg_t,
+                           jsonb_opt_proto_vsf_stream_cap_t,
                            obuf->data,
                            obuf->size,
                            cap,

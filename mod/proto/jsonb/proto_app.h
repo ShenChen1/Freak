@@ -17,7 +17,7 @@ typedef struct {
 extern void jsonb_opt_proto_app_alg_cap_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
     int id;
-    int dummy;
+    int frame;
 } proto_app_alg_cap_t;
 extern void jsonb_opt_proto_app_alg_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
