@@ -34,15 +34,6 @@
 		<div class="title__container">
 			<p class="main__title">Live stream using ws</p>
 		</div>
-		<div class="stream__address__container">
-			<div class="form-group" style="margin-left:30px">
-				<label class="col-sm-1 control-label" style="padding-left:0px;padding-top:5px;padding-right:0px;">Stream
-					URL:</label>
-				<div class="col-sm-5" style="padding:0">
-					<input type="text" class="form-control" id="urlinput" name="urlinput" placeholder="请输入URL">
-				</div>
-			</div>
-		</div>
 		<div class="video__container">
 			<video name="videoElement" class="centeredVideo" controls autoplay width="1024" height="576">
 				Your browser is too old which doesn't support HTML5 video.
@@ -68,7 +59,7 @@
 			hasAudio: false,
 			autoCleanupSourceBuffer: true,
 			//url: 'ws://'+ window.location.hostname + ':' + (window.location.port?1+parseInt(window.location.port,10):81) + '/' + document.getElementsByName('urlinput')[0].value,
-			url: 'ws://' + window.location.hostname + ':' + window.location.port + '/flv' + document.getElementsByName('urlinput')[0].value,
+			url: 'ws://' + window.location.hostname + ':' + window.location.port + '/flv-0-0',
 		}
 		console.log('MediaDataSource', mediaDataSource);
 		var element = document.getElementsByName('videoElement')[0];

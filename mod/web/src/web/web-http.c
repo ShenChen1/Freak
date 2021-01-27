@@ -1,5 +1,6 @@
 #include "log.h"
 #include "mongoose.h"
+#include "web-media.h"
 
 enum {
     HTTP_SERVER_STATUS_SETUP   = 0,
@@ -34,6 +35,13 @@ static void ev_handler(struct mg_connection *nc, int ev, void *p)
             struct http_message *hm = p;
             infof("MG_EV_WEBSOCKET_HANDSHAKE_REQUEST [%s:%d], nc:%p, user_data:%p\n",
                 hm->message.p, hm->message.len, nc, nc->user_data);
+            web_media_t *media = web_createMedia(hm->uri.p);
+            web_media_cb_t cb = {
+
+            };
+            media->regcallback(media, &cb);
+            media->init(media);
+            nc->user_data = media;
             break;
         }
 
