@@ -17,16 +17,45 @@ typedef struct {
     struct mg_connection *nc;
 } http_server_priv_t;
 
+static int media_send_proc(void *data, int len, void *args)
+{
+    struct mg_mgr *mgr      = args;
+    struct mg_connection *c = NULL;
+
+    for (c = mg_next(mgr, NULL); c != NULL; c = mg_next(mgr, c)) {
+
+        if (!(c->flags & MG_F_IS_WEBSOCKET)) {
+            continue;
+        }
+
+        if (len <= 0) {
+            // EOF is received. Schedule the connection to close
+            c->flags |= MG_F_SEND_AND_CLOSE;
+            if (c->send_mbuf.len <= 0 || c->send_mbuf.len >= 1024 * 1024) {
+                c->flags |= MG_F_CLOSE_IMMEDIATELY;
+            }
+        } else {
+            mg_send_websocket_frame(c, WEBSOCKET_OP_BINARY, data, len);
+            infof("mg_send_websocket_frame:%d", len);
+        }
+    }
+
+    return len;
+}
+
 static void ev_handler(struct mg_connection *nc, int ev, void *p)
 {
     switch (ev) {
         case MG_EV_HTTP_REQUEST: {
             struct http_message *hm = p;
             infof("MG_EV_HTTP_REQUEST [%s:%d], nc:%p, user_data:%p\n",
-                hm->message.p, hm->message.len, nc, nc->user_data);
+                hm->message.p,
+                hm->message.len,
+                nc,
+                nc->user_data);
 
             struct mg_serve_http_opts opts = {};
-            opts.document_root = "/var/www";
+            opts.document_root             = "/var/www";
             mg_serve_http(nc, hm, opts);
             break;
         }
@@ -34,33 +63,51 @@ static void ev_handler(struct mg_connection *nc, int ev, void *p)
         case MG_EV_WEBSOCKET_HANDSHAKE_REQUEST: {
             struct http_message *hm = p;
             infof("MG_EV_WEBSOCKET_HANDSHAKE_REQUEST [%s:%d], nc:%p, user_data:%p\n",
-                hm->message.p, hm->message.len, nc, nc->user_data);
-            web_media_t *media = web_createMedia(hm->uri.p);
-            web_media_cb_t cb = {
+                hm->message.p,
+                hm->message.len,
+                nc,
+                nc->user_data);
 
-            };
-            media->regcallback(media, &cb);
-            media->init(media);
-            nc->user_data = media;
+            if (nc->user_data == NULL) {
+                web_media_t *media = web_createMedia(hm->uri.p, hm->uri.len);
+                web_media_cb_t cb  = {
+                    .args = nc->mgr,
+                    .func = media_send_proc,
+                };
+                media->regcallback(media, &cb);
+                media->init(media);
+                nc->user_data = media;
+            }
             break;
         }
 
         case MG_EV_WEBSOCKET_FRAME: {
             struct websocket_message *wm = p;
             infof("MG_EV_WEBSOCKET_FRAME [%s:%d], nc:%p, user_data:%p\n",
-                wm->data, wm->size, nc, nc->user_data);
+                wm->data,
+                wm->size,
+                nc,
+                nc->user_data);
             break;
         }
 
         case MG_EV_WEBSOCKET_HANDSHAKE_DONE: {
             struct http_message *hm = p;
             infof("MG_EV_WEBSOCKET_HANDSHAKE_DONE [%s:%d], nc:%p, user_data:%p\n",
-                hm->message.p, hm->message.len, nc, nc->user_data);
+                hm->message.p,
+                hm->message.len,
+                nc,
+                nc->user_data);
             break;
         }
 
         case MG_EV_CLOSE: {
             infof("MG_EV_CLOSE [%p], nc:%p, user_data:%p\n", p, nc, nc->user_data);
+            if (nc->user_data) {
+                web_media_t *media = nc->user_data;
+                media->destroy(media);
+                nc->user_data = NULL;
+            }
             break;
         }
     }

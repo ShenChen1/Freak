@@ -9,14 +9,25 @@
 #include "sys/thread.h"
 #include "ufifo.h"
 
+enum {
+    MEDIA_STATUS_SETUP = 0,
+    MEDIA_STATUS_PLAY  = 1,
+    MEDIA_STATUS_EXIT  = 2,
+    MEDIA_STATUS_MAX,
+};
+
 typedef struct {
     ufifo_t *fifo;
     flv_muxer_t *muxer;
     void *writer;
     char path[64];
-    uint8_t data[512 * 1024];
+    uint8_t in_data[512 * 1024];
+    uint8_t out_data[512 * 1024];
+    int out_status;
+    int out_len;
     pthread_t thread;
     web_media_cb_t snd;
+    int status;
 } web_media_priv_t;
 
 static unsigned int recsize(unsigned char *p1, unsigned int n1, unsigned char *p2)
@@ -88,35 +99,47 @@ static unsigned int recget(unsigned char *p1, unsigned int n1, unsigned char *p2
     return rec->size;
 }
 
-static int on_flv_packet(void* param, int type, const void* data, size_t bytes, uint32_t timestamp)
+static int on_flv_packet(void *param, int type, const void *data, size_t bytes, uint32_t timestamp)
 {
     return flv_writer_input(param, type, data, bytes, timestamp);
 }
 
-static int web_media_write(void* param, const void* buf, int len)
+static int web_media_write(void *param, const void *buf, int len)
 {
     web_media_priv_t *priv = param;
-    if (priv->snd.func) {
-        priv->snd.func((void *)buf, len, priv->snd.args);
+
+    memcpy(&priv->out_data[priv->out_len], buf, len);
+    priv->out_len += len;
+
+    if (priv->out_status == 2 && priv->snd.func) {
+        len = priv->snd.func(priv->out_data, priv->out_len, priv->snd.args);
+        priv->out_len = priv->out_status = 0;
+        return len;
     }
 
-    tracef("bytes:%zu", len);
+    priv->out_status++;
     return len;
 }
 
-static int flv_send_proc(void* param)
+static int flv_send_proc(void *param)
 {
     int i;
     web_media_priv_t *priv = param;
 
-    priv->muxer = flv_muxer_create(on_flv_packet, priv);
     priv->writer = flv_writer_create2(web_media_write, priv);
+    priv->muxer = flv_muxer_create(on_flv_packet, priv->writer);
+    priv->status = MEDIA_STATUS_PLAY;
 
     while (1) {
-        media_record_t *rec = (media_record_t *)priv->data;
+
+        if (priv->status == MEDIA_STATUS_EXIT) {
+            break;
+        }
+
+        media_record_t *rec = (media_record_t *)priv->in_data;
         memset(rec, 0, sizeof(media_record_t));
 
-        ufifo_get_timeout(priv->fifo, priv->data, sizeof(priv->data), 1000);
+        ufifo_get_timeout(priv->fifo, priv->in_data, sizeof(priv->in_data), 1000);
         tracef("bytes:%zu tag:0x%x ts:%zu", rec->size, rec->tag, rec->ts);
 
         if (rec->size) {
@@ -164,7 +187,26 @@ static int __media_init(web_media_t *self)
 
 static int __media_destroy(web_media_t *self)
 {
+    web_media_t *obj       = self;
+    web_media_priv_t *priv = obj->priv;
 
+    priv->status = MEDIA_STATUS_EXIT;
+    thread_destroy(priv->thread);
+
+    if (priv->fifo) {
+        ufifo_close(priv->fifo);
+    }
+
+    if (priv->muxer) {
+        flv_muxer_destroy(priv->muxer);
+    }
+
+    if (priv->writer) {
+        flv_writer_destroy(priv->writer);
+    }
+
+    free(priv);
+    free(obj);
     return 0;
 }
 
@@ -179,7 +221,7 @@ static int __media_regcallback(web_media_t *self, web_media_cb_t *cb)
     return 0;
 }
 
-web_media_t *web_createMedia(const char *path)
+web_media_t *web_createMedia(const char *path, int len)
 {
     web_media_t *obj       = NULL;
     web_media_priv_t *priv = NULL;
@@ -187,7 +229,9 @@ web_media_t *web_createMedia(const char *path)
     priv = malloc(sizeof(web_media_priv_t));
     assert(priv);
     memset(priv, 0, sizeof(web_media_priv_t));
-    strncpy(priv->path, path, sizeof(priv->path));
+    strncpy(priv->path, path, len);
+    priv->path[len] = 0;
+    priv->status = MEDIA_STATUS_SETUP;
 
     obj = malloc(sizeof(web_media_t));
     assert(obj);

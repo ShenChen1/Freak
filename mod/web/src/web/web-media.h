@@ -16,6 +16,6 @@ typedef struct media {
     int (*regcallback)(struct media *self, web_media_cb_t *cb);
 } web_media_t;
 
-web_media_t *web_createMedia(const char *path);
+web_media_t *web_createMedia(const char *path, int len);
 
 #endif /* __WEB_MEDIA_H__ */
