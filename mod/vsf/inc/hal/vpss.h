@@ -14,6 +14,7 @@ typedef struct {
     int height;
     int fps;
 } vsf_frame_cfg_t;
+
 typedef struct vpss {
     void *priv;
     int (*init)(struct vpss *self);

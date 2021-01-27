@@ -29,6 +29,7 @@ target_link_libraries(${PROJECT_NAME}
     proto)
 include_directories(${PROJECT_SOURCE_DIR})
 add_dependencies(${PROJECT_NAME} ${LIB_MEDIA_SRV_NAME})
+add_dependencies(${PROJECT_NAME} ${LIB_UFIFO_NAME})
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_BINDIR})
 jsonb(${PROJECT_NAME} cfg ${PROJECT_SOURCE_DIR}/cfg/cfg.jsonb ${PROJECT_SOURCE_DIR}/cfg)
