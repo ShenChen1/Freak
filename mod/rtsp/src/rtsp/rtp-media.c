@@ -139,15 +139,13 @@ static void __packet(void *param, const void *packet, int bytes, uint32_t timest
 
 static int rtp_send_data(void *arg)
 {
-    int ret;
     rtp_media_priv_t *priv = arg;
 
     while (1) {
-        ret = priv->status;
-        if (ret == MEDIA_STATUS_EXIT) {
+        if (priv->status == MEDIA_STATUS_EXIT) {
             break;
         }
-        if (ret != MEDIA_STATUS_PLAY) {
+        if (priv->status != MEDIA_STATUS_PLAY) {
             usleep(40 * 1000);
             continue;
         }

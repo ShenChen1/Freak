@@ -10,12 +10,11 @@ typedef struct {
 
 typedef struct media {
     void *priv;
-    int (*init)(struct media *self);
     int (*destroy)(struct media *self);
 
     int (*regcallback)(struct media *self, web_media_cb_t *cb);
 } web_media_t;
 
-web_media_t *web_createMedia(const char *path, int len);
+web_media_t *web_createMedia(const char *path);
 
 #endif /* __WEB_MEDIA_H__ */

@@ -30,6 +30,7 @@ static app_face_mod_t s_mod = { 0 };
 
 static void *hs_fd_result_task(void *args)
 {
+    int ret;
     app_face_priv_t *priv           = args;
     proto_app_alg_result_t *results = NULL;
 

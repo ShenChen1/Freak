@@ -2,67 +2,39 @@
 <html>
 
 <head>
-	<title>head</title>
-	<meta charset="utf-8" />
-	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE11">
-	<meta name="renderer" content="webkit|ie-comp|ie-stand">
-	<link rel="stylesheet" type="text/css" href="css/index.css">
-	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+	<title>flv demo</title>
 </head>
 
 <body>
-	<div class="public-head-nav">
-		<div class="public-head-bottom">
-			<div class="public-head-m public-head-bottom-m">
-				<a href="#"><b class="public-head-bottom-logo"></b></a>
-
-				<div class="public-head-nav-content">
-					<div class="public-head-nav-item" style="margin-right:10px"><a href="#" class="nav-title">FLV
-							DEMO</a>
-						<div class='bottom-line'></div>
-					</div>
-					<div class="public-head-nav-item"><a href="#" class="nav-title">ABOUT US</a>
-						<div class='bottom-line'></div>
-					</div>
-
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- 第一部分 -->
-	<div class="flvContainer">
-		<div class="title__container">
-			<p class="main__title">Live stream using ws</p>
-		</div>
-		<div class="video__container">
+	<div class="video-container">
+		<div>
 			<video name="videoElement" class="centeredVideo" controls autoplay width="1024" height="576">
 				Your browser is too old which doesn't support HTML5 video.
 			</video>
 		</div>
-		<div class="button__container">
-			<button type="button" class="entrance__btn--blue" id="submit" style="margin-left:40px">加载</button>
-		</div>
 	</div>
+	<div class="controls">
+		<button onclick="flv_load()">Load</button>
+		<button onclick="flv_start()">Start</button>
+		<button onclick="flv_pause()">Pause</button>
+		<button onclick="flv_destroy()">Destroy</button>
+		<button onclick="flv_seekto()">SeekTo</button>
+	</div>
+	<textarea name="logcatbox" class="logcatBox" rows="10" readonly></textarea>
 </body>
-<script type="text/javascript" src="js/jquery-1.9.1.js"></script>
-<script type="text/javascript" src="js/bootstrap.min.js"></script>
-<script type="text/javascript" src="js/jsflv.min.js"></script>
+
+<script type="text/javascript" src="js/flv.min.js"></script>
+
 <script>
-	$(".public-head-nav-item").eq(0).find('.bottom-line').show();
+	function flv_version() {
+		var version = flvjs.version;
+		document.title = document.title + " (v" + version + ")";
+	}
 
 	function flv_load() {
 		console.log('isSupported: ' + flvjs.isSupported());
-		var mediaDataSource = {
-			type: "flv",
-			isLive: true,
-			//cors: true,
-			hasAudio: false,
-			autoCleanupSourceBuffer: true,
-			//url: 'ws://'+ window.location.hostname + ':' + (window.location.port?1+parseInt(window.location.port,10):81) + '/' + document.getElementsByName('urlinput')[0].value,
-			url: 'ws://' + window.location.hostname + ':' + window.location.port + '/flv-0-0',
-		}
-		console.log('MediaDataSource', mediaDataSource);
-		var element = document.getElementsByName('videoElement')[0];
+
 		if (typeof player !== "undefined") {
 			if (player != null) {
 				player.unload();
@@ -71,14 +43,30 @@
 				player = null;
 			}
 		}
+
+		var mediaDataSource = {
+			type: "flv",
+			isLive: true,
+			hasVideo: true,
+			hasAudio: false,
+			url: 'ws://' + window.location.hostname + ':' + window.location.port + '/flv-0-1',
+			//url: 'http://' + window.location.hostname + ':' + window.location.port + '/flv-0-1.flv'
+		}
+
 		player = flvjs.createPlayer(mediaDataSource, {
-			// enableWorker: false,
-			// lazyLoadMaxDuration: 3 * 60,
-			// seekType: 'range',
 			enableWorker: true,
 			enableStashBuffer: false,
-			stashInitialSize: 128,
+			autoCleanupSourceBuffer: true,
 		});
+
+		flvjs.LoggingControl.enableAll = true;
+		flvjs.LoggingControl.enableDebug = true;
+		flvjs.LoggingControl.enableInfo = true;
+		flvjs.LoggingControl.enableWarn = true;
+		flvjs.LoggingControl.enableError = true;
+		flvjs.LoggingControl.enableVerbose = true;
+
+		var element = document.getElementsByName('videoElement')[0];
 		player.attachMediaElement(element);
 		player.load();
 	}
@@ -100,30 +88,18 @@
 	}
 
 	function flv_seekto() {
-		var input = document.getElementsByName('seekpoint')[0];
-		player.currentTime = parseFloat(input.value);
-	}
-	function flv_seektoend() {
-		console.log("seek to end", player.buffered.end(0));
 		player.currentTime = player.buffered.end(0) - 0.01;
 	}
 
-	function getUrlParam(key, defaultValue) {
-		var pageUrl = window.location.search.substring(1);
-		var pairs = pageUrl.split('&');
-		for (var i = 0; i < pairs.length; i++) {
-			var keyAndValue = pairs[i].split('=');
-			if (keyAndValue[0] === key) {
-				return keyAndValue[1];
-			}
-		}
-		return defaultValue;
-	}
+	var logcatbox = document.getElementsByName('logcatbox')[0];
+	flvjs.LoggingControl.addLogListener(function (type, str) {
+		logcatbox.value = logcatbox.value + str + '\n';
+		logcatbox.scrollTop = logcatbox.scrollHeight;
+	});
 
 	document.addEventListener('DOMContentLoaded', function () {
-		console.log("tab load");
+		flv_version();
 		flv_load();
-		flv_start();
 	});
 
 </script>
