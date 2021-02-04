@@ -19,6 +19,7 @@ typedef struct {
 
 typedef struct {
     struct mg_mgr *mgr;
+    struct mbuf buf;
     web_media_t *media;
 } web_media_session_t;
 
@@ -26,22 +27,22 @@ static void on_media_read(struct mg_connection *nc, int ev, void *p)
 {
     struct mg_connection *c = nc;
     web_media_session_t *session = c->user_data;
-    void *data = (char *)p + sizeof(int);
-    int len = *(int *)p;
+    struct mbuf *buf = &session->buf;
 
     if (session == NULL || session->mgr != c->mgr) {
         return;
     }
 
-    if (len <= 0 || c->send_mbuf.len >= 1024 * 1024) {
+    if (buf->len <= 0 || c->send_mbuf.len >= 1024 * 1024) {
         // EOF is received. Schedule the connection to close
         c->flags |= MG_F_SEND_AND_CLOSE;
         if (c->send_mbuf.len <= 0) {
             c->flags |= MG_F_CLOSE_IMMEDIATELY;
         }
     } else {
-        tracef("mg_send_websocket_frame:%d", len);
-        mg_send_websocket_frame(c, WEBSOCKET_OP_BINARY, data, len);
+        tracef("mg_send_websocket_frame:%d", buf->len);
+        mg_send_websocket_frame(c, WEBSOCKET_OP_BINARY, buf->buf, buf->len);
+        mbuf_clear(buf);
     }
 }
 
@@ -50,7 +51,8 @@ static int media_send_proc(void *data, int len, void *args)
     web_media_session_t *session = args;
 
     tracef("media_send_proc:%d", len);
-    mg_broadcast(session->mgr, on_media_read, data, len);
+    mbuf_append(&session->buf, data, len);
+    mg_broadcast(session->mgr, on_media_read, session, sizeof(web_media_session_t));
     return len;
 }
 
@@ -68,6 +70,7 @@ static web_media_session_t *media_session_new(char *path, void *mgr)
     assert(session);
     session->media = media;
     session->mgr = mgr;
+    mbuf_init(&session->buf, 1024 * 64);
 
     web_media_cb_t cb  = {
         .args = session,
@@ -82,6 +85,7 @@ static void media_session_del(web_media_session_t *session)
 {
     web_media_t *media = session->media;
     media->destroy(media);
+    mbuf_free(&session->buf);
     free(session);
 }
 

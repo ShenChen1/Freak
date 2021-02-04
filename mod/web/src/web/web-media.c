@@ -8,8 +8,6 @@
 #include "sys/thread.h"
 #include "ufifo.h"
 
-#define DEBUG
-
 enum {
     MEDIA_STATUS_SETUP = 0,
     MEDIA_STATUS_PLAY  = 1,
@@ -113,16 +111,15 @@ static int web_media_write(void *param, const void *buf, int len)
     web_media_priv_t *priv = param;
 
     tracef("web_media_write:%d", len);
-#ifdef DEBUG
-    fwrite(buf, len, 1, priv->out_file);
-#endif
-    memcpy(&priv->out_data[sizeof(int32_t) + priv->out_len], buf, len);
+    memcpy(&priv->out_data[priv->out_len], buf, len);
     priv->out_len += len;
 
     if (priv->out_status == 3 || priv->out_status == 0) {
         if (priv->snd.func) {
-            memcpy(priv->out_data, &priv->out_len, sizeof(int32_t));
-            priv->snd.func(priv->out_data, sizeof(int32_t) + priv->out_len, priv->snd.args);
+            priv->snd.func(priv->out_data, priv->out_len, priv->snd.args);
+#ifdef DEBUG
+            fwrite(priv->out_data, priv->out_len, 1, priv->out_file);
+#endif
         }
         priv->out_len = 0;
         priv->out_status = 1;
