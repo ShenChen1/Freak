@@ -29,5 +29,3 @@ target_include_directories(${PROJECT_NAME}
 add_dependencies(${PROJECT_NAME} ${LIB_CJSON_NAME})
 add_dependencies(${PROJECT_NAME} ${LIB_UTHASH_NAME})
 add_dependencies(${PROJECT_NAME} ${LIB_NANOMSG_NAME})
-
-install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})

@@ -28,7 +28,6 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC ${PROJECT_SOURCE_DIR}/jsonb
     PUBLIC ${PROJECT_SOURCE_DIR}/interface)
 
-install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
 jsonb(${PROJECT_NAME} base ${PROJECT_SOURCE_DIR}/jsonb/proto_base.jsonb ${PROJECT_SOURCE_DIR}/jsonb)
 jsonb(${PROJECT_NAME} bsp ${PROJECT_SOURCE_DIR}/jsonb/proto_bsp.jsonb ${PROJECT_SOURCE_DIR}/jsonb)
 jsonb(${PROJECT_NAME} rtsp ${PROJECT_SOURCE_DIR}/jsonb/proto_rtsp.jsonb ${PROJECT_SOURCE_DIR}/jsonb)
