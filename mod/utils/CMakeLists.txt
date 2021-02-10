@@ -2,9 +2,8 @@ project(utils)
 
 add_definitions(-DMODULE_NAME="${PROJECT_NAME}")
 add_compile_options(-ffunction-sections -fdata-sections)
-add_link_options(-Wl,--gc-sections)
 
-add_library(${PROJECT_NAME} SHARED
+add_library(${PROJECT_NAME} STATIC
     json-cfg/src/json-cfg.c
     log/src/log.c
     common/src/que.c
@@ -14,6 +13,11 @@ add_library(${PROJECT_NAME} SHARED
     nnm/src/nnm_pipeline.c
     nnm/src/nnm_reqrep.c
     nnm/src/nnm_pubsub.c)
+
+target_link_libraries(${PROJECT_NAME}
+    -l${LIB_CJSON_NAME}
+    -l${LIB_NANOMSG_NAME}
+    -lrt -lpthread)
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC ${PROJECT_SOURCE_DIR}/json-cfg/inc

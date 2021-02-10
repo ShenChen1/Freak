@@ -27,11 +27,3 @@ jobs:
       working-directory: ${{github.workspace}}/build
       shell: bash
       run: cmake --build . -v
-
-    - name: The job has failed
-      if: ${{ failure() }}
-      uses: actions/upload-artifact@v2
-      with:
-        name: my-artifact
-        path: ${{github.workspace}}
-

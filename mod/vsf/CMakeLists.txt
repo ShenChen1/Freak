@@ -23,8 +23,6 @@ add_executable(${PROJECT_NAME}
     cfg/cfg.c)
 
 target_link_libraries(${PROJECT_NAME}
-    -l${LIB_CJSON_NAME}
-    -l${LIB_NANOMSG_NAME}
     -l${LIB_UFIFO_NAME}
     ${LIB_VSF_SDK_NAME}
     -Wl,--whole-archive

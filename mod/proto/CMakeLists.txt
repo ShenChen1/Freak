@@ -2,9 +2,8 @@ project(proto)
 
 add_definitions(-DMODULE_NAME="${PROJECT_NAME}")
 add_compile_options(-ffunction-sections -fdata-sections)
-add_link_options(-Wl,--gc-sections)
 
-add_library(${PROJECT_NAME} SHARED
+add_library(${PROJECT_NAME} STATIC
     jsonb/proto_app.c
     jsonb/proto_base.c
     jsonb/proto_bsp.c
@@ -28,7 +27,6 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC ${PROJECT_SOURCE_DIR}/alg
     PUBLIC ${PROJECT_SOURCE_DIR}/jsonb
     PUBLIC ${PROJECT_SOURCE_DIR}/interface)
-add_dependencies(${PROJECT_NAME} ${LIB_CJSON_NAME})
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
 jsonb(${PROJECT_NAME} base ${PROJECT_SOURCE_DIR}/jsonb/proto_base.jsonb ${PROJECT_SOURCE_DIR}/jsonb)

@@ -11,7 +11,7 @@ add_subdirectory(proto)
 add_subdirectory(vsf-${CMAKE_CHIP_NAME}) # special vsf
 add_subdirectory(alg-${CMAKE_CHIP_NAME}) # special alg
 
-link_libraries(-lrt -lpthread)
+add_link_options(-Wl,--gc-sections)
 add_subdirectory(bsp)
 add_subdirectory(vsf)
 add_subdirectory(rtsp)
