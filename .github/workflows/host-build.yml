@@ -1,6 +1,9 @@
 name: host-build
 
-on: [push]
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -19,11 +22,22 @@ jobs:
       run: cmake -E make_directory ${{github.workspace}}/build
 
     - name: Configure CMake
-      shell: bash
       working-directory: ${{github.workspace}}/build
+      shell: bash
       run: cmake $GITHUB_WORKSPACE -DCMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE/cmake/platforms/host.cmake
 
     - name: Build
       working-directory: ${{github.workspace}}/build
       shell: bash
       run: cmake --build . -v
+
+    - name: Install
+      working-directory: ${{github.workspace}}/build
+      shell: bash
+      run: cmake --install . -v
+
+    - name: Archive results
+      uses: actions/upload-artifact@v2
+      with:
+        name: artifact
+        path: ${{github.workspace}}/package
