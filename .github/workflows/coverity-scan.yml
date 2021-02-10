@@ -1,0 +1,53 @@
+name: coverity-scan
+
+on: [push]
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{github.workspace}}/build
+
+    - name: Download Coverity Build Tool
+      working-directory: ${{github.workspace}}/build
+      run: |
+        wget -q https://scan.coverity.com/download/cxx/linux64 --post-data "token=$TOKEN&project=ShenChen1%2FFreak" -O cov-analysis-linux64.tar.gz
+        mkdir cov-analysis-linux64
+        tar xzf cov-analysis-linux64.tar.gz --strip 1 -C cov-analysis-linux64
+      env:
+        TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
+
+    - name: Configure CMake
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: cmake $GITHUB_WORKSPACE -DCMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE/cmake/platforms/host.cmake
+
+    - name: Build with cov-build
+      working-directory: ${{github.workspace}}/build
+      run: |
+        export PATH=$(pwd)/cov-analysis-linux64/bin:$PATH
+        cov-build --dir cov-int cmake --build . -v
+
+    - name: Submit the result to Coverity Scan
+      working-directory: ${{github.workspace}}/build
+      run: |
+        tar czvf freak.tgz cov-int
+        curl \
+          --form token=$TOKEN \
+          --form email=peterchenshen@gmail.com \
+          --form file=@freak.tgz \
+          --form version=trunk \
+          --form description="freak" \
+          https://scan.coverity.com/builds?project=ShenChen1%2FFreak
+      env:
+        TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}

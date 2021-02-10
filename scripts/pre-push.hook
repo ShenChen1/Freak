@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 protected_branch='master'
 current_branch=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
