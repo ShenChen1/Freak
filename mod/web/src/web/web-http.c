@@ -40,7 +40,7 @@ static void on_media_read(struct mg_connection *nc, int ev, void *p)
             c->flags |= MG_F_CLOSE_IMMEDIATELY;
         }
     } else {
-        tracef("mg_send_websocket_frame:%d", buf->len);
+        tracef("mg_send_websocket_frame:%zu", buf->len);
         mg_send_websocket_frame(c, WEBSOCKET_OP_BINARY, buf->buf, buf->len);
         mbuf_clear(buf);
     }
@@ -107,7 +107,7 @@ static void ev_handler(struct mg_connection *nc, int ev, void *p)
 
         case MG_EV_WEBSOCKET_HANDSHAKE_REQUEST: {
             struct http_message *hm = p;
-            infof("MG_EV_WEBSOCKET_HANDSHAKE_REQUEST [%d], nc:%p, user_data:%p\n",
+            infof("MG_EV_WEBSOCKET_HANDSHAKE_REQUEST [%zu], nc:%p, user_data:%p\n",
                 hm->message.len,
                 nc,
                 nc->user_data);
@@ -116,7 +116,7 @@ static void ev_handler(struct mg_connection *nc, int ev, void *p)
 
         case MG_EV_WEBSOCKET_FRAME: {
             struct websocket_message *wm = p;
-            infof("MG_EV_WEBSOCKET_FRAME [%d], nc:%p, user_data:%p\n",
+            infof("MG_EV_WEBSOCKET_FRAME [%zu], nc:%p, user_data:%p\n",
                 wm->size,
                 nc,
                 nc->user_data);
@@ -125,7 +125,7 @@ static void ev_handler(struct mg_connection *nc, int ev, void *p)
 
         case MG_EV_WEBSOCKET_HANDSHAKE_DONE: {
             struct http_message *hm = p;
-            infof("MG_EV_WEBSOCKET_HANDSHAKE_DONE [%d], nc:%p, user_data:%p\n",
+            infof("MG_EV_WEBSOCKET_HANDSHAKE_DONE [%zu], nc:%p, user_data:%p\n",
                 hm->message.len,
                 nc,
                 nc->user_data);

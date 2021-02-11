@@ -155,7 +155,7 @@ static int rtp_send_data(void *arg)
 
         if (priv->track[MEDIA_TRACK_VIDEO].fifo) {
             ufifo_get_timeout(priv->track[MEDIA_TRACK_VIDEO].fifo, priv->data, sizeof(priv->data), 1000);
-            tracef("bytes:%zu tag:0x%x ts:%zu", rec->size, rec->tag, rec->ts);
+            tracef("bytes:%u tag:0x%x ts:%llu", rec->size, rec->tag, rec->ts);
         }
 
         if (rec->size && priv->track[MEDIA_TRACK_VIDEO].packer) {
@@ -272,7 +272,7 @@ static int rtp_get_rtpinfo(struct rtp_media_t *m, const char *uri, char *rtpinfo
     uint16_t seq = 0;
     uint32_t timestamp = 0;
     rtp_media_priv_t *priv = container_of(m, rtp_media_priv_t, base);
-    tracef("m:%p uri:%p rtpinfo:%s bytes:%d", m, uri, rtpinfo, bytes);
+    tracef("m:%p uri:%p rtpinfo:%s bytes:%zu", m, uri, rtpinfo, bytes);
 
     if (priv->track[MEDIA_TRACK_VIDEO].packer) {
         rtp_payload_encode_getinfo(priv->track[MEDIA_TRACK_VIDEO].packer, &seq, &timestamp);
@@ -321,7 +321,7 @@ struct rtp_media_t *rtp_media_live_new(char *path)
     priv->base.get_rtpinfo   = rtp_get_rtpinfo;
     priv->base.add_transport = rtp_add_transport;
     priv->status             = MEDIA_STATUS_SETUP;
-    strncpy(priv->path, path, sizeof(priv->path));
+    strncpy(priv->path, path, sizeof(priv->path) - 1);
     thread_create(&priv->thread, rtp_send_data, priv);
     tracef("&priv->base:%p", &priv->base);
     return &priv->base;

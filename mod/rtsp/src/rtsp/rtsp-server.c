@@ -87,7 +87,7 @@ static int rtsp_onsetup(void *ptr,
     size_t i;
     rtsp_server_media_t *sm  = NULL;
     rtsp_server_priv_t *priv = ptr;
-    tracef("ptr:%p rtsp:%p uri:%s session:%s transports:%p num:%d", ptr, rtsp, uri, session, transports, num);
+    tracef("ptr:%p rtsp:%p uri:%s session:%s transports:%p num:%lu", ptr, rtsp, uri, session, transports, num);
 
     char key[128] = {};
     uint16_t port = 0;
@@ -221,7 +221,7 @@ static int rtsp_onplay(void *ptr,
 
 static int rtsp_onpause(void *ptr, rtsp_server_t *rtsp, const char *uri, const char *session, const int64_t *npt)
 {
-    tracef("ptr:%p rtsp:%p uri:%s", ptr, rtsp, uri, npt);
+    tracef("ptr:%p rtsp:%p uri:%s session:%s", ptr, rtsp, uri, session);
     // 457 Invalid Range
     return rtsp_server_reply_pause(rtsp, 200);
 }
@@ -286,7 +286,7 @@ static int rtsp_ongetparameter(void *ptr,
                                const void *content,
                                int bytes)
 {
-    tracef("ptr:%p rtsp:%p uri:%s, session:%s, content:%s, bytes:%d", ptr, rtsp, uri, session, content, bytes);
+    tracef("ptr:%p rtsp:%p uri:%s, session:%s, content:%s, bytes:%d", ptr, rtsp, uri, session, (char *)content, bytes);
 
     // const char* ctype = rtsp_server_get_header(rtsp, "Content-Type");
     // const char* encoding = rtsp_server_get_header(rtsp, "Content-Encoding");
@@ -301,7 +301,7 @@ static int rtsp_onsetparameter(void *ptr,
                                const void *content,
                                int bytes)
 {
-    tracef("ptr:%p rtsp:%p uri:%s, session:%s, content:%s, bytes:%d", ptr, rtsp, uri, session, content, bytes);
+    tracef("ptr:%p rtsp:%p uri:%s, session:%s, content:%s, bytes:%d", ptr, rtsp, uri, session, (char *)content, bytes);
 
     // const char* ctype = rtsp_server_get_header(rtsp, "Content-Type");
     // const char* encoding = rtsp_server_get_header(rtsp, "Content-Encoding");

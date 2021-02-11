@@ -117,7 +117,6 @@ static unsigned int recput(unsigned char *p1, unsigned int n1, unsigned char *p2
         _p2 += a - l;
     }
 
-    tracef("totalsize:%u", totalsize);
     return totalsize;
 }
 

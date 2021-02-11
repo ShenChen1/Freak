@@ -24,7 +24,7 @@ typedef struct {
 #ifdef DEBUG
     FILE *out_file;
 #endif
-    size_t pts;
+    uint64_t pts;
     pthread_t thread;
     int status;
     web_media_cb_t snd;
@@ -151,7 +151,7 @@ static int flv_send_proc(void *param)
         memset(rec, 0, sizeof(media_record_t));
 
         ufifo_get_timeout(priv->in_fifo, priv->in_data, sizeof(priv->in_data), 1000);
-        tracef("bytes:%zu tag:0x%x ts:%zu", rec->size, rec->tag, rec->ts);
+        tracef("bytes:%u tag:0x%x ts:%llu", rec->size, rec->tag, rec->ts);
 
         if (rec->size) {
             video_stream_t *stream = (void *)rec->buf;

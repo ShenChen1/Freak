@@ -7,7 +7,7 @@ int json_cfg_load(const char *filename, void *cfg, size_t size, jsonb_opt_func_t
     char *data  = NULL;
     cJSON *json = NULL;
     FILE *fp    = NULL;
-    size_t len  = 0;
+    long len    = 0;
 
     fp = fopen(filename, "rb");
     if (fp == NULL) {
@@ -16,6 +16,10 @@ int json_cfg_load(const char *filename, void *cfg, size_t size, jsonb_opt_func_t
 
     fseek(fp, 0, SEEK_END);
     len = ftell(fp);
+    if (len <= 0) {
+        ret = -EIO;
+        goto end1;
+    }
     fseek(fp, 0, SEEK_SET);
 
     data = calloc(1, len + 1);
@@ -24,7 +28,7 @@ int json_cfg_load(const char *filename, void *cfg, size_t size, jsonb_opt_func_t
         goto end1;
     }
 
-    if (fread(data, 1, len, fp) < len) {
+    if (fread(data, 1, len, fp) != len) {
         ret = -EIO;
         goto end2;
     }
@@ -66,7 +70,7 @@ int json_cfg_save(const char *filename, void *cfg, size_t size, jsonb_opt_func_t
 
     callback(JSONB_OPT_S2J, json, cfg, size);
     data = cJSON_Print(json);
-    if (json == NULL) {
+    if (data == NULL) {
         ret = -ENOMEM;
         goto end2;
     }

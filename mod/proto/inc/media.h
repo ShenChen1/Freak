@@ -7,7 +7,7 @@
 typedef struct {
     uint32_t size;
     uint32_t tag;
-    size_t ts;
+    uint64_t ts;
     uint8_t buf[0];
 } media_record_t;
 

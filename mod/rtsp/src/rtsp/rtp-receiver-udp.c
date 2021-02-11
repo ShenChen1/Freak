@@ -38,7 +38,7 @@ static int rtp_read(rtp_receiver_priv_t *priv, socket_t s)
         return -1;
     assert(0 == socket_addr_compare((const struct sockaddr *)&ss, (const struct sockaddr *)&priv->ss[0]));
 
-    tracef("rtp_demuxer_input:%zu", len);
+    tracef("rtp_demuxer_input:%u", len);
     return rtp_demuxer_input(priv->demuxer, priv->rtp_buffer, r);
 }
 
@@ -53,7 +53,7 @@ static int rtcp_read(rtp_receiver_priv_t *priv, socket_t s)
         return -1;
     assert(0 == socket_addr_compare((const struct sockaddr *)&ss, (const struct sockaddr *)&priv->ss[1]));
 
-    tracef("rtp_demuxer_input:%zu", len);
+    tracef("rtp_demuxer_input:%u", len);
     return rtp_demuxer_input(priv->demuxer, priv->rtcp_buffer, r);
 }
 
