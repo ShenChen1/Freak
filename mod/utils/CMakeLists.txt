@@ -7,6 +7,7 @@ add_library(${PROJECT_NAME} STATIC
     json-cfg/src/json-cfg.c
     log/src/log.c
     common/src/que.c
+    font/src/font.c
     mm/src/physmap.c
     mm/src/virt2phys.c
     nnm/src/nnm_utils.c
@@ -23,9 +24,14 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC ${PROJECT_SOURCE_DIR}/json-cfg/inc
     PRIVATE ${FREAK_TOOLS_PATH}/jsonb-c/inc
     PUBLIC ${PROJECT_SOURCE_DIR}/common/inc
+    PRIVATE ${FREAK_TOOLS_PATH}/font-dot-matrix/inc
     PUBLIC ${PROJECT_SOURCE_DIR}/log/inc
+    PUBLIC ${PROJECT_SOURCE_DIR}/font/inc
     PUBLIC ${PROJECT_SOURCE_DIR}/mm/inc
     PUBLIC ${PROJECT_SOURCE_DIR}/nnm/inc)
 add_dependencies(${PROJECT_NAME} ${LIB_CJSON_NAME})
 add_dependencies(${PROJECT_NAME} ${LIB_UTHASH_NAME})
 add_dependencies(${PROJECT_NAME} ${LIB_NANOMSG_NAME})
+
+install(FILES ${FREAK_TOOLS_PATH}/font-dot-matrix/default.font
+        DESTINATION ${CMAKE_INSTALL_LOCALSTATEDIR})

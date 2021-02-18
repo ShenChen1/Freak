@@ -101,13 +101,12 @@ static vsf_cfg_t s_cfg = {
             .id = 1,
             .enable = 1,
             .info = {
-                .condition = "mask",
-                .mask = {
-                    .color = 0x0000ff00,
-                    .points[0] = {100, 100},
-                    .points[1] = {300, 300},
-                    .points[2] = {100, 300},
-                    .points[3] = {300, 100},
+                .condition = "text",
+                .text = {
+                    .points = {4096, 4096},
+                    .size = 48,
+                    .text = {0x00, 0x31, 0x00, 0x32, 0x00, 0x33, 0x00, 0x34,
+                             0x00, 0x36, 0x00, 0x35, 0x6c, 0x88, 0x5f, 0xf1},
                 },
             },
         },

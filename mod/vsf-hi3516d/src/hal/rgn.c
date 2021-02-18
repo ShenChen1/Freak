@@ -3,6 +3,7 @@
 #include "inc/sdk_cfg.h"
 #include "log.h"
 #include "proto_vsf.h"
+#include "font.h"
 
 typedef enum {
     VSF_RGN_NONE,
@@ -25,6 +26,7 @@ typedef struct {
 typedef struct {
     int num;
     vsf_rgn_t **objs;
+    void *font;
 } vsf_rgn_mod_t;
 
 static vsf_rgn_mod_t s_mod;
@@ -130,6 +132,76 @@ static int __rgn_ctrl_mask(vsf_rgn_t *self, int chn, void *param)
     s32Ret |= HI_MPI_RGN_SetDisplayAttr(priv->id, &priv->stChn, &priv->stChnAttr);
     if (HI_SUCCESS != s32Ret) {
         errorf("HI_MPI_RGN_SetDisplayAttr faild with%#x!", s32Ret);
+    }
+
+    return s32Ret;
+}
+
+static int __rgn_ctrl_text(vsf_rgn_t *self, int chn, void *param)
+{
+    HI_S32 s32Ret            = 0;
+    vsf_rgn_mod_t *mod       = &s_mod;
+    vsf_rgn_t *obj           = self;
+    vsf_rgn_priv_t *priv     = obj->priv;
+    proto_vsf_osd_cfg_t *cfg = param;
+
+    priv->stChn.enModId  = HI_ID_VENC;
+    priv->stChn.s32DevId = 0;
+    priv->stChn.s32ChnId = chn;
+
+    VENC_CHN_ATTR_S stChnAttr;
+    s32Ret = HI_MPI_VENC_GetChnAttr(priv->stChn.s32ChnId, &stChnAttr);
+    assert(s32Ret == HI_SUCCESS);
+
+    priv->stRegion.enType                            = OVERLAY_RGN;
+    priv->stRegion.unAttr.stOverlay.enPixelFmt       = PIXEL_FORMAT_ARGB_1555;
+    priv->stRegion.unAttr.stOverlay.u32BgColor       = 0x00000000;
+    priv->stRegion.unAttr.stOverlay.stSize.u32Width  = stChnAttr.stVencAttr.u32PicWidth;
+    priv->stRegion.unAttr.stOverlay.stSize.u32Height = stChnAttr.stVencAttr.u32PicHeight;
+    priv->stRegion.unAttr.stOverlay.u32CanvasNum     = 2;
+
+    priv->stChnAttr.bShow                               = cfg->enable;
+    priv->stChnAttr.enType                              = OVERLAY_RGN;
+    priv->stChnAttr.unChnAttr.stOverlayChn.stPoint.s32X = 0;
+    priv->stChnAttr.unChnAttr.stOverlayChn.stPoint.s32Y = 0;
+    priv->stChnAttr.unChnAttr.stOverlayChn.u32Layer     = 4;
+    priv->stChnAttr.unChnAttr.stOverlayChn.u32BgAlpha   = 0;
+    priv->stChnAttr.unChnAttr.stOverlayChn.u32FgAlpha   = 128;
+
+    // create;
+    if (priv->status < VSF_RGN_CREATE) {
+        s32Ret |= HI_MPI_RGN_Create(priv->id, &priv->stRegion);
+        if (HI_SUCCESS != s32Ret) {
+            errorf("HI_MPI_RGN_Create faild with%#x!", s32Ret);
+        }
+        s32Ret |= HI_MPI_RGN_SetAttr(priv->id, &priv->stRegion);
+        if (HI_SUCCESS != s32Ret) {
+            errorf("HI_MPI_RGN_SetAttr faild with%#x!", s32Ret);
+        }
+        priv->status = VSF_RGN_CREATE;
+    }
+    // attach;
+    if (priv->status < VSF_RGN_ATTACH) {
+        s32Ret |= HI_MPI_RGN_AttachToChn(priv->id, &priv->stChn, &priv->stChnAttr);
+        if (HI_SUCCESS != s32Ret) {
+            errorf("HI_MPI_RGN_AttachToChn faild with%#x!", s32Ret);
+        }
+        priv->status = VSF_RGN_ATTACH;
+    }
+
+    RGN_CANVAS_INFO_S stRgnCanvasInfo = {};
+    s32Ret |= HI_MPI_RGN_GetCanvasInfo(priv->id, &stRgnCanvasInfo);
+    if (HI_SUCCESS != s32Ret) {
+        errorf("HI_MPI_RGN_GetCanvasInfo faild with%#x!", s32Ret);
+    }
+#if 1
+    font_pic_t pic = {};
+    font_text(mod->font, cfg->info.text.text, &pic);
+    // scale the picture depending on font size (consider about the boundary)
+#endif
+    s32Ret |= HI_MPI_RGN_UpdateCanvas(priv->id);
+    if (HI_SUCCESS != s32Ret) {
+        errorf("HI_MPI_RGN_UpdateCanvas faild with%#x!", s32Ret);
     }
 
     return s32Ret;
@@ -264,7 +336,7 @@ int __rgn_ctrl(vsf_rgn_t *self, int chn, void *param)
     if (!strncmp(cfg->info.condition, "mask", sizeof("mask"))) {
         return __rgn_ctrl_mask(self, chn, param);
     } else if (!strncmp(cfg->info.condition, "text", sizeof("text"))) {
-        return -1;
+        return __rgn_ctrl_text(self, chn, param);
     }
 
     return -1;
@@ -333,12 +405,15 @@ static void __attribute__((constructor(VSF_RGN_PRIORITY))) sdk_rgn_constructor()
     mod->num  = RGN_HANDLE_MAX;
     mod->objs = calloc(mod->num, sizeof(vsf_rgn_t *));
     assert(mod->objs);
+    mod->font = font_init("/var/default.font");
+    assert(mod->font);
 }
 
 static void __attribute__((destructor(VSF_RGN_PRIORITY))) sdk_rgn_destructor()
 {
     vsf_rgn_mod_t *mod = &s_mod;
 
+    font_deinit(mod->font);
     free(mod->objs);
     mod->num = 0;
 }

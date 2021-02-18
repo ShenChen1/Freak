@@ -451,12 +451,24 @@ void jsonb_opt_proto_vsf_osd_text_t(jsonb_opt_e opt, cJSON *json, void *e, size_
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
         if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "text");
+        json_child = cJSON_GetObjectItem(json, "size");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "size", json_child);
+    }
+    jsonb_opt_int(opt, json_child, &element->size, sizeof(int));
+}
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) return;
+        json_child = cJSON_GetObjectItem(json, "text");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "text", json_child);
     }
-    jsonb_opt_string(opt, json_child, element->text, 64);
+    const size_t array_size_list[] = {128,0};
+    jsonb_opt_array(opt, json_child, element->text, sizeof(char) * 1 * 128, array_size_list, jsonb_opt_char);
 }
 }
 void jsonb_opt_proto_vsf_osd_cfg_union_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)

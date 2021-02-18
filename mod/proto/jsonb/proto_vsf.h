@@ -74,7 +74,8 @@ typedef struct {
 extern void jsonb_opt_proto_vsf_osd_text_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
     proto_point_t points;
-    char text[64];
+    int size;
+    char text[128];
 } proto_vsf_osd_text_t;
 extern void jsonb_opt_proto_vsf_osd_cfg_union_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {

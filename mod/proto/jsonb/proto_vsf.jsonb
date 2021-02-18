@@ -80,7 +80,8 @@ JSONB_STRUCT_END(proto_vsf_osd_mask_t)
 
 JSONB_STRUCT_START(proto_vsf_osd_text_t)
 JSONB_FIELD(points, proto_point_t)
-JSONB_STRING(text, 64)
+JSONB_FIELD(size, int)
+JSONB_FIELD_ARRAY(text, 128, char)
 JSONB_STRUCT_END(proto_vsf_osd_text_t)
 
 JSONB_UNION_START(proto_vsf_osd_cfg_union_t)
