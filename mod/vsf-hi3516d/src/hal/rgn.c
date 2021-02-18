@@ -164,7 +164,7 @@ static int __rgn_ctrl_text(vsf_rgn_t *self, int chn, void *param)
     priv->stChnAttr.enType                              = OVERLAY_RGN;
     priv->stChnAttr.unChnAttr.stOverlayChn.stPoint.s32X = 0;
     priv->stChnAttr.unChnAttr.stOverlayChn.stPoint.s32Y = 0;
-    priv->stChnAttr.unChnAttr.stOverlayChn.u32Layer     = 4;
+    priv->stChnAttr.unChnAttr.stOverlayChn.u32Layer     = 2;
     priv->stChnAttr.unChnAttr.stOverlayChn.u32BgAlpha   = 0;
     priv->stChnAttr.unChnAttr.stOverlayChn.u32FgAlpha   = 128;
 
@@ -195,9 +195,37 @@ static int __rgn_ctrl_text(vsf_rgn_t *self, int chn, void *param)
         errorf("HI_MPI_RGN_GetCanvasInfo faild with%#x!", s32Ret);
     }
 #if 1
+    uint16_t color  = argb8888_1555((0x01 << 15) | cfg->info.text.color);
+    uint16_t *data  = (uint16_t *)(size_t)stRgnCanvasInfo.u64VirtAddr;
+    uint32_t width  = stRgnCanvasInfo.stSize.u32Width;
+    uint32_t height = stRgnCanvasInfo.stSize.u32Height;
+    uint32_t stride = stRgnCanvasInfo.u32Stride;
+    memset(data, 0, stRgnCanvasInfo.stSize.u32Height * stRgnCanvasInfo.u32Stride);
+
+    cfg->info.text.point.x = max(cfg->info.text.point.x, 0);
+    cfg->info.text.point.x = min(cfg->info.text.point.x, 8192);
+    cfg->info.text.point.y = max(cfg->info.text.point.y, 0);
+    cfg->info.text.point.y = min(cfg->info.text.point.y, 8192);
+
     font_pic_t pic = {};
-    font_text(mod->font, cfg->info.text.text, &pic);
-    // scale the picture depending on font size (consider about the boundary)
+    font_text(mod->font, cfg->info.text.text, cfg->info.text.size, &pic);
+
+    int i, j;
+    int box_x     = cfg->info.text.point.x * width / 8192;
+    int box_y     = cfg->info.text.point.y * height / 8192;
+    int box_w     = min(pic.width, width - pic.width);
+    int box_h     = min(pic.height, height - pic.height);
+    uint16_t *box = &data[box_y * stride / 2 + box_x];
+
+    for (j = 0; j < box_h; j++) {
+        for (i = 0; i < box_w; i++) {
+            if (pic.data[j * pic.width + i]) {
+                box[j * stride / 2 + i] = color;
+            }
+        }
+    }
+
+    free(pic.data);
 #endif
     s32Ret |= HI_MPI_RGN_UpdateCanvas(priv->id);
     if (HI_SUCCESS != s32Ret) {

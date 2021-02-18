@@ -1,8 +1,8 @@
+#include "cfg/cfg.h"
 #include "common.h"
 #include "json-cfg.h"
 #include "log.h"
 #include "media.h"
-#include "cfg/cfg.h"
 
 static vsf_cfg_t s_cfg = {
     .stream = {
@@ -103,8 +103,9 @@ static vsf_cfg_t s_cfg = {
             .info = {
                 .condition = "text",
                 .text = {
-                    .points = {4096, 4096},
+                    .point = {4096, 4096},
                     .size = 48,
+                    .color = 0x0100ffff,
                     .text = {0x00, 0x31, 0x00, 0x32, 0x00, 0x33, 0x00, 0x34,
                              0x00, 0x36, 0x00, 0x35, 0x6c, 0x88, 0x5f, 0xf1},
                 },

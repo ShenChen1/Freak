@@ -73,8 +73,9 @@ typedef struct {
 } proto_vsf_osd_mask_t;
 extern void jsonb_opt_proto_vsf_osd_text_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
-    proto_point_t points;
-    int size;
+    proto_point_t point;
+    uint32_t size;
+    uint32_t color;
     char text[128];
 } proto_vsf_osd_text_t;
 extern void jsonb_opt_proto_vsf_osd_cfg_union_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);

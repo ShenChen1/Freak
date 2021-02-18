@@ -3,8 +3,6 @@
 #include "font-hdr.h"
 #include "log.h"
 
-#define DEBUG
-
 typedef struct {
     font_file_hdr_t *fileHdr;
     font_char_hdr_t *charHdr;
@@ -87,14 +85,6 @@ static int read_bit(char *data, int num)
     return (data[base] >> (7 - shift)) & 0x1;
 }
 
-static void write_bit(char *data, int num, int value)
-{
-    int base  = num / 8;
-    int shift = num % 8;
-
-    data[base] |= value << (7 - shift);
-}
-
 #ifdef DEBUG
 static void __show_matrix(font_pic_t *pic)
 {
@@ -121,14 +111,19 @@ static int __merge_matrix(void *font, char *buf, uint32_t width, int index, uint
 
     for (j = 0; j < charHdr->height; j++) {
         for (i = 0; i < charHdr->width; i++) {
-            write_bit(buf, start + j * width + i, read_bit(&priv->data[charHdr->offset], j * charHdr->width + i));
+            buf[start + j * width + i] = read_bit(&priv->data[charHdr->offset], j * charHdr->width + i);
         }
     }
 
     return 0;
 }
 
-int font_text(void *font, const char *text, font_pic_t *pic)
+static int __scale_matrix(void *font, font_pic_t *pic, uint32_t size)
+{
+    return 0;
+}
+
+int font_text(void *font, const char *text, uint32_t size, font_pic_t *pic)
 {
     int i, index;
     uint32_t code;
@@ -154,13 +149,12 @@ int font_text(void *font, const char *text, font_pic_t *pic)
     }
 
     if (width == 0) {
-        return 0;
+        return -2;
     }
 
     // 2. allocate memroy depending on width & height
-    datablen = width * height / sizeof(char);
+    datablen = width * height * sizeof(char);
     databuf  = realloc(pic->data, datablen);
-    memset(databuf, 0, datablen);
 
     // 3. get the matrix one by one depending on unicode to build the picture
     for (start = 0, i = 0;; i += 2) {
@@ -179,11 +173,11 @@ int font_text(void *font, const char *text, font_pic_t *pic)
         start += priv->charHdr[index].width;
     }
 
-#ifdef DEBUG
     pic->data   = databuf;
     pic->width  = width;
     pic->height = height;
-    __show_matrix(pic);
-#endif
+
+    // 4. scale the picture depending on font size
+    __scale_matrix(font, pic, size);
     return 0;
 }

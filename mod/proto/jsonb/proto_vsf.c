@@ -440,12 +440,12 @@ void jsonb_opt_proto_vsf_osd_text_t(jsonb_opt_e opt, cJSON *json, void *e, size_
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
         if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "points");
+        json_child = cJSON_GetObjectItem(json, "point");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "points", json_child);
+        cJSON_AddItemToObject(json, "point", json_child);
     }
-    jsonb_opt_proto_point_t(opt, json_child, &element->points, sizeof(proto_point_t));
+    jsonb_opt_proto_point_t(opt, json_child, &element->point, sizeof(proto_point_t));
 }
 {
     cJSON *json_child = NULL;
@@ -456,7 +456,18 @@ void jsonb_opt_proto_vsf_osd_text_t(jsonb_opt_e opt, cJSON *json, void *e, size_
         json_child = cJSON_CreateObject();
         cJSON_AddItemToObject(json, "size", json_child);
     }
-    jsonb_opt_int(opt, json_child, &element->size, sizeof(int));
+    jsonb_opt_uint32_t(opt, json_child, &element->size, sizeof(uint32_t));
+}
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) return;
+        json_child = cJSON_GetObjectItem(json, "color");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "color", json_child);
+    }
+    jsonb_opt_uint32_t(opt, json_child, &element->color, sizeof(uint32_t));
 }
 {
     cJSON *json_child = NULL;
