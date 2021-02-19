@@ -26,10 +26,10 @@ typedef struct {
 static void on_media_read(struct mg_connection *nc, int ev, void *p)
 {
     struct mg_connection *c = nc;
-    web_media_session_t *session = c->user_data;
+    web_media_session_t *session = *(void **)p;
     struct mbuf *buf = &session->buf;
 
-    if (session == NULL || session->mgr != c->mgr) {
+    if (session != c->user_data) {
         return;
     }
 
@@ -46,37 +46,56 @@ static void on_media_read(struct mg_connection *nc, int ev, void *p)
     }
 }
 
+static int media_send_pre(void *args)
+{
+    web_media_session_t *session = args;
+
+    mbuf_init(&session->buf, 1024 * 64);
+    return 0;
+}
+
 static int media_send_proc(void *data, int len, void *args)
 {
     web_media_session_t *session = args;
 
     tracef("media_send_proc:%d", len);
     mbuf_append(&session->buf, data, len);
-    mg_broadcast(session->mgr, on_media_read, session, sizeof(web_media_session_t));
+    mg_broadcast(session->mgr, on_media_read, &session, sizeof(void *));
     return len;
+}
+
+static int media_send_post(void *args)
+{
+    web_media_session_t *session = args;
+
+    mbuf_free(&session->buf);
+    free(session);
+    return 0;
 }
 
 static web_media_session_t *media_session_new(char *path, void *mgr)
 {
-    web_media_t *media = NULL;
     web_media_session_t *session = NULL;
 
-    media = web_createMedia(path);
-    if (media == NULL) {
+    session = malloc(sizeof(web_media_session_t));
+    if (session == NULL) {
         return NULL;
     }
 
-    session = malloc(sizeof(web_media_session_t));
-    assert(session);
-    session->media = media;
     session->mgr = mgr;
-    mbuf_init(&session->buf, 1024 * 64);
+    session->media = web_createMedia(path);
+    if (session->media == NULL) {
+        free(session);
+        return NULL;
+    }
 
-    web_media_cb_t cb  = {
+    web_media_cb_t cb = {
         .args = session,
-        .func = media_send_proc,
+        .pre  = media_send_pre,
+        .proc = media_send_proc,
+        .post = media_send_post,
     };
-    media->regcallback(media, &cb);
+    session->media->regcallback(session->media, &cb);
 
     return session;
 }
@@ -85,8 +104,6 @@ static void media_session_del(web_media_session_t *session)
 {
     web_media_t *media = session->media;
     media->destroy(media);
-    mbuf_free(&session->buf);
-    free(session);
 }
 
 static void ev_handler(struct mg_connection *nc, int ev, void *p)

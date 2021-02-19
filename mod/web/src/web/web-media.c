@@ -115,12 +115,12 @@ static int web_media_write(void *param, const void *buf, int len)
     priv->out_len += len;
 
     if (priv->out_status == 3 || priv->out_status == 0) {
-        if (priv->snd.func) {
-            priv->snd.func(priv->out_data, priv->out_len, priv->snd.args);
-#ifdef DEBUG
-            fwrite(priv->out_data, priv->out_len, 1, priv->out_file);
-#endif
+        if (priv->snd.proc) {
+            priv->snd.proc(priv->out_data, priv->out_len, priv->snd.args);
         }
+#ifdef DEBUG
+        fwrite(priv->out_data, priv->out_len, 1, priv->out_file);
+#endif
         priv->out_len = 0;
         priv->out_status = 1;
         return len;
@@ -136,13 +136,20 @@ static int flv_send_proc(void *param)
     web_media_priv_t *priv = param;
 
     thread_detach(priv->thread);
+    while (priv->status == MEDIA_STATUS_SETUP) {
+        usleep(100);
+        break;
+    }
+
+    if (priv->snd.pre) {
+        priv->snd.pre(priv->snd.args);
+    }
+
     priv->writer = flv_writer_create2(web_media_write, priv);
     priv->muxer = flv_muxer_create(on_flv_packet, priv->writer);
-    priv->status = MEDIA_STATUS_PLAY;
     ufifo_newest(priv->in_fifo, (0xdeadbeef << 8) | 1);
 
     while (1) {
-
         if (priv->status == MEDIA_STATUS_EXIT) {
             break;
         }
@@ -181,8 +188,12 @@ static int flv_send_proc(void *param)
 #ifdef DEBUG
     fclose(priv->out_file);
 #endif
-    free(priv);
 
+    if (priv->snd.post) {
+        priv->snd.post(priv->snd.args);
+    }
+
+    free(priv);
     return 0;
 }
 
@@ -191,8 +202,9 @@ static int __media_destroy(web_media_t *self)
     web_media_t *obj       = self;
     web_media_priv_t *priv = obj->priv;
 
-    priv->snd.func = NULL;
+    // set flag here, let worker free resource
     priv->status = MEDIA_STATUS_EXIT;
+
     free(obj);
     return 0;
 }
@@ -206,6 +218,7 @@ static int __media_regcallback(web_media_t *self, web_media_cb_t *cb)
         priv->snd = *cb;
     }
 
+    priv->status = MEDIA_STATUS_PLAY;
     return 0;
 }
 
