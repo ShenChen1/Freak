@@ -30,7 +30,7 @@ void *font_init(const char *path)
     fseek(fp, 0, SEEK_SET);
 
     priv->buf = malloc(filesize);
-    fread(priv->buf, filesize, 1, fp);
+    assert(fread(priv->buf, 1, filesize, fp) == filesize);
     fclose(fp);
 
     priv->fileHdr = (void *)priv->buf;
