@@ -150,10 +150,8 @@ static void *hs_fd_task(void *args)
         memset(&result_out, 0, sizeof(RESULT_BAG));
 
         for (i = 0; i < result.fd_num; i++) {
-            result.fd[i].ul.x = result.fd[i].ul.x < 0 ? 0 : result.fd[i].ul.x;
-            result.fd[i].ul.y = result.fd[i].ul.y < 0 ? 0 : result.fd[i].ul.y;
-            result.fd[i].lr.x = result.fd[i].lr.x > 640 ? 640 : result.fd[i].lr.x;
-            result.fd[i].lr.y = result.fd[i].lr.y > 640 ? 640 : result.fd[i].lr.y;
+            result.fd[i].ul.x = range(result.fd[i].ul.x, 0, 640);
+            result.fd[i].ul.y = range(result.fd[i].ul.y, 0, 640);
 
             result_bag.obj[i].centerx = (result.fd[i].ul.x + result.fd[i].lr.x) / 2;
             result_bag.obj[i].centery = (result.fd[i].ul.y + result.fd[i].lr.y) / 2;

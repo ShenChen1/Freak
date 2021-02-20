@@ -202,10 +202,8 @@ static int __rgn_ctrl_text(vsf_rgn_t *self, int chn, void *param)
     uint32_t stride = stRgnCanvasInfo.u32Stride;
     memset(data, 0, stRgnCanvasInfo.stSize.u32Height * stRgnCanvasInfo.u32Stride);
 
-    cfg->info.text.point.x = max(cfg->info.text.point.x, 0);
-    cfg->info.text.point.x = min(cfg->info.text.point.x, 8192);
-    cfg->info.text.point.y = max(cfg->info.text.point.y, 0);
-    cfg->info.text.point.y = min(cfg->info.text.point.y, 8192);
+    cfg->info.text.point.x = range(cfg->info.text.point.x, 0, 8192);
+    cfg->info.text.point.y = range(cfg->info.text.point.y, 0, 8192);
 
     font_pic_t pic = {};
     font_text(mod->font, cfg->info.text.text, cfg->info.text.size, &pic);
@@ -303,14 +301,10 @@ static int __rgn_ctrl_objs(vsf_rgn_t *self, int chn, void *param)
 
         for (n = 0; n < tgr->info.objs.num; n++) {
 
-            tgr->info.objs.rects[n].x = max(tgr->info.objs.rects[n].x, 0);
-            tgr->info.objs.rects[n].x = min(tgr->info.objs.rects[n].x, 8192);
-            tgr->info.objs.rects[n].y = max(tgr->info.objs.rects[n].y, 0);
-            tgr->info.objs.rects[n].y = min(tgr->info.objs.rects[n].y, 8192);
-            tgr->info.objs.rects[n].w = max(tgr->info.objs.rects[n].w, 0);
-            tgr->info.objs.rects[n].w = min(tgr->info.objs.rects[n].w, 8192 - tgr->info.objs.rects[n].x);
-            tgr->info.objs.rects[n].h = max(tgr->info.objs.rects[n].h, 0);
-            tgr->info.objs.rects[n].h = min(tgr->info.objs.rects[n].h, 8192 - tgr->info.objs.rects[n].y);
+            tgr->info.objs.rects[n].x = range(tgr->info.objs.rects[n].x, 0, 8192);
+            tgr->info.objs.rects[n].y = range(tgr->info.objs.rects[n].y, 0, 8192);
+            tgr->info.objs.rects[n].w = range(tgr->info.objs.rects[n].w, 0, 8192 - tgr->info.objs.rects[n].x);
+            tgr->info.objs.rects[n].h = range(tgr->info.objs.rects[n].h, 0, 8192 - tgr->info.objs.rects[n].y);
 
             int box_x     = tgr->info.objs.rects[n].x * width / 8192;
             int box_y     = tgr->info.objs.rects[n].y * height / 8192;

@@ -118,8 +118,49 @@ static int __merge_matrix(void *font, char *buf, uint32_t width, int index, uint
     return 0;
 }
 
-static int __scale_matrix(void *font, font_pic_t *pic, uint32_t size)
+// x1, y1, x2, y2 forms a rectangle of coordinates in the image
+// v11 represents the value at x1, y1
+// v12 represents the value at x1, y2
+// v21 represents the value at x2, y1
+// v22 represents the value at x2, y2
+struct bilinear_interpolation {
+    double x1, y1, x2, y2;
+    double v11, v12, v21, v22;
+};
+
+// approximates the value of the function f at x,y using bilinear interpolation
+static double interpolate(double x, double y, struct bilinear_interpolation *f)
 {
+    double dx1    = x - f->x1;
+    double dx2    = f->x2 - x;
+    double dy1    = y - f->y1;
+    double dy2    = f->y2 - y;
+    double scaled = f->v11 * dx2 * dy2 + f->v21 * dx1 * dy2 + f->v12 * dx2 * dy1 + f->v22 * dx1 * dy1;
+    return scaled / ((f->x2 - f->x1) * (f->y2 - f->y1));
+}
+
+static int __scale_matrix(void *font, font_pic_t *pic, float scale)
+{
+    uint32_t i, j;
+    font_pic_t src, dst;
+
+    src.data = pic->data;
+    src.width = pic->width;
+    src.height = pic->height;
+
+    dst.width = (uint32_t)(src.width * scale);
+    dst.height = (uint32_t)(src.height * scale);
+    dst.data = malloc(dst.width * dst.height * sizeof(char));
+
+    for (j = 0; j < dst.height; j++) {
+        for (i = 0; i < dst.width; i++) {
+            struct bilinear_interpolation ff = {};
+            dst.data[j * dst.width + i] = interpolate(i, j, &ff);
+        }
+    }
+
+    *pic = dst;
+    free(src.data);
     return 0;
 }
 

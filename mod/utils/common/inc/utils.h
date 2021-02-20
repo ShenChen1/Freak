@@ -20,4 +20,11 @@
     (void) ((void *)&_max1 == (void *)&_max2);      \
     _max1 > _max2 ? _max1 : _max2; })
 
+#define range(v, min, max) ({                       \
+    typeof(v) _v = (v);                             \
+    typeof(min) _min = (min);                       \
+    typeof(max) _max = (max);                       \
+    (void) (_v = _v > _max ? _max : _v);            \
+    _v < _min ? _min : _v; })
+
 #endif /* __UTILS_H__ */

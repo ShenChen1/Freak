@@ -63,7 +63,7 @@ static unsigned int rectag(unsigned char *p1, unsigned int n1, unsigned char *p2
 
 static unsigned int recget(unsigned char *p1, unsigned int n1, unsigned char *p2, void *arg)
 {
-    media_record_t *rec  = arg;
+    media_record_t *rec = arg;
     unsigned int a = 0, l = 0, _n1 = n1;
     unsigned char *p = NULL, *_p1 = p1, *_p2 = p2;
 
@@ -98,13 +98,13 @@ static int __app_alg_get_frame(void *data, void *args)
     int ret;
     app_alg_mgr_priv_t *priv = s_mgr->priv;
     proto_app_alg_cfg_t *cfg = args;
-    media_record_t *rec = (media_record_t *)priv->bufs[cfg->id].data;
+    media_record_t *rec      = (media_record_t *)priv->bufs[cfg->id].data;
 
     ret = ufifo_get_block(priv->fifos[cfg->id], priv->bufs[cfg->id].data, priv->bufs[cfg->id].size);
     assert(ret > 0 && ret <= priv->bufs[cfg->id].size);
 
     void **_data = (void **)data;
-    *_data = (void *)rec->buf;
+    *_data       = (void *)rec->buf;
     return 0;
 }
 
@@ -119,16 +119,17 @@ static int __app_alg_result(void *data, void *args)
     // get result and send to osd
     vsf_osd_mgr_t *osd             = args;
     proto_app_alg_result_t *result = data;
-    int i                          = 0;
     proto_vsf_osd_tgr_t tgr = {
-    .id = 4,
-    .info = {
-        .condition = "objs",
-        .objs = {
-            .num = result->num,
+        .id = 4,
+        .info = {
+            .condition = "objs",
+            .objs = {
+                .num = result->num,
+            },
         },
-      },
     };
+
+    int i = 0;
     for (i = 0; i < tgr.info.objs.num; i++) {
         tgr.info.objs.rects[i].x = result->objs[i].rect.x;
         tgr.info.objs.rects[i].y = result->objs[i].rect.y;
@@ -171,10 +172,10 @@ static int __app_alg_set(app_alg_mgr_t *self, proto_app_alg_cfg_t *cfg)
 
                 char name[64];
                 ufifo_init_t init = {
-                            .lock = UFIFO_LOCK_NONE,
-                            .opt  = UFIFO_OPT_ATTACH,
-                            .attach = { .shared = 0, },
-                            .hook = { recsize, rectag, NULL, recget },
+                    .lock = UFIFO_LOCK_NONE,
+                    .opt  = UFIFO_OPT_ATTACH,
+                    .attach = { .shared = 0, },
+                    .hook = { recsize, rectag, NULL, recget },
                 };
                 snprintf(name, sizeof(name), PROTO_VSF_FRAME_FIFO "%d-%d", frame_cap.chn, frame_cap.subchn);
                 ufifo_open(name, &init, &priv->fifos[cfg->id]);
