@@ -139,27 +139,36 @@ static double interpolate(double x, double y, struct bilinear_interpolation *f)
     return scaled / ((f->x2 - f->x1) * (f->y2 - f->y1));
 }
 
-static int __scale_matrix(void *font, font_pic_t *pic, float scale)
+static int __scale_matrix(void *font, font_pic_t *pic, uint32_t size)
 {
     uint32_t i, j;
-    font_pic_t src, dst;
+    font_pic_t src;
 
     src.data = pic->data;
     src.width = pic->width;
     src.height = pic->height;
 
-    dst.width = (uint32_t)(src.width * scale);
-    dst.height = (uint32_t)(src.height * scale);
-    dst.data = malloc(dst.width * dst.height * sizeof(char));
+    double scale = (double)size / (double)src.height;
+    pic->width = (uint32_t)(src.width * scale);
+    pic->height = (uint32_t)(src.height * scale);
+    pic->data = malloc(pic->width * pic->height * sizeof(char));
+    assert(pic->data);
 
-    for (j = 0; j < dst.height; j++) {
-        for (i = 0; i < dst.width; i++) {
+    for (j = 0; j < pic->height; j++) {
+        for (i = 0; i < pic->width; i++) {
             struct bilinear_interpolation ff = {};
-            dst.data[j * dst.width + i] = interpolate(i, j, &ff);
+            ff.x1 = range((uint32_t)(i / scale - 0.5), 0, src.width - 1);
+            ff.x2 = range((uint32_t)(i / scale + 0.5), 0, src.width - 1);
+            ff.y1 = range((uint32_t)(j / scale - 0.5), 0, src.height - 1);
+            ff.y2 = range((uint32_t)(j / scale + 0.5), 0, src.height - 1);
+            ff.v11 = src.data[(uint32_t)ff.y1 * src.width + (uint32_t)ff.x1];
+            ff.v12 = src.data[(uint32_t)ff.y2 * src.width + (uint32_t)ff.x1];
+            ff.v21 = src.data[(uint32_t)ff.y1 * src.width + (uint32_t)ff.x2];
+            ff.v22 = src.data[(uint32_t)ff.y2 * src.width + (uint32_t)ff.x2];
+            pic->data[j * pic->width + i] = interpolate(i, j, &ff) > 0 ? 1 : 0;
         }
     }
 
-    *pic = dst;
     free(src.data);
     return 0;
 }
@@ -195,7 +204,8 @@ int font_text(void *font, const char *text, uint32_t size, font_pic_t *pic)
 
     // 2. allocate memroy depending on width & height
     datablen = width * height * sizeof(char);
-    databuf  = realloc(pic->data, datablen);
+    databuf  = malloc(datablen);
+    assert(databuf);
 
     // 3. get the matrix one by one depending on unicode to build the picture
     for (start = 0, i = 0;; i += 2) {
