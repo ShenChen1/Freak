@@ -3,7 +3,6 @@
 #include "inc/sdk_cfg.h"
 #include "log.h"
 #include "proto_vsf.h"
-#include "font.h"
 
 typedef enum {
     VSF_RGN_NONE,
@@ -26,7 +25,6 @@ typedef struct {
 typedef struct {
     int num;
     vsf_rgn_t **objs;
-    void *font;
 } vsf_rgn_mod_t;
 
 static vsf_rgn_mod_t s_mod;
@@ -140,7 +138,6 @@ static int __rgn_ctrl_mask(vsf_rgn_t *self, int chn, void *param)
 static int __rgn_ctrl_text(vsf_rgn_t *self, int chn, void *param)
 {
     HI_S32 s32Ret            = 0;
-    vsf_rgn_mod_t *mod       = &s_mod;
     vsf_rgn_t *obj           = self;
     vsf_rgn_priv_t *priv     = obj->priv;
     proto_vsf_osd_cfg_t *cfg = param;
@@ -194,7 +191,7 @@ static int __rgn_ctrl_text(vsf_rgn_t *self, int chn, void *param)
     if (HI_SUCCESS != s32Ret) {
         errorf("HI_MPI_RGN_GetCanvasInfo faild with%#x!", s32Ret);
     }
-#if 1
+#if 0
     uint16_t color  = argb8888_1555((0x01 << 15) | cfg->info.text.color);
     uint16_t *data  = (uint16_t *)(size_t)stRgnCanvasInfo.u64VirtAddr;
     uint32_t width  = stRgnCanvasInfo.stSize.u32Width;
@@ -427,15 +424,12 @@ static void __attribute__((constructor(VSF_RGN_PRIORITY))) sdk_rgn_constructor()
     mod->num  = RGN_HANDLE_MAX;
     mod->objs = calloc(mod->num, sizeof(vsf_rgn_t *));
     assert(mod->objs);
-    mod->font = font_init("/var/default.font");
-    assert(mod->font);
 }
 
 static void __attribute__((destructor(VSF_RGN_PRIORITY))) sdk_rgn_destructor()
 {
     vsf_rgn_mod_t *mod = &s_mod;
 
-    font_deinit(mod->font);
     free(mod->objs);
     mod->num = 0;
 }

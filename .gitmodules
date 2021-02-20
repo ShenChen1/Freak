@@ -1,6 +1,3 @@
 [submodule "tools/jsonb-c"]
 	path = tools/jsonb-c
 	url = https://github.com/ShenChen1/jsonb-c.git
-[submodule "tools/font-dot-matrix"]
-	path = tools/font-dot-matrix
-	url = https://github.com/ShenChen1/font-dot-matrix.git
