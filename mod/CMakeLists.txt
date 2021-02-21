@@ -1,4 +1,5 @@
 include(cjson)
+include(freetype)
 include(media-server)
 include(mongoose)
 include(nanomsg)
