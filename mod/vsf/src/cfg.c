@@ -77,7 +77,7 @@ static vsf_cfg_t s_cfg = {
         },
     },
     .osd = {
-        .num = { 2 },
+        .num = { VSF_OSD_MAX },
         .cfgs[0] = {
             .id = 0,
             .enable = 1,
@@ -94,8 +94,6 @@ static vsf_cfg_t s_cfg = {
         },
         .caps[0] = {
             .id = 0,
-            .chn = 0,
-            .subchn = 0,
         },
         .cfgs[1] = {
             .id = 1,
@@ -105,16 +103,46 @@ static vsf_cfg_t s_cfg = {
                 .text = {
                     .point = {4096, 4096},
                     .size = 48,
-                    .color = 0x0100ffff,
-                    .text = {0x00, 0x31, 0x00, 0x32, 0x00, 0x33, 0x00, 0x34,
-                             0x00, 0x36, 0x00, 0x35, 0x6c, 0x88, 0x5f, 0xf1},
+                    .color = 0x0100ff00,
+                    .text = "123abcABC",
                 },
             },
         },
         .caps[1] = {
             .id = 1,
-            .chn = 0,
-            .subchn = 0,
+        },
+        .cfgs[3] = {
+            .id = 3,
+            .enable = 1,
+            .info = {
+                .condition = "mask",
+                .mask = {
+                    .color = 0x0000ffff,
+                    .points[0] = {6000, 6000},
+                    .points[1] = {6600, 6600},
+                    .points[2] = {6000, 6600},
+                    .points[3] = {6600, 6000},
+                },
+            },
+        },
+        .caps[3] = {
+            .id = 3,
+        },
+        .cfgs[4] = {
+            .id = 4,
+            .enable = 1,
+            .info = {
+                .condition = "text",
+                .text = {
+                    .point = {2048, 4096},
+                    .size = 48,
+                    .color = 0x01ff0000,
+                    .text = "abc",
+                },
+            },
+        },
+        .caps[4] = {
+            .id = 4,
         },
     },
 };

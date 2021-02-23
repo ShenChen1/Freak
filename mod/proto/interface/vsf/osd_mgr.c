@@ -108,7 +108,7 @@ static int __vsf_osd_cap(vsf_osd_mgr_t *self, proto_vsf_osd_cap_t *cap)
     return 0;
 }
 
-static int __vsf_osd_tgr(vsf_osd_mgr_t *self, proto_vsf_osd_tgr_t *tgr)
+static int __vsf_osd_tgr(vsf_osd_mgr_t *self, proto_vsf_osd_cfg_t *cfg)
 {
     vsf_osd_mgr_priv_t *priv = self->priv;
     proto_header_t *obuf     = NULL;
@@ -117,23 +117,23 @@ static int __vsf_osd_tgr(vsf_osd_mgr_t *self, proto_vsf_osd_tgr_t *tgr)
 
     uint8_t ibuf[PROTO_PACKAGE_MAXSIZE] = {};
     proto_client_data_pre(priv->proto,
-                          jsonb_opt_proto_vsf_osd_tgr_t,
-                          tgr,
-                          sizeof(proto_vsf_osd_tgr_t),
+                          jsonb_opt_proto_vsf_osd_cfg_t,
+                          cfg,
+                          sizeof(proto_vsf_osd_cfg_t),
                           proto_package_data(ibuf),
                           &isize);
 
-    proto_package_fill_header(ibuf, tgr->id, PROTO_VSF_KEY_OSD, PROTO_ACTION_TGR, priv->proto, isize);
+    proto_package_fill_header(ibuf, cfg->id, PROTO_VSF_KEY_OSD, PROTO_ACTION_TGR, priv->proto, isize);
     nnm_req_exchange(priv->req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
     assert(obuf->key == PROTO_VSF_KEY_OSD);
     assert(!obuf->errcode);
 
     proto_client_data_post(priv->proto,
-                           jsonb_opt_proto_vsf_osd_tgr_t,
+                           jsonb_opt_proto_vsf_osd_cfg_t,
                            obuf->data,
                            obuf->size,
-                           tgr,
-                           sizeof(proto_vsf_osd_tgr_t));
+                           cfg,
+                           sizeof(proto_vsf_osd_cfg_t));
     nnm_free(obuf);
     return 0;
 }

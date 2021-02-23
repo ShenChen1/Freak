@@ -54,16 +54,16 @@ static int msgbox_osd_cap(msgbox_param_t *param)
 static int msgbox_osd_tgr(msgbox_param_t *param)
 {
     int ret;
-    proto_vsf_osd_tgr_t tgr;
+    proto_vsf_osd_cfg_t cfg;
 
-    proto_server_data_pre(param->format, jsonb_opt_proto_vsf_osd_tgr_t, param->in, param->isize, &tgr, sizeof(proto_vsf_osd_tgr_t));
+    proto_server_data_pre(param->format, jsonb_opt_proto_vsf_osd_cfg_t, param->in, param->isize, &cfg, sizeof(proto_vsf_osd_cfg_t));
 
     vsf_osd_mgr_t *obj = vsf_createOsdMgr();
     assert(obj && obj->tgr);
-    ret = obj->tgr(obj, &tgr);
+    ret = obj->tgr(obj, &cfg);
     assert(ret == 0);
 
-    proto_server_data_post(param->format, jsonb_opt_proto_vsf_osd_tgr_t, &tgr, sizeof(proto_vsf_osd_tgr_t), param->out, param->osize);
+    proto_server_data_post(param->format, jsonb_opt_proto_vsf_osd_cfg_t, &cfg, sizeof(proto_vsf_osd_cfg_t), param->out, param->osize);
     return ret;
 }
 
