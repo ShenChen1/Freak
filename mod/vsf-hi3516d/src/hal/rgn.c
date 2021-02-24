@@ -59,8 +59,8 @@ static int __rgn_ctrl_cover(vsf_rgn_t *self, void *param)
     vsf_rgn_cfg_t *cfg   = param;
 
     priv->stChn.enModId  = HI_ID_VPSS;
-    priv->stChn.s32DevId = 0; // VpssGrp
-    priv->stChn.s32ChnId = cfg->chn;
+    priv->stChn.s32DevId = sdk_cfg_get_member(astVpssInfo[cfg->chn])->VpssGrp;
+    priv->stChn.s32ChnId = sdk_cfg_get_member(astVpssInfo[cfg->chn])->ViChn;
 
     VPSS_CHN_ATTR_S stChnAttr;
     s32Ret = HI_MPI_VPSS_GetChnAttr(priv->stChn.s32DevId, priv->stChn.s32ChnId, &stChnAttr);

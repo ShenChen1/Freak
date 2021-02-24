@@ -12,6 +12,7 @@
 #include FT_FREETYPE_H
 typedef struct {
     proto_vsf_osd_t *info;
+    vsf_font_cfg_t *font;
     FT_Library ft_library;
     FT_Face ft_face;
 } vsf_osd_mgr_priv_t;
@@ -24,7 +25,7 @@ static int __vsf_osd_destroy(vsf_osd_mgr_t *self)
     return 0;
 }
 
-static void __draw_bitmap(vsf_rgn_bitmap_t *src, FT_Bitmap *dst, proto_point_t *point, uint32_t color)
+static void __draw_char(vsf_rgn_bitmap_t *src, FT_Bitmap *dst, proto_point_t *point, uint32_t color)
 {
     FT_Int i, j, p, q;
     FT_Int x_max = point->x + dst->width;
@@ -46,7 +47,7 @@ static void __draw_bitmap(vsf_rgn_bitmap_t *src, FT_Bitmap *dst, proto_point_t *
     }
 }
 
-static void __draw_text(vsf_rgn_bitmap_t *bitmap, proto_vsf_osd_text_t *text)
+static int __draw_text(vsf_rgn_bitmap_t *bitmap, proto_vsf_osd_text_t *text, int set)
 {
     int n, num_chars;
     FT_Error error;
@@ -88,44 +89,22 @@ static void __draw_text(vsf_rgn_bitmap_t *bitmap, proto_vsf_osd_text_t *text)
         /* now, draw to our target surface (convert position) */
         point.x = slot->bitmap_left;
         point.y = bitmap->u32Height - slot->bitmap_top;
-        __draw_bitmap(bitmap, &slot->bitmap, &point, text->color);
+        __draw_char(bitmap, &slot->bitmap, &point, set ? text->color : 0);
 
         /* increment pen position */
         pen.x += slot->advance.x;
         pen.y += slot->advance.y;
     }
-}
-
-static int __vsf_osd_ctrl_text(void *rgn, void *args)
-{
-    int i;
-    vsf_osd_mgr_priv_t *priv = s_mgr->priv;
-
-    for (i = 0; i < priv->info->num.num; i++) {
-        proto_vsf_osd_cfg_t *cfg = &priv->info->cfgs[i];
-
-        if (!cfg->enable) {
-            continue;
-        }
-
-        if (strncmp(cfg->info.condition, "text", sizeof("text"))) {
-            continue;
-        }
-
-        __draw_text(rgn, &cfg->info.text);
-    }
-    __draw_text(rgn, args);
 
     return 0;
 }
 
-static int __vsf_osd_ctrl_objs(void *rgn, void *args)
+static int __draw_objs(vsf_rgn_bitmap_t *bitmap, proto_vsf_osd_objs_t *objs)
 {
     int n, i;
-    vsf_rgn_bitmap_t *bitmap   = rgn;
-    proto_vsf_osd_objs_t *objs = args;
-    uint16_t color             = argb8888_1555(0x01FF0000);
+    uint16_t color = argb8888_1555(0x01FF0000);
 
+    memset(bitmap->pData, 0, bitmap->u32Height * bitmap->u32Stride);
     for (n = 0; n < objs->num; n++) {
         proto_rect_t rect = objs->rects[n];
 
@@ -166,6 +145,20 @@ static int __vsf_osd_ctrl_objs(void *rgn, void *args)
     return 0;
 }
 
+static int __vsf_osd_ctrl_text(void *rgn, void *args)
+{
+    proto_vsf_osd_cfg_t *cfg = args;
+    vsf_osd_mgr_priv_t *priv = s_mgr->priv;
+
+    __draw_text(rgn, &priv->info->cfgs[cfg->id].info.text, 0);
+    return __draw_text(rgn, &cfg->info.text, cfg->enable);
+}
+
+static int __vsf_osd_ctrl_objs(void *rgn, void *args)
+{
+    return __draw_objs(rgn, args);
+}
+
 static int __vsf_osd_ctrl(vsf_osd_mgr_t *self, proto_vsf_osd_cfg_t *cfg)
 {
     int id;
@@ -180,20 +173,20 @@ static int __vsf_osd_ctrl(vsf_osd_mgr_t *self, proto_vsf_osd_cfg_t *cfg)
     if (!strncmp(cfg->info.condition, "mask", sizeof("mask"))) {
         id                 = cfg->id;
         config.type        = VSF_RGN_COVER;
-        config.layer       = 0;
+        config.layer       = 1;
         config.cover.color = cfg->info.mask.color;
         memcpy(config.cover.points, cfg->info.mask.points, 4 * sizeof(proto_point_t));
     } else if (!strncmp(cfg->info.condition, "text", sizeof("text"))) {
         id                 = VSF_OSD_MAX + config.chn * VSF_STREAM_MAX / VSF_CHN_MAX + config.subchn;
         config.type        = VSF_RGN_BITMAP;
         config.layer       = 0;
-        config.bitmap.args = &cfg->info.text;
+        config.bitmap.args = cfg;
         config.bitmap.proc = __vsf_osd_ctrl_text;
     } else if (!strncmp(cfg->info.condition, "objs", sizeof("objs"))) {
         id                 = VSF_OSD_MAX + config.chn * VSF_STREAM_MAX / VSF_CHN_MAX + config.subchn;
         config.type        = VSF_RGN_BITMAP;
         config.layer       = 0;
-        config.bitmap.args = &cfg->info.objs;
+        config.bitmap.args = cfg;
         config.bitmap.proc = __vsf_osd_ctrl_objs;
     } else {
         errorf("osd type error: %s", cfg->info.condition);
@@ -247,10 +240,11 @@ vsf_osd_mgr_t *vsf_createOsdMgr()
     assert(priv);
     memset(priv, 0, sizeof(vsf_osd_mgr_priv_t));
     priv->info = cfg_get_member(osd);
+    priv->font = cfg_get_member(font);
     FT_Error error;
     error = FT_Init_FreeType(&priv->ft_library);
     assert(!error);
-    error = FT_New_Face(priv->ft_library, "/var/simhei.ttf", 0, &priv->ft_face);
+    error = FT_New_Face(priv->ft_library, priv->font->path, 0, &priv->ft_face);
     assert(!error);
 
     mgr = malloc(sizeof(vsf_osd_mgr_t));

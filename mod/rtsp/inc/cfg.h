@@ -3,10 +3,10 @@
 
 #include "cfg/cfg.h"
 
-#define cfg_get_member(member)       \
-    ({                               \
-        rtsp_cfg_t *cfg = cfg_get(); \
-        &cfg->member;                \
+#define cfg_get_member(member)         \
+    ({                                 \
+        rtsp_cfg_t *__cfg = cfg_get(); \
+        &__cfg->member;                \
     })
 
 int cfg_load(const char *path);

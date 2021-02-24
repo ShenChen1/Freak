@@ -96,8 +96,8 @@ JSONB_FIELD_ARRAY(as32ViId, VI_MAX_DEV_NUM, int32_t)
 JSONB_FIELD_ARRAY(astViInfo, VI_MAX_DEV_NUM, sdk_vi_info_t)
 
 JSONB_FIELD(s32VpssNum, int32_t)
-JSONB_FIELD_ARRAY(as32VpssId, 1, int32_t)
-JSONB_FIELD_ARRAY(astVpssInfo, 1, sdk_vpss_info_t)
+JSONB_FIELD_ARRAY(as32VpssId, VPSS_MAX_GRP_NUM, int32_t)
+JSONB_FIELD_ARRAY(astVpssInfo, VPSS_MAX_GRP_NUM, sdk_vpss_info_t)
 
 JSONB_FIELD(s32VencNum, int32_t)
 JSONB_FIELD_ARRAY(as32VencId, VENC_MAX_CHN_NUM, int32_t)

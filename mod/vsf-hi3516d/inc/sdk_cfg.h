@@ -3,10 +3,10 @@
 
 #include "cfg/sdk_cfg.h"
 
-#define sdk_cfg_get_member(member)      \
-    ({                                  \
-        sdk_cfg_t *cfg = sdk_cfg_get(); \
-        &cfg->member;                   \
+#define sdk_cfg_get_member(member)        \
+    ({                                    \
+        sdk_cfg_t *__cfg = sdk_cfg_get(); \
+        &__cfg->member;                   \
     })
 
 void *sdk_cfg_get();

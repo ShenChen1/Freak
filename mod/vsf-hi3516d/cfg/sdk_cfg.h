@@ -86,8 +86,8 @@ typedef struct {
     int32_t as32ViId[VI_MAX_DEV_NUM];
     sdk_vi_info_t astViInfo[VI_MAX_DEV_NUM];
     int32_t s32VpssNum;
-    int32_t as32VpssId[1];
-    sdk_vpss_info_t astVpssInfo[1];
+    int32_t as32VpssId[VPSS_MAX_GRP_NUM];
+    sdk_vpss_info_t astVpssInfo[VPSS_MAX_GRP_NUM];
     int32_t s32VencNum;
     int32_t as32VencId[VENC_MAX_CHN_NUM];
     sdk_venc_info_t astVencInfo[VENC_MAX_CHN_NUM];

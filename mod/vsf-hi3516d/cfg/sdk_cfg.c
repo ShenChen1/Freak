@@ -624,8 +624,8 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "as32VpssId", json_child);
     }
-    const size_t array_size_list[] = {1,0};
-    jsonb_opt_array(opt, json_child, element->as32VpssId, sizeof(int32_t) * 1 * 1, array_size_list, jsonb_opt_int32_t);
+    const size_t array_size_list[] = {VPSS_MAX_GRP_NUM,0};
+    jsonb_opt_array(opt, json_child, element->as32VpssId, sizeof(int32_t) * 1 * VPSS_MAX_GRP_NUM, array_size_list, jsonb_opt_int32_t);
 }
 {
     cJSON *json_child = NULL;
@@ -636,8 +636,8 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "astVpssInfo", json_child);
     }
-    const size_t array_size_list[] = {1,0};
-    jsonb_opt_array(opt, json_child, element->astVpssInfo, sizeof(sdk_vpss_info_t) * 1 * 1, array_size_list, jsonb_opt_sdk_vpss_info_t);
+    const size_t array_size_list[] = {VPSS_MAX_GRP_NUM,0};
+    jsonb_opt_array(opt, json_child, element->astVpssInfo, sizeof(sdk_vpss_info_t) * 1 * VPSS_MAX_GRP_NUM, array_size_list, jsonb_opt_sdk_vpss_info_t);
 }
 {
     cJSON *json_child = NULL;
