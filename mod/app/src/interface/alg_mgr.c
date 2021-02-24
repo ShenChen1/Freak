@@ -132,10 +132,12 @@ static int __app_alg_result(void *data, void *args)
 
     int i = 0;
     for (i = 0; i < cfg.info.objs.num; i++) {
-        cfg.info.objs.rects[i].x = result->objs[i].rect.x;
-        cfg.info.objs.rects[i].y = result->objs[i].rect.y;
-        cfg.info.objs.rects[i].w = result->objs[i].rect.w;
-        cfg.info.objs.rects[i].h = result->objs[i].rect.h;
+        cfg.info.objs.objs[i].id = result->objs[i].id;
+        cfg.info.objs.objs[i].color = 0x01ff0000;
+        cfg.info.objs.objs[i].rect.x = result->objs[i].rect.x;
+        cfg.info.objs.objs[i].rect.y = result->objs[i].rect.y;
+        cfg.info.objs.objs[i].rect.w = result->objs[i].rect.w;
+        cfg.info.objs.objs[i].rect.h = result->objs[i].rect.h;
     }
 
     if (osd && osd->tgr) {

@@ -101,24 +101,6 @@ static vsf_cfg_t s_cfg = {
             .id = 1,
             .enable = 1,
             .info = {
-                .condition = "text",
-                .text = {
-                    .point = {4096, 4096},
-                    .size = 48,
-                    .color = 0x0100ff00,
-                    .text = "123abcABC",
-                },
-            },
-        },
-        .caps[1] = {
-            .id = 1,
-            .chn = 0,
-            .subchn = 0,
-        },
-        .cfgs[3] = {
-            .id = 3,
-            .enable = 1,
-            .info = {
                 .condition = "mask",
                 .mask = {
                     .color = 0x0000ffff,
@@ -129,24 +111,37 @@ static vsf_cfg_t s_cfg = {
                 },
             },
         },
-        .caps[3] = {
-            .id = 3,
+        .caps[1] = {
+            .id = 1,
+            .chn = 0,
+            .subchn = -1,
         },
-        .cfgs[4] = {
-            .id = 4,
+        .cfgs[2] = {
+            .id = 2,
             .enable = 1,
             .info = {
-                .condition = "text",
-                .text = {
-                    .point = {2048, 4096},
-                    .size = 48,
-                    .color = 0x01ff0000,
-                    .text = "abc",
+                .condition = "texts",
+                .texts = {
+                    .num = 2,
+                    .texts[0] = {
+                        .point = {2048, 4096},
+                        .size = 48,
+                        .color = 0x01ff0000,
+                        .text = "abc",
+                    },
+                    .texts[1] = {
+                        .point = {4096, 4096},
+                        .size = 64,
+                        .color = 0x0100ff00,
+                        .text = "123abcABC",
+                    },
                 },
             },
         },
-        .caps[4] = {
-            .id = 4,
+        .caps[2] = {
+            .id = 2,
+            .chn = 0,
+            .subchn = 1,
         },
     },
     .font = {

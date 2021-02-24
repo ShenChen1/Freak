@@ -1,9 +1,12 @@
 JSONB_INCLUDE_HEADER(proto_base.h)
 
 JSONB_MACRO_DEFINE(VSF_CHN_MAX, 2)
+JSONB_MACRO_DEFINE(VSF_SUBCHN_MAX, 4)
 JSONB_MACRO_DEFINE(VSF_FRAME_MAX, 8)
 JSONB_MACRO_DEFINE(VSF_STREAM_MAX, 6)
 JSONB_MACRO_DEFINE(VSF_OSD_MAX, 16)
+JSONB_MACRO_DEFINE(VSF_OSD_TEXTS_MAX, 8)
+JSONB_MACRO_DEFINE(VSF_OSD_OBJS_MAX, 16)
 
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -82,17 +85,28 @@ JSONB_STRUCT_START(proto_vsf_osd_text_t)
 JSONB_FIELD(point, proto_point_t)
 JSONB_FIELD(size, uint32_t)
 JSONB_FIELD(color, uint32_t)
-JSONB_STRING(text, 128)
+JSONB_STRING(text, 32)
 JSONB_STRUCT_END(proto_vsf_osd_text_t)
+
+JSONB_STRUCT_START(proto_vsf_osd_texts_t)
+JSONB_FIELD(num, uint32_t)
+JSONB_FIELD_ARRAY(texts, VSF_OSD_TEXTS_MAX, proto_vsf_osd_text_t)
+JSONB_STRUCT_END(proto_vsf_osd_texts_t)
+
+JSONB_STRUCT_START(proto_vsf_osd_obj_t)
+JSONB_FIELD(id, int)
+JSONB_FIELD(color, uint32_t)
+JSONB_FIELD(rect, proto_rect_t)
+JSONB_STRUCT_END(proto_vsf_osd_obj_t)
 
 JSONB_STRUCT_START(proto_vsf_osd_objs_t)
 JSONB_FIELD(num, uint32_t)
-JSONB_FIELD_ARRAY(rects, 32, proto_rect_t)
+JSONB_FIELD_ARRAY(objs, VSF_OSD_OBJS_MAX, proto_vsf_osd_obj_t)
 JSONB_STRUCT_END(proto_vsf_osd_objs_t)
 
 JSONB_UNION_START(proto_vsf_osd_cfg_union_t)
 JSONB_UNION_FIELD(mask, proto_vsf_osd_mask_t)
-JSONB_UNION_FIELD(text, proto_vsf_osd_text_t)
+JSONB_UNION_FIELD(texts, proto_vsf_osd_texts_t)
 JSONB_UNION_FIELD(objs, proto_vsf_osd_objs_t)
 JSONB_UNION_END(proto_vsf_osd_cfg_union_t)
 

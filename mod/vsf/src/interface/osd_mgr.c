@@ -10,6 +10,7 @@
 #include "proto.h"
 #include "ufifo.h"
 #include FT_FREETYPE_H
+
 typedef struct {
     proto_vsf_osd_t *info;
     vsf_font_cfg_t *font;
@@ -47,7 +48,7 @@ static void __draw_char(vsf_rgn_bitmap_t *src, FT_Bitmap *dst, proto_point_t *po
     }
 }
 
-static int __draw_text(vsf_rgn_bitmap_t *bitmap, proto_vsf_osd_text_t *text, int set)
+static int __draw_text(vsf_rgn_bitmap_t *bitmap, proto_vsf_osd_text_t *text)
 {
     int n, num_chars;
     FT_Error error;
@@ -89,7 +90,7 @@ static int __draw_text(vsf_rgn_bitmap_t *bitmap, proto_vsf_osd_text_t *text, int
         /* now, draw to our target surface (convert position) */
         point.x = slot->bitmap_left;
         point.y = bitmap->u32Height - slot->bitmap_top;
-        __draw_char(bitmap, &slot->bitmap, &point, set ? text->color : 0);
+        __draw_char(bitmap, &slot->bitmap, &point, text->color);
 
         /* increment pen position */
         pen.x += slot->advance.x;
@@ -99,101 +100,104 @@ static int __draw_text(vsf_rgn_bitmap_t *bitmap, proto_vsf_osd_text_t *text, int
     return 0;
 }
 
-static int __draw_objs(vsf_rgn_bitmap_t *bitmap, proto_vsf_osd_objs_t *objs)
+static int __draw_obj(vsf_rgn_bitmap_t *bitmap, proto_vsf_osd_obj_t *obj)
 {
-    int n, i;
-    uint16_t color = argb8888_1555(0x01FF0000);
+    int i;
+    uint16_t color = argb8888_1555(obj->color);
 
-    memset(bitmap->pData, 0, bitmap->u32Height * bitmap->u32Stride);
-    for (n = 0; n < objs->num; n++) {
-        proto_rect_t rect = objs->rects[n];
+    proto_rect_t rect;
+    rect.x = range(obj->rect.x, 0, 8191) * bitmap->u32Width / 8192;
+    rect.y = range(obj->rect.y, 0, 8191) * bitmap->u32Height / 8192;
+    rect.w = range(obj->rect.w, 0, 8191 - obj->rect.x) * bitmap->u32Width / 8192;
+    rect.h = range(obj->rect.h, 0, 8191 - obj->rect.y) * bitmap->u32Height / 8192;
+    if (rect.w * rect.h == 0) {
+        return 0;
+    }
 
-        rect.x = range(rect.x, 0, 8191) * bitmap->u32Width / 8192;
-        rect.y = range(rect.y, 0, 8191) * bitmap->u32Height / 8192;
-        rect.w = range(rect.w, 0, 8191 - rect.x) * bitmap->u32Width / 8192;
-        rect.h = range(rect.h, 0, 8191 - rect.y) * bitmap->u32Height / 8192;
+    uint16_t *box = &((uint16_t *)bitmap->pData)[rect.y * bitmap->u32Stride / 2 + rect.x];
+    for (i = 0; i < rect.w; i++) {
+        box[0 * bitmap->u32Stride / 2 + i]            = color;
+        box[1 * bitmap->u32Stride / 2 + i]            = color;
+        box[2 * bitmap->u32Stride / 2 + i]            = color;
+        box[3 * bitmap->u32Stride / 2 + i]            = color;
+        box[(rect.h - 1) * bitmap->u32Stride / 2 + i] = color;
+        box[(rect.h - 2) * bitmap->u32Stride / 2 + i] = color;
+        box[(rect.h - 3) * bitmap->u32Stride / 2 + i] = color;
+        box[(rect.h - 4) * bitmap->u32Stride / 2 + i] = color;
+    }
 
-        tracef("[%d]: %d %d %d %d", n, rect.x, rect.y, rect.w, rect.h);
-        if (rect.w * rect.h == 0) {
-            continue;
-        }
-
-        uint16_t *box = &((uint16_t *)bitmap->pData)[rect.y * bitmap->u32Stride / 2 + rect.x];
-        for (i = 0; i < rect.w; i++) {
-            box[0 * bitmap->u32Stride / 2 + i]            = color;
-            box[1 * bitmap->u32Stride / 2 + i]            = color;
-            box[2 * bitmap->u32Stride / 2 + i]            = color;
-            box[3 * bitmap->u32Stride / 2 + i]            = color;
-            box[(rect.h - 1) * bitmap->u32Stride / 2 + i] = color;
-            box[(rect.h - 2) * bitmap->u32Stride / 2 + i] = color;
-            box[(rect.h - 3) * bitmap->u32Stride / 2 + i] = color;
-            box[(rect.h - 4) * bitmap->u32Stride / 2 + i] = color;
-        }
-
-        for (i = 0; i < rect.h; i++) {
-            box[i * bitmap->u32Stride / 2 + 0]            = color;
-            box[i * bitmap->u32Stride / 2 + 1]            = color;
-            box[i * bitmap->u32Stride / 2 + 2]            = color;
-            box[i * bitmap->u32Stride / 2 + 3]            = color;
-            box[i * bitmap->u32Stride / 2 + (rect.w - 1)] = color;
-            box[i * bitmap->u32Stride / 2 + (rect.w - 2)] = color;
-            box[i * bitmap->u32Stride / 2 + (rect.w - 3)] = color;
-            box[i * bitmap->u32Stride / 2 + (rect.w - 4)] = color;
-        }
+    for (i = 0; i < rect.h; i++) {
+        box[i * bitmap->u32Stride / 2 + 0]            = color;
+        box[i * bitmap->u32Stride / 2 + 1]            = color;
+        box[i * bitmap->u32Stride / 2 + 2]            = color;
+        box[i * bitmap->u32Stride / 2 + 3]            = color;
+        box[i * bitmap->u32Stride / 2 + (rect.w - 1)] = color;
+        box[i * bitmap->u32Stride / 2 + (rect.w - 2)] = color;
+        box[i * bitmap->u32Stride / 2 + (rect.w - 3)] = color;
+        box[i * bitmap->u32Stride / 2 + (rect.w - 4)] = color;
     }
 
     return 0;
 }
 
-static int __vsf_osd_ctrl_text(void *rgn, void *args)
+static int __vsf_osd_ctrl_texts(void *rgn, void *args)
 {
-    proto_vsf_osd_cfg_t *cfg = args;
-    vsf_osd_mgr_priv_t *priv = s_mgr->priv;
+    int i;
+    vsf_rgn_bitmap_t *bitmap     = rgn;
+    proto_vsf_osd_texts_t *texts = args;
 
-    __draw_text(rgn, &priv->info->cfgs[cfg->id].info.text, 0);
-    return __draw_text(rgn, &cfg->info.text, cfg->enable);
+    memset(bitmap->pData, 0, bitmap->u32Height * bitmap->u32Stride);
+    for (i = 0; i < texts->num; i++) {
+        __draw_text(bitmap, &texts->texts[i]);
+    }
+
+    return 0;
 }
 
 static int __vsf_osd_ctrl_objs(void *rgn, void *args)
 {
-    return __draw_objs(rgn, args);
+    int i;
+    vsf_rgn_bitmap_t *bitmap   = rgn;
+    proto_vsf_osd_objs_t *objs = args;
+
+    memset(bitmap->pData, 0, bitmap->u32Height * bitmap->u32Stride);
+    for (i = 0; i < objs->num; i++) {
+        __draw_obj(bitmap, &objs->objs[i]);
+    }
+
+    return 0;
 }
 
 static int __vsf_osd_ctrl(vsf_osd_mgr_t *self, proto_vsf_osd_cfg_t *cfg)
 {
-    int id;
     vsf_osd_mgr_t *mgr       = self;
     vsf_osd_mgr_priv_t *priv = mgr->priv;
-    vsf_rgn_cfg_t config     = {};
-
-    config.enable = cfg->enable;
-    config.chn    = priv->info->caps[cfg->id].chn;
-    config.subchn = priv->info->caps[cfg->id].subchn;
+    vsf_rgn_cfg_t config     = {.enable = cfg->enable};
 
     if (!strncmp(cfg->info.condition, "mask", sizeof("mask"))) {
-        id                 = cfg->id;
         config.type        = VSF_RGN_COVER;
-        config.layer       = 1;
+        config.layer       = 4;
+        config.chn         = priv->info->caps[cfg->id].chn;
         config.cover.color = cfg->info.mask.color;
         memcpy(config.cover.points, cfg->info.mask.points, 4 * sizeof(proto_point_t));
-    } else if (!strncmp(cfg->info.condition, "text", sizeof("text"))) {
-        id                 = VSF_OSD_MAX + config.chn * VSF_STREAM_MAX / VSF_CHN_MAX + config.subchn;
+    } else if (!strncmp(cfg->info.condition, "texts", sizeof("texts"))) {
         config.type        = VSF_RGN_BITMAP;
-        config.layer       = 0;
-        config.bitmap.args = cfg;
-        config.bitmap.proc = __vsf_osd_ctrl_text;
+        config.layer       = 1;
+        config.chn         = priv->info->caps[cfg->id].chn * VSF_SUBCHN_MAX + priv->info->caps[cfg->id].subchn;
+        config.bitmap.args = &cfg->info.texts;
+        config.bitmap.proc = __vsf_osd_ctrl_texts;
     } else if (!strncmp(cfg->info.condition, "objs", sizeof("objs"))) {
-        id                 = VSF_OSD_MAX + config.chn * VSF_STREAM_MAX / VSF_CHN_MAX + config.subchn;
         config.type        = VSF_RGN_BITMAP;
         config.layer       = 0;
-        config.bitmap.args = cfg;
+        config.chn         = priv->info->caps[cfg->id].chn * VSF_SUBCHN_MAX + priv->info->caps[cfg->id].subchn;
+        config.bitmap.args = &cfg->info.objs;
         config.bitmap.proc = __vsf_osd_ctrl_objs;
     } else {
         errorf("osd type error: %s", cfg->info.condition);
         return 0;
     }
 
-    vsf_rgn_t *rgn = VSF_createRgn(id);
+    vsf_rgn_t *rgn = VSF_createRgn(cfg->id);
     if (rgn && rgn->ctrl) {
         return rgn->ctrl(rgn, &config);
     }

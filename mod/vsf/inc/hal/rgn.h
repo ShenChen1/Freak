@@ -38,7 +38,6 @@ typedef struct {
     int layer;
     int type;
     int chn;
-    int subchn;
     union {
         vsf_rgn_cb_t bitmap;
         vsf_rgn_cover_t cover;

@@ -3,9 +3,12 @@
 #include "jsonb_c_type.h"
 #include "proto_base.h"
 #define VSF_CHN_MAX (2)
+#define VSF_SUBCHN_MAX (4)
 #define VSF_FRAME_MAX (8)
 #define VSF_STREAM_MAX (6)
 #define VSF_OSD_MAX (16)
+#define VSF_OSD_TEXTS_MAX (8)
+#define VSF_OSD_OBJS_MAX (16)
 extern void jsonb_opt_proto_vsf_chn_cfg_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
     int id;
@@ -76,19 +79,30 @@ typedef struct {
     proto_point_t point;
     uint32_t size;
     uint32_t color;
-    char text[128];
+    char text[32];
 } proto_vsf_osd_text_t;
+extern void jsonb_opt_proto_vsf_osd_texts_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
+typedef struct {
+    uint32_t num;
+    proto_vsf_osd_text_t texts[VSF_OSD_TEXTS_MAX];
+} proto_vsf_osd_texts_t;
+extern void jsonb_opt_proto_vsf_osd_obj_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
+typedef struct {
+    int id;
+    uint32_t color;
+    proto_rect_t rect;
+} proto_vsf_osd_obj_t;
 extern void jsonb_opt_proto_vsf_osd_objs_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
     uint32_t num;
-    proto_rect_t rects[32];
+    proto_vsf_osd_obj_t objs[VSF_OSD_OBJS_MAX];
 } proto_vsf_osd_objs_t;
 extern void jsonb_opt_proto_vsf_osd_cfg_union_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
     char condition[32];
     union {
         proto_vsf_osd_mask_t mask;
-        proto_vsf_osd_text_t text;
+        proto_vsf_osd_texts_t texts;
         proto_vsf_osd_objs_t objs;
     };
 } proto_vsf_osd_cfg_union_t;
