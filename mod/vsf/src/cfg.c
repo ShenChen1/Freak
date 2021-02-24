@@ -141,6 +141,11 @@ static vsf_cfg_t s_cfg = {
         .caps[2] = {
             .id = 2,
             .chn = 0,
+            .subchn = 0,
+        },
+        .caps[VSF_OSD_MAX - 1] = {
+            .id = VSF_OSD_MAX - 1,
+            .chn = 0,
             .subchn = 1,
         },
     },

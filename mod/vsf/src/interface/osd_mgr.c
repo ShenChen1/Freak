@@ -108,8 +108,8 @@ static int __draw_obj(vsf_rgn_bitmap_t *bitmap, proto_vsf_osd_obj_t *obj)
     proto_rect_t rect;
     rect.x = range(obj->rect.x, 0, 8191) * bitmap->u32Width / 8192;
     rect.y = range(obj->rect.y, 0, 8191) * bitmap->u32Height / 8192;
-    rect.w = range(obj->rect.w, 0, 8191 - obj->rect.x) * bitmap->u32Width / 8192;
-    rect.h = range(obj->rect.h, 0, 8191 - obj->rect.y) * bitmap->u32Height / 8192;
+    rect.w = range(obj->rect.w, 0, 8192 - obj->rect.x) * bitmap->u32Width / 8192;
+    rect.h = range(obj->rect.h, 0, 8192 - obj->rect.y) * bitmap->u32Height / 8192;
     if (rect.w * rect.h == 0) {
         return 0;
     }
@@ -137,6 +137,13 @@ static int __draw_obj(vsf_rgn_bitmap_t *bitmap, proto_vsf_osd_obj_t *obj)
         box[i * bitmap->u32Stride / 2 + (rect.w - 4)] = color;
     }
 
+    proto_vsf_osd_text_t text = {};
+    text.color = obj->color;
+    text.size = 32;
+    sprintf(text.text, "id: %d", obj->id);
+    text.point.x = obj->rect.x - text.size - 2;
+    text.point.y = obj->rect.y;
+    __draw_text(bitmap, &text);
     return 0;
 }
 
