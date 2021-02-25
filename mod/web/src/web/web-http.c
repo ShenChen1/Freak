@@ -111,7 +111,7 @@ static void ev_handler(struct mg_connection *nc, int ev, void *p)
     switch (ev) {
         case MG_EV_HTTP_REQUEST: {
             struct http_message *hm = p;
-            infof("MG_EV_HTTP_REQUEST [%d], nc:%p, user_data:%p\n",
+            infof("MG_EV_HTTP_REQUEST [%zu], nc:%p, user_data:%p\n",
                 hm->message.len,
                 nc,
                 nc->user_data);

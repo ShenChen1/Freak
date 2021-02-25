@@ -19,7 +19,6 @@ typedef struct {
     ufifo_t *in_fifo;
     uint8_t in_data[512 * 1024];
     uint8_t out_data[512 * 1024];
-    int out_len;
 #ifdef DEBUG
     FILE *out_file;
 #endif
@@ -107,20 +106,19 @@ static int on_flv_packet(void *param, int type, const void *data, size_t bytes, 
 
 static int web_media_write(void *param, const struct flv_vec_t *vec, int n)
 {
-    int i;
+    int i, out_len = 0;
     web_media_priv_t *priv = param;
 
-    priv->out_len = 0;
     for(i = 0; i < n; i++) {
-        memcpy(&priv->out_data[priv->out_len], vec[i].ptr, vec[i].len);
-        priv->out_len += vec[i].len;
+        memcpy(&priv->out_data[out_len], vec[i].ptr, vec[i].len);
+        out_len += vec[i].len;
     }
 
     if (priv->snd.proc) {
-        priv->snd.proc(priv->out_data, priv->out_len, priv->snd.args);
+        priv->snd.proc(priv->out_data, out_len, priv->snd.args);
     }
 #ifdef DEBUG
-    fwrite(priv->out_data, priv->out_len, 1, priv->out_file);
+    fwrite(priv->out_data, out_len, 1, priv->out_file);
 #endif
 
     return 0;
