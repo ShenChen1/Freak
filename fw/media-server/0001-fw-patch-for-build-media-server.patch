@@ -1,0 +1,47 @@
+From 1892a1472bd01181d678aa12c169db21bebd9c24 Mon Sep 17 00:00:00 2001
+From: Peter Shen <peterchenshen@gmail.com>
+Date: Thu, 25 Feb 2021 13:29:07 +0800
+Subject: [PATCH] fw: patch for build media-server
+
+---
+ librtsp/Makefile                            | 3 ++-
+ librtsp/source/server/aio/rtsp-server-tcp.c | 4 ++--
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/librtsp/Makefile b/librtsp/Makefile
+index bcaae52..0fdccf1 100644
+--- a/librtsp/Makefile
++++ b/librtsp/Makefile
+@@ -14,12 +14,13 @@ INCLUDES = . \
+ 					./include \
+ 					$(ROOT)/include \
+ 					$(ROOT)/libhttp/include \
++					$(ROOT)/libaio/include \
+ 					../librtp/include
+ 
+ #-------------------------------Source-------------------------------
+ #
+ #--------------------------------------------------------------------
+-SOURCE_PATHS = source source/client source/server
++SOURCE_PATHS = source source/client source/server source/server/aio
+ SOURCE_FILES = $(foreach dir,$(SOURCE_PATHS),$(wildcard $(dir)/*.cpp))
+ SOURCE_FILES += $(foreach dir,$(SOURCE_PATHS),$(wildcard $(dir)/*.c))
+ 
+diff --git a/librtsp/source/server/aio/rtsp-server-tcp.c b/librtsp/source/server/aio/rtsp-server-tcp.c
+index 451bd0e..b35d1fe 100644
+--- a/librtsp/source/server/aio/rtsp-server-tcp.c
++++ b/librtsp/source/server/aio/rtsp-server-tcp.c
+@@ -83,8 +83,8 @@ static void rtsp_session_onrecv(void* param, int code, size_t bytes)
+ 				if (0 == code)
+ 				{
+ 					// TODO: pipeline remain data
+-					assert(bytes > remain);
+-					assert(0 == remain || '$' == *(end - remain));
++					//assert(bytes > remain);
++					//assert(0 == remain || '$' == *(end - remain));
+ 				}
+ 				p = end - remain;
+ 			}
+-- 
+2.24.1
+

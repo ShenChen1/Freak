@@ -19,7 +19,6 @@ typedef struct {
     ufifo_t *in_fifo;
     uint8_t in_data[512 * 1024];
     uint8_t out_data[512 * 1024];
-    int out_status;
     int out_len;
 #ifdef DEBUG
     FILE *out_file;
@@ -106,28 +105,25 @@ static int on_flv_packet(void *param, int type, const void *data, size_t bytes, 
     return flv_writer_input(param, type, data, bytes, timestamp);
 }
 
-static int web_media_write(void *param, const void *buf, int len)
+static int web_media_write(void *param, const struct flv_vec_t *vec, int n)
 {
+    int i;
     web_media_priv_t *priv = param;
 
-    tracef("web_media_write:%d", len);
-    memcpy(&priv->out_data[priv->out_len], buf, len);
-    priv->out_len += len;
-
-    if (priv->out_status == 3 || priv->out_status == 0) {
-        if (priv->snd.proc) {
-            priv->snd.proc(priv->out_data, priv->out_len, priv->snd.args);
-        }
-#ifdef DEBUG
-        fwrite(priv->out_data, priv->out_len, 1, priv->out_file);
-#endif
-        priv->out_len = 0;
-        priv->out_status = 1;
-        return len;
+    priv->out_len = 0;
+    for(i = 0; i < n; i++) {
+        memcpy(&priv->out_data[priv->out_len], vec[i].ptr, vec[i].len);
+        priv->out_len += vec[i].len;
     }
 
-    priv->out_status++;
-    return len;
+    if (priv->snd.proc) {
+        priv->snd.proc(priv->out_data, priv->out_len, priv->snd.args);
+    }
+#ifdef DEBUG
+    fwrite(priv->out_data, priv->out_len, 1, priv->out_file);
+#endif
+
+    return 0;
 }
 
 static int flv_send_proc(void *param)
@@ -145,7 +141,7 @@ static int flv_send_proc(void *param)
         priv->snd.pre(priv->snd.args);
     }
 
-    priv->writer = flv_writer_create2(web_media_write, priv);
+    priv->writer = flv_writer_create2(0, 1, web_media_write, priv);
     priv->muxer = flv_muxer_create(on_flv_packet, priv->writer);
     ufifo_newest(priv->in_fifo, (0xdeadbeef << 8) | 1);
 

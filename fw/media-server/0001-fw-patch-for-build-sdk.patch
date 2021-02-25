@@ -1,0 +1,73 @@
+From c8f7e604a4e975e6e428a17f6dcb1e1f1c01c5d3 Mon Sep 17 00:00:00 2001
+From: Peter Shen <peterchenshen@gmail.com>
+Date: Thu, 25 Feb 2021 13:15:18 +0800
+Subject: [PATCH] fw: patch for build sdk
+
+---
+ source/Makefile | 54 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 54 insertions(+)
+ create mode 100644 source/Makefile
+
+diff --git a/source/Makefile b/source/Makefile
+new file mode 100644
+index 0000000..0a627b3
+--- /dev/null
++++ b/source/Makefile
+@@ -0,0 +1,54 @@
++ROOT:=..
++
++#--------------------------------Output------------------------------
++# OUTTYPE: 0-exe, 1-dll, 2-static
++#--------------------------------------------------------------------
++OUTTYPE = 1
++OUTFILE = libutils.so
++
++#-------------------------------Include------------------------------
++#
++# INCLUDES = $(addprefix -I,$(INCLUDES)) # add -I prefix
++#--------------------------------------------------------------------
++INCLUDES = . \
++					./include \
++					$(ROOT)/include
++
++#-------------------------------Source-------------------------------
++#
++#--------------------------------------------------------------------
++SOURCE_FILES = \
++	base64.c \
++	bsearch.c \
++	digest/md5.c \
++	ntp-time.c \
++	port/ip-route.c \
++	sockpair.c \
++	time64.c \
++	uri-parse.c \
++	urlcodec.c
++
++#-----------------------------Library--------------------------------
++#
++# LIBPATHS = $(addprefix -L,$(LIBPATHS)) # add -L prefix
++#--------------------------------------------------------------------
++LIBPATHS =
++ifdef RELEASE
++# relase library path
++LIBPATHS +=
++else
++LIBPATHS +=
++endif
++
++LIBS =
++
++STATIC_LIBS =
++
++#-----------------------------DEFINES--------------------------------
++#
++# DEFINES := $(addprefix -D,$(DEFINES)) # add -L prefix
++#--------------------------------------------------------------------
++DEFINES =
++
++include $(ROOT)/gcc.mk
++CFLAGS += -fvisibility=default
+-- 
+2.24.1
+

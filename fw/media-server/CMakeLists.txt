@@ -1,7 +1,10 @@
 project(media-server)
 
 ExternalProject_Add(build-${PROJECT_NAME}
-    GIT_REPOSITORY "https://github.com/ShenChen1/media-server.git"
+    GIT_REPOSITORY "https://github.com/ireader/media-server.git"
+    PATCH_COMMAND true
+    COMMAND git reset --hard FETCH_HEAD
+    COMMAND git am ${PROJECT_SOURCE_DIR}/0001-fw-patch-for-build-media-server.patch
     CONFIGURE_COMMAND true
     BUILD_COMMAND true
     COMMAND make CROSS=${CMAKE_CROSS_PREFIX}- RELEASE=0 OUTPATH=${PROJECT_BINARY_DIR}/build -C libflv
@@ -26,7 +29,10 @@ set(MEDIA_SRV_LINK_DIR "${PROJECT_BINARY_DIR}/build"
     CACHE PATH INTERNAL FORCE)
 
 ExternalProject_Add(build-${PROJECT_NAME}-sdk
-    GIT_REPOSITORY "https://github.com/ShenChen1/sdk.git"
+    GIT_REPOSITORY "https://github.com/ireader/sdk.git"
+    PATCH_COMMAND true
+    COMMAND git reset --hard FETCH_HEAD
+    COMMAND git am ${PROJECT_SOURCE_DIR}/0001-fw-patch-for-build-sdk.patch
     CONFIGURE_COMMAND true
     BUILD_COMMAND true
     COMMAND make CROSS=${CMAKE_CROSS_PREFIX}- RELEASE=0 OUTPATH=${PROJECT_BINARY_DIR}/build -C libhttp

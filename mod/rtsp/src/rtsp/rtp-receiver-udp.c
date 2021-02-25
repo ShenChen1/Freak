@@ -102,13 +102,15 @@ static int rtp_receiver(rtp_receiver_priv_t *priv, socket_t rtp[2], int timeout)
     return r;
 }
 
-static void rtp_onpacket(void *param, const void *packet, int bytes, uint32_t timestamp, int flags)
+static int rtp_onpacket(void *param, const void *packet, int bytes, uint32_t timestamp, int flags)
 {
     rtp_receiver_priv_t *priv = param;
 
     if (priv->base.frame) {
         priv->base.frame(priv->base.param, priv->encoding, packet, bytes, timestamp, flags);
     }
+
+    return 0;
 }
 
 static int rtp_worker(void *param)
@@ -141,7 +143,7 @@ rtp_udp_receiver_create(int rtp[2], const char *peer, int peerport[2], int paylo
     priv->base.free = rtp_udp_receiver_free;
     snprintf(priv->encoding, sizeof(priv->encoding), "%s", encoding);
     priv->profile = (void *)rtp_profile_find(payload);
-    priv->demuxer = rtp_demuxer_create(priv->profile ? priv->profile->frequency : 90000, payload, encoding, rtp_onpacket, priv);
+    priv->demuxer = rtp_demuxer_create(100, priv->profile ? priv->profile->frequency : 90000, payload, encoding, rtp_onpacket, priv);
 
     assert(0 == socket_addr_from(&priv->ss[0], NULL, peer, (uint16_t)peerport[0]));
     assert(0 == socket_addr_from(&priv->ss[1], NULL, peer, (uint16_t)peerport[1]));
