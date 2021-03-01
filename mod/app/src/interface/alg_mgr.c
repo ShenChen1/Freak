@@ -5,8 +5,6 @@
 #include "log.h"
 #include "media.h"
 #include "proto.h"
-#include "proto_app.h"
-#include "ufifo.h"
 #include "vsf/frame_mgr.h"
 #include "vsf/osd_mgr.h"
 
@@ -16,82 +14,13 @@ typedef struct {
 } buf_t;
 
 typedef struct {
-    ufifo_t *fifos[APP_ITEM_MAX];
+    mfifo_t *fifos[APP_ITEM_MAX];
     void *osds[APP_ITEM_MAX];
     buf_t bufs[APP_ITEM_MAX];
     proto_app_alg_t *info;
 } app_alg_mgr_priv_t;
 
 static app_alg_mgr_t *s_mgr = NULL;
-
-static unsigned int recsize(unsigned char *p1, unsigned int n1, unsigned char *p2)
-{
-    unsigned int size = sizeof(media_record_t);
-
-    if (n1 >= size) {
-        media_record_t *rec = (media_record_t *)p1;
-        size                = rec->size;
-    } else {
-        media_record_t rec;
-        char *p = (char *)(&rec);
-        memcpy(p, p1, n1);
-        memcpy(p + n1, p2, size - n1);
-        size = rec.size;
-    }
-
-    return size;
-}
-
-static unsigned int rectag(unsigned char *p1, unsigned int n1, unsigned char *p2)
-{
-    unsigned int tag;
-    unsigned int size = sizeof(media_record_t);
-
-    if (n1 >= size) {
-        media_record_t *rec = (media_record_t *)p1;
-        tag                 = rec->tag;
-    } else {
-        media_record_t rec;
-        char *p = (char *)(&rec);
-        memcpy(p, p1, n1);
-        memcpy(p + n1, p2, size - n1);
-        tag = rec.tag;
-    }
-
-    return tag;
-}
-
-static unsigned int recget(unsigned char *p1, unsigned int n1, unsigned char *p2, void *arg)
-{
-    media_record_t *rec = arg;
-    unsigned int a = 0, l = 0, _n1 = n1;
-    unsigned char *p = NULL, *_p1 = p1, *_p2 = p2;
-
-    // copy header
-    p = (unsigned char *)(rec);
-    a = sizeof(media_record_t);
-    l = min(a, _n1);
-    memcpy(p, _p1, l);
-    memcpy(p + _n1, _p2, a - l);
-    _n1 -= l;
-    _p1 += l;
-    _p2 += a - l;
-
-    // check header
-    assert(rec->tag >= (0xdeadbeef << 8));
-
-    // copy data
-    p = (unsigned char *)(rec->buf);
-    a = rec->size - sizeof(media_record_t);
-    l = min(a, _n1);
-    memcpy(p, _p1, l);
-    memcpy(p + l, _p2, a - l);
-    _n1 -= l;
-    _p1 += l;
-    _p2 += a - l;
-
-    return rec->size;
-}
 
 static int __app_alg_get_frame(void *data, void *args)
 {
@@ -100,7 +29,7 @@ static int __app_alg_get_frame(void *data, void *args)
     proto_app_alg_cfg_t *cfg = args;
     media_record_t *rec      = (media_record_t *)priv->bufs[cfg->id].data;
 
-    ret = ufifo_get_block(priv->fifos[cfg->id], priv->bufs[cfg->id].data, priv->bufs[cfg->id].size);
+    ret = priv->fifos[cfg->id]->get(priv->fifos[cfg->id], priv->bufs[cfg->id].data, priv->bufs[cfg->id].size, -1);
     assert(ret > 0 && ret <= priv->bufs[cfg->id].size);
 
     void **_data = (void **)data;
@@ -173,19 +102,15 @@ static int __app_alg_set(app_alg_mgr_t *self, proto_app_alg_cfg_t *cfg)
             frame_mgr->set(frame_mgr, &frame_cfg);
             frame_mgr->destroy(frame_mgr);
 
-            char name[64];
-            ufifo_init_t init = {
-                    .lock = UFIFO_LOCK_NONE,
-                    .opt  = UFIFO_OPT_ATTACH,
-                    .attach = { .shared = 0, },
-                    .hook = { recsize, rectag, NULL, recget },
-                };
-            snprintf(name, sizeof(name), PROTO_VSF_FRAME_FIFO "%d-%d", frame_cap.chn, frame_cap.subchn);
-            ufifo_open(name, &init, &priv->fifos[cfg->id]);
-            ufifo_newest(priv->fifos[cfg->id], (0xdeadbeef << 8) | 1);
-
-            vsf_osd_mgr_t *osd  = vsf_createOsdMgr_r();
-            priv->osds[cfg->id] = osd;
+            mfifo_init_t fifo_init = {
+                .type = MEDIA_VIDEO_FRAME,
+                .chn = frame_cap.chn,
+                .subchn = frame_cap.subchn,
+            };
+            priv->fifos[cfg->id] = mfifo_attach(&fifo_init, 1);
+            assert(priv->fifos[cfg->id]);
+            priv->fifos[cfg->id]->newest(priv->fifos[cfg->id]);
+            priv->osds[cfg->id] = vsf_createOsdMgr_r();
 
             priv->bufs[cfg->id].size = frame_cfg.width * frame_cfg.height * 3 + 1024;
             priv->bufs[cfg->id].data = malloc(priv->bufs[cfg->id].size);
@@ -207,7 +132,7 @@ static int __app_alg_set(app_alg_mgr_t *self, proto_app_alg_cfg_t *cfg)
             }
         } else {
             if (priv->fifos[cfg->id]) {
-                ufifo_close(priv->fifos[cfg->id]);
+                priv->fifos[cfg->id]->destroy(priv->fifos[cfg->id]);
                 priv->fifos[cfg->id] = NULL;
             }
 

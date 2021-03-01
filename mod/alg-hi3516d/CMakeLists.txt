@@ -12,7 +12,9 @@ add_library(${PROJECT_NAME} STATIC
 
 target_link_libraries(${PROJECT_NAME}
     utils
-    proto)
+    proto
+    media
+    -lstdc++)
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${FREAK_TOOLS_PATH}/jsonb-c/inc/)
 include_directories(${PROJECT_SOURCE_DIR}/../app/)

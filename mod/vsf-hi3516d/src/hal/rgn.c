@@ -1,9 +1,8 @@
-#include "inc/hal/rgn.h"
+#include "log.h"
 #include "common.h"
 #include "media.h"
+#include "inc/hal/rgn.h"
 #include "inc/sdk_cfg.h"
-#include "log.h"
-#include "proto_vsf.h"
 
 typedef enum {
     VSF_RGN_NONE,
@@ -31,6 +30,11 @@ typedef struct {
 static vsf_rgn_mod_t s_mod;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+static inline unsigned int argb8888_888(unsigned int color)
+{
+    return color & 0xffffff;
+}
 
 static int __rgn_init(vsf_rgn_t *self)
 {

@@ -23,17 +23,16 @@ add_executable(${PROJECT_NAME}
     cfg/cfg.c)
 
 target_link_libraries(${PROJECT_NAME}
-    -l${LIB_UFIFO_NAME}
     -l${LIB_FREETYPE_NAME}
     ${LIB_VSF_SDK_NAME}
     -Wl,--whole-archive
     vsf-${CMAKE_CHIP_NAME}
     -Wl,--no-whole-archive
     utils
-    proto)
+    proto
+    media)
 include_directories(${PROJECT_SOURCE_DIR})
 add_dependencies(${PROJECT_NAME} vsf-${CMAKE_CHIP_NAME})
-add_dependencies(${PROJECT_NAME} ${LIB_UFIFO_NAME})
 add_dependencies(${PROJECT_NAME} ${LIB_FREETYPE_NAME})
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_BINDIR})

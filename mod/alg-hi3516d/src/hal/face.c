@@ -3,15 +3,13 @@
 #include "inc/nnie_face_api.h"
 #include "inc/sdk_common.h"
 #include "log.h"
+#include "common.h"
 #include "media.h"
 #include "proto_app.h"
-#include "ufifo.h"
 
 extern int tracker_id(int FrameIndex, RESULT_BAG *result_bag, RESULT_BAG *result_out);
 
 typedef struct {
-    ufifo_t *fifo_get;
-    ufifo_t *fifo_free;
     que_t *resultQue;
     pthread_t s_hMdThread;
     pthread_t s_rsltThread;
@@ -31,8 +29,8 @@ static app_face_mod_t s_mod = { 0 };
 static void *hs_fd_result_task(void *args)
 {
     int ret;
-    app_face_priv_t *priv           = args;
-    proto_app_alg_result_t *results = NULL;
+    app_face_priv_t *priv = args;
+    void *results         = NULL;
 
     while (HI_FALSE == priv->s_bStopSignal) {
         // block mode
@@ -56,10 +54,9 @@ static void *hs_fd_task(void *args)
     int framecnt = 0;
     int u32Size  = 0;
 
-    HI_S32 s32Ret                   = 0;
-    HI_BOOL bInstant                = HI_TRUE;
-    proto_app_alg_result_t *results = NULL;
-    app_face_priv_t *priv           = args;
+    HI_S32 s32Ret         = 0;
+    HI_BOOL bInstant      = HI_TRUE;
+    app_face_priv_t *priv = args;
     HI_U64 alg_phy_addr;
     HI_U64 alg_vir_addr;
 
@@ -167,22 +164,24 @@ static void *hs_fd_task(void *args)
         tracker_id(framecnt, &result_bag, &result_out);
 
         if (priv->cb[APP_ALG_CB_RESULT_OUT].func) {
-            results      = malloc(sizeof(proto_app_alg_result_t));
-            results->num = result_bag.obj_num;
-            for (i = 0; i < result_out.obj_num; i++) {
-                results->objs[i].id     = result_out.obj[i].ID;
-                results->objs[i].rect.x = result_out.obj[i].centerx - result_out.obj[i].width / 2;
-                results->objs[i].rect.y = result_out.obj[i].centery - result_out.obj[i].heigth / 2;
-                results->objs[i].rect.w = result_out.obj[i].width;
-                results->objs[i].rect.h = result_out.obj[i].heigth;
-                // to do keypoint
-                results->objs[i].rect.x = results->objs[i].rect.x * 8192 / 640;
-                results->objs[i].rect.y = results->objs[i].rect.y * 8192 / 640;
-                results->objs[i].rect.w = results->objs[i].rect.w * 8192 / 640;
-                results->objs[i].rect.h = results->objs[i].rect.h * 8192 / 640;
+            proto_app_alg_result_t *results = malloc(sizeof(proto_app_alg_result_t));
+            if (results) {
+                results->num = result_bag.obj_num;
+                for (i = 0; i < result_out.obj_num; i++) {
+                    results->objs[i].id     = result_out.obj[i].ID;
+                    results->objs[i].rect.x = result_out.obj[i].centerx - result_out.obj[i].width / 2;
+                    results->objs[i].rect.y = result_out.obj[i].centery - result_out.obj[i].heigth / 2;
+                    results->objs[i].rect.w = result_out.obj[i].width;
+                    results->objs[i].rect.h = result_out.obj[i].heigth;
+                    // to do keypoint
+                    results->objs[i].rect.x = results->objs[i].rect.x * 8192 / 640;
+                    results->objs[i].rect.y = results->objs[i].rect.y * 8192 / 640;
+                    results->objs[i].rect.w = results->objs[i].rect.w * 8192 / 640;
+                    results->objs[i].rect.h = results->objs[i].rect.h * 8192 / 640;
+                }
+                // no block
+                que_put(priv->resultQue, results, 0);
             }
-            // no block
-            que_put(priv->resultQue, results, 0);
         }
 
         if (priv->cb[APP_ALG_CB_FRAME_GET].func) {

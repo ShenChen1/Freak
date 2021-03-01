@@ -8,7 +8,4 @@
 #define PROTO_WEB_CFG_PATH "/tmp/web-config.json"
 #define PROTO_APP_CFG_PATH "/tmp/app-config.json"
 
-#define PROTO_VSF_STREAM_FIFO "vsf-stream-"
-#define PROTO_VSF_FRAME_FIFO "vsf-frame-"
-
 #endif /* __PATH_H__ */

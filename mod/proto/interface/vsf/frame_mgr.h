@@ -2,7 +2,6 @@
 #define __VSF_FRAME_MGR_H__
 
 #include "proto_vsf.h"
-#include "video_frame.h"
 
 typedef struct frame_mgr {
     void *priv;

@@ -15,13 +15,12 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     -l${LIB_MONGOOSE_NAME}
     -l${LIB_MEDIA_SRV_UTILS_NAME}
-    -l${LIB_UFIFO_NAME}
     ${LIB_MEDIA_SRV_NAME}::flv
     utils
-    proto)
+    proto
+    media)
 include_directories(${PROJECT_SOURCE_DIR})
 add_dependencies(${PROJECT_NAME} ${LIB_MONGOOSE_NAME})
-add_dependencies(${PROJECT_NAME} ${LIB_UFIFO_NAME})
 add_dependencies(${PROJECT_NAME} ${LIB_MEDIA_SRV_NAME})
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_BINDIR})

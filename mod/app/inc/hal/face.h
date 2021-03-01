@@ -1,6 +1,5 @@
 #ifndef __HSFACE_H
 #define __HSFACE_H
-#include "proto.h"
 
 typedef int (*app_alg_proc_t)(void *frame, void *args);
 typedef struct {

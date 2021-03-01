@@ -8,7 +8,6 @@
 #include "inc/hal/vpss.h"
 #include "log.h"
 #include "proto.h"
-#include "ufifo.h"
 #include FT_FREETYPE_H
 
 typedef struct {
@@ -20,10 +19,19 @@ typedef struct {
 
 static vsf_osd_mgr_t *s_mgr = NULL;
 
-static int __vsf_osd_destroy(vsf_osd_mgr_t *self)
+static inline unsigned short argb8888_1555(unsigned int color)
 {
-    // never destroy
-    return 0;
+    unsigned char a = (color >> 24) & 0xff;
+    unsigned char r = (color >> 16) & 0xff;
+    unsigned char g = (color >> 8) & 0xff;
+    unsigned char b = color & 0xff;
+
+    a = a ? 1 : 0;
+    r >>= 3;
+    g >>= 3;
+    b >>= 3;
+
+    return (unsigned short)(a << 15 | r << 10 | g << 5 | b);
 }
 
 static void __draw_char(vsf_rgn_bitmap_t *src, FT_Bitmap *dst, proto_point_t *point, uint32_t color)
@@ -144,6 +152,12 @@ static int __draw_obj(vsf_rgn_bitmap_t *bitmap, proto_vsf_osd_obj_t *obj)
     text.point.x = obj->rect.x - text.size - 2;
     text.point.y = obj->rect.y;
     __draw_text(bitmap, &text);
+    return 0;
+}
+
+static int __vsf_osd_destroy(vsf_osd_mgr_t *self)
+{
+    // never destroy
     return 0;
 }
 

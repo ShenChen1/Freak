@@ -28,7 +28,7 @@ add_library(${PROJECT_NAME} STATIC
 
 target_link_libraries(${PROJECT_NAME}
     utils
-    proto)
+    media)
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/../vsf/)
 add_dependencies(${PROJECT_NAME} sdk-${CMAKE_CHIP_NAME})

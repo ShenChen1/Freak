@@ -23,7 +23,6 @@ target_link_libraries(${PROJECT_NAME}
     utils)
 target_include_directories(${PROJECT_NAME}
     PUBLIC ${PROJECT_SOURCE_DIR}/inc
-    PUBLIC ${PROJECT_SOURCE_DIR}/media
     PUBLIC ${PROJECT_SOURCE_DIR}/alg
     PUBLIC ${PROJECT_SOURCE_DIR}/jsonb
     PUBLIC ${PROJECT_SOURCE_DIR}/interface)

@@ -6,10 +6,10 @@
 #include "librtp/rtp.h"
 #include "log.h"
 #include "proto.h"
+#include "media.h"
 #include "rtp-transport.h"
 #include "sys/locker.h"
 #include "sys/thread.h"
-#include "ufifo.h"
 
 enum {
     MEDIA_TRACK_VIDEO = 0, // a=control:video
@@ -29,7 +29,7 @@ enum {
 typedef struct {
     void *rtp;
     void *packer;
-    ufifo_t *fifo;
+    mfifo_t *fifo;
     uint8_t packet[64 * 1024];
     struct rtp_transport_t *transport;
 } rtp_media_track_t;
@@ -42,75 +42,6 @@ typedef struct {
     int status;
     rtp_media_track_t track[MEDIA_TRACK_MAX];
 } rtp_media_priv_t;
-
-static unsigned int recsize(unsigned char *p1, unsigned int n1, unsigned char *p2)
-{
-    unsigned int size = sizeof(media_record_t);
-
-    if (n1 >= size) {
-        media_record_t *rec = (media_record_t *)p1;
-        size = rec->size;
-    } else {
-        media_record_t rec;
-        char *p = (char *)(&rec);
-        memcpy(p, p1, n1);
-        memcpy(p + n1, p2, size - n1);
-        size = rec.size;
-    }
-
-    return size;
-}
-
-static unsigned int rectag(unsigned char *p1, unsigned int n1, unsigned char *p2)
-{
-    unsigned int tag;
-    unsigned int size = sizeof(media_record_t);
-
-    if (n1 >= size) {
-        media_record_t *rec = (media_record_t *)p1;
-        tag = rec->tag;
-    } else {
-        media_record_t rec;
-        char *p = (char *)(&rec);
-        memcpy(p, p1, n1);
-        memcpy(p + n1, p2, size - n1);
-        tag = rec.tag;
-    }
-
-    return tag;
-}
-
-static unsigned int recget(unsigned char *p1, unsigned int n1, unsigned char *p2, void *arg)
-{
-    media_record_t *rec  = arg;
-    unsigned int a = 0, l = 0, _n1 = n1;
-    unsigned char *p = NULL, *_p1 = p1, *_p2 = p2;
-
-    // copy header
-    p = (unsigned char *)(rec);
-    a = sizeof(media_record_t);
-    l = min(a, _n1);
-    memcpy(p, _p1, l);
-    memcpy(p + _n1, _p2, a - l);
-    _n1 -= l;
-    _p1 += l;
-    _p2 += a - l;
-
-    // check header
-    assert(rec->tag >= (0xdeadbeef << 8));
-
-    // copy data
-    p = (unsigned char *)(rec->buf);
-    a = rec->size - sizeof(media_record_t);
-    l = min(a, _n1);
-    memcpy(p, _p1, l);
-    memcpy(p + l, _p2, a - l);
-    _n1 -= l;
-    _p1 += l;
-    _p2 += a - l;
-
-    return rec->size;
-}
 
 static void *__alloc(void *param, int bytes)
 {
@@ -154,7 +85,7 @@ static int rtp_send_data(void *arg)
         memset(rec, 0, sizeof(media_record_t));
 
         if (priv->track[MEDIA_TRACK_VIDEO].fifo) {
-            ufifo_get_timeout(priv->track[MEDIA_TRACK_VIDEO].fifo, priv->data, sizeof(priv->data), 1000);
+            priv->track[MEDIA_TRACK_VIDEO].fifo->get(priv->track[MEDIA_TRACK_VIDEO].fifo, priv->data, sizeof(priv->data), 1000);
             tracef("bytes:%u tag:0x%x ts:%llu", rec->size, rec->tag, rec->ts);
         }
 
@@ -203,15 +134,12 @@ static int rtp_get_sdp(struct rtp_media_t *m, char *sdp)
     }
 
     if (!priv->track[MEDIA_TRACK_VIDEO].fifo) {
-        ufifo_init_t init = {
-            .lock = UFIFO_LOCK_NONE,
-            .opt  = UFIFO_OPT_ATTACH,
-            .attach = { .shared = 1, },
-            .hook = { recsize, rectag, NULL, recget },
-        };
-        char name[64];
-        snprintf(name, sizeof(name), PROTO_VSF_STREAM_FIFO"%s", &priv->path[1]);
-        ufifo_open(name, &init, &priv->track[MEDIA_TRACK_VIDEO].fifo);
+        mfifo_init_t init = { .type = MEDIA_VIDEO_STREAM };
+        int ret = sscanf(priv->path, "/%d-%d", &init.chn, &init.subchn);
+        if (ret != 2) {
+            return -1;
+        }
+        priv->track[MEDIA_TRACK_VIDEO].fifo = mfifo_attach(&init, 1);
         if (priv->track[MEDIA_TRACK_VIDEO].fifo == NULL) {
             return -1;
         }
@@ -239,7 +167,7 @@ static int rtp_play(struct rtp_media_t *m)
     rtp_media_priv_t *priv = container_of(m, rtp_media_priv_t, base);
     tracef("m:%p", m);
     if (priv->track[MEDIA_TRACK_VIDEO].fifo) {
-        ufifo_newest(priv->track[MEDIA_TRACK_VIDEO].fifo, (0xdeadbeef << 8) | 1);
+        priv->track[MEDIA_TRACK_VIDEO].fifo->newest(priv->track[MEDIA_TRACK_VIDEO].fifo);
     }
     priv->status = MEDIA_STATUS_PLAY;
     return 0;
@@ -351,7 +279,7 @@ int rtp_media_live_free(struct rtp_media_t *m)
         }
         if (priv->track[i].fifo) {
             tracef("ufifo_close");
-            ufifo_close(priv->track[i].fifo);
+            priv->track[i].fifo->destroy(priv->track[i].fifo);
         }
     }
 

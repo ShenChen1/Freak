@@ -19,15 +19,14 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     -l${LIB_MEDIA_SRV_AIO_NAME}
     -l${LIB_MEDIA_SRV_UTILS_NAME}
-    -l${LIB_UFIFO_NAME}
     ${LIB_MEDIA_SRV_NAME}::rtsp
     ${LIB_MEDIA_SRV_NAME}::http
     ${LIB_MEDIA_SRV_NAME}::rtp
     utils
-    proto)
+    proto
+    media)
 include_directories(${PROJECT_SOURCE_DIR})
 add_dependencies(${PROJECT_NAME} ${LIB_MEDIA_SRV_NAME})
-add_dependencies(${PROJECT_NAME} ${LIB_UFIFO_NAME})
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_BINDIR})
 jsonb(${PROJECT_NAME} cfg ${PROJECT_SOURCE_DIR}/cfg/cfg.jsonb ${PROJECT_SOURCE_DIR}/cfg)

@@ -2,7 +2,6 @@
 #define __PROTO_H__
 
 #include "common.h"
-#include "media.h"
 #include "node.h"
 #include "path.h"
 
