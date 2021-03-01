@@ -4,7 +4,7 @@
 #include "ufifo.h"
 #include "media.h"
 
-static unsigned int recsize(unsigned char *p1, unsigned int n1, unsigned char *p2)
+unsigned int video_stream_recsize(unsigned char *p1, unsigned int n1, unsigned char *p2)
 {
     unsigned int size = sizeof(media_record_t);
 
@@ -23,7 +23,7 @@ static unsigned int recsize(unsigned char *p1, unsigned int n1, unsigned char *p
     return size;
 }
 
-static unsigned int rectag(unsigned char *p1, unsigned int n1, unsigned char *p2)
+unsigned int video_stream_rectag(unsigned char *p1, unsigned int n1, unsigned char *p2)
 {
     unsigned int tag;
     unsigned int size = sizeof(media_record_t);
@@ -43,7 +43,7 @@ static unsigned int rectag(unsigned char *p1, unsigned int n1, unsigned char *p2
     return tag;
 }
 
-static unsigned int recput(unsigned char *p1, unsigned int n1, unsigned char *p2, void *arg)
+unsigned int video_stream_recput(unsigned char *p1, unsigned int n1, unsigned char *p2, void *arg)
 {
     int i;
     size_t totalsize       = sizeof(media_record_t) + sizeof(video_stream_t);
@@ -109,7 +109,7 @@ static unsigned int recput(unsigned char *p1, unsigned int n1, unsigned char *p2
     return totalsize;
 }
 
-static unsigned int recget(unsigned char *p1, unsigned int n1, unsigned char *p2, void *arg)
+unsigned int video_stream_recget(unsigned char *p1, unsigned int n1, unsigned char *p2, void *arg)
 {
     media_record_t *rec  = arg;
     unsigned int a = 0, l = 0, _n1 = n1;
