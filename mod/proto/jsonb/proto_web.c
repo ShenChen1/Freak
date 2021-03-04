@@ -98,7 +98,7 @@ void jsonb_opt_proto_web_svr_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "caps", json_child);
     }
-    const size_t array_size_list[] = {WEB_ITEM_MAX,0};
+    const size_t array_size_list[8 + 1] = {WEB_ITEM_MAX,0};
     jsonb_opt_array(opt, json_child, element->caps, sizeof(proto_web_svr_cap_t) * 1 * WEB_ITEM_MAX, array_size_list, jsonb_opt_proto_web_svr_cap_t);
 }
 {
@@ -110,7 +110,7 @@ void jsonb_opt_proto_web_svr_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "cfgs", json_child);
     }
-    const size_t array_size_list[] = {WEB_ITEM_MAX,0};
+    const size_t array_size_list[8 + 1] = {WEB_ITEM_MAX,0};
     jsonb_opt_array(opt, json_child, element->cfgs, sizeof(proto_web_svr_cfg_t) * 1 * WEB_ITEM_MAX, array_size_list, jsonb_opt_proto_web_svr_cfg_t);
 }
 }

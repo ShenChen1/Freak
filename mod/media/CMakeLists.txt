@@ -10,6 +10,7 @@ add_library(${PROJECT_NAME} STATIC
 
 target_link_libraries(${PROJECT_NAME}
     -l${LIB_UFIFO_NAME}
+    -lrt
     utils)
 target_include_directories(${PROJECT_NAME}
     PUBLIC ${PROJECT_SOURCE_DIR}/inc)

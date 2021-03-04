@@ -17,7 +17,7 @@ add_library(${PROJECT_NAME} STATIC
 target_link_libraries(${PROJECT_NAME}
     -l${LIB_CJSON_NAME}
     -l${LIB_NANOMSG_NAME}
-    -lrt -lpthread)
+    -lpthread)
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC ${PROJECT_SOURCE_DIR}/json-cfg/inc

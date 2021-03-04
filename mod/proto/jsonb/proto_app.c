@@ -98,7 +98,7 @@ void jsonb_opt_proto_app_alg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "caps", json_child);
     }
-    const size_t array_size_list[] = {APP_ITEM_MAX,0};
+    const size_t array_size_list[8 + 1] = {APP_ITEM_MAX,0};
     jsonb_opt_array(opt, json_child, element->caps, sizeof(proto_app_alg_cap_t) * 1 * APP_ITEM_MAX, array_size_list, jsonb_opt_proto_app_alg_cap_t);
 }
 {
@@ -110,7 +110,7 @@ void jsonb_opt_proto_app_alg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "cfgs", json_child);
     }
-    const size_t array_size_list[] = {APP_ITEM_MAX,0};
+    const size_t array_size_list[8 + 1] = {APP_ITEM_MAX,0};
     jsonb_opt_array(opt, json_child, element->cfgs, sizeof(proto_app_alg_cfg_t) * 1 * APP_ITEM_MAX, array_size_list, jsonb_opt_proto_app_alg_cfg_t);
 }
 }
@@ -159,7 +159,7 @@ void jsonb_opt_proto_app_alg_obj_t(jsonb_opt_e opt, cJSON *json, void *e, size_t
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "keypoints", json_child);
     }
-    const size_t array_size_list[] = {ALG_KEY_POINT_NUM,0};
+    const size_t array_size_list[8 + 1] = {ALG_KEY_POINT_NUM,0};
     jsonb_opt_array(opt, json_child, element->keypoints, sizeof(proto_point_t) * 1 * ALG_KEY_POINT_NUM, array_size_list, jsonb_opt_proto_point_t);
 }
 }
@@ -186,7 +186,7 @@ void jsonb_opt_proto_app_alg_result_t(jsonb_opt_e opt, cJSON *json, void *e, siz
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "objs", json_child);
     }
-    const size_t array_size_list[] = {ALG_OBJ_NUM_MAX,0};
+    const size_t array_size_list[8 + 1] = {ALG_OBJ_NUM_MAX,0};
     jsonb_opt_array(opt, json_child, element->objs, sizeof(proto_app_alg_obj_t) * 1 * ALG_OBJ_NUM_MAX, array_size_list, jsonb_opt_proto_app_alg_obj_t);
 }
 }
