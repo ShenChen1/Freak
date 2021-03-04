@@ -21,7 +21,6 @@ static int __web_svr_destroy(web_svr_mgr_t *self)
 
 static int __web_svr_set(web_svr_mgr_t *self, proto_web_svr_cfg_t *cfg)
 {
-    int ret;
     web_svr_mgr_t *mgr       = self;
     web_svr_mgr_priv_t *priv = mgr->priv;
 
@@ -32,8 +31,7 @@ static int __web_svr_set(web_svr_mgr_t *self, proto_web_svr_cfg_t *cfg)
         }
     } else {
         if (priv->server[cfg->id]) {
-            ret = http_server_uninit(priv->server[cfg->id]);
-            assert(ret == 0);
+            http_server_uninit(priv->server[cfg->id]);
             priv->server[cfg->id] = NULL;
         }
     }

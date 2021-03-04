@@ -23,6 +23,7 @@ ExternalProject_Add(build-${PROJECT_NAME}
 ExternalProject_Add_Step(build-${PROJECT_NAME} apply-patch
     WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/build-${PROJECT_NAME}-prefix/src/build-${PROJECT_NAME}
     COMMENT "Apply patches for build-${PROJECT_NAME}"
+    COMMAND git reset --hard HEAD
     COMMAND git apply ${PROJECT_SOURCE_DIR}/0001-fw-patch-for-build-media-server.patch
     DEPENDEES download)
 
@@ -51,6 +52,7 @@ add_dependencies(build-${PROJECT_NAME} build-${PROJECT_NAME}-sdk)
 ExternalProject_Add_Step(build-${PROJECT_NAME}-sdk apply-patch
     WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/build-${PROJECT_NAME}-sdk-prefix/src/build-${PROJECT_NAME}-sdk
     COMMENT "Apply patches for build-${PROJECT_NAME}-sdk"
+    COMMAND git reset --hard HEAD
     COMMAND git apply ${PROJECT_SOURCE_DIR}/0001-fw-patch-for-build-sdk.patch
     DEPENDEES download)
 

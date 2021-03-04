@@ -28,7 +28,7 @@ int log_init(const char *url, int server)
     ret = nnm_push_create(url, &s_nnm);
     assert(ret == 0);
 
-    return 0;
+    return ret;
 }
 
 int log_deinit()

@@ -171,20 +171,22 @@ static int __vsf_osd_num(vsf_osd_mgr_t *self)
 vsf_osd_mgr_t *__vsf_createOsdMgr(int proto)
 {
     int ret;
+    nnm_t req                = NULL;
     vsf_osd_mgr_t *mgr       = NULL;
     vsf_osd_mgr_priv_t *priv = NULL;
 
-    priv = malloc(sizeof(vsf_osd_mgr_priv_t));
-    assert(priv);
-    ret = nnm_req_create(PROTO_VSF_COM_NODE, &priv->req);
-    assert(!ret);
-    priv->proto = proto;
-
-    mgr = malloc(sizeof(vsf_osd_mgr_t));
-    if (mgr == NULL) {
+    ret = nnm_req_create(PROTO_VSF_COM_NODE, &req);
+    if (ret < 0) {
         return NULL;
     }
 
+    priv = malloc(sizeof(vsf_osd_mgr_priv_t));
+    assert(priv);
+    priv->proto = proto;
+    priv->req   = req;
+
+    mgr = malloc(sizeof(vsf_osd_mgr_t));
+    assert(mgr);
     mgr->priv    = priv;
     mgr->destroy = __vsf_osd_destroy;
     mgr->num     = __vsf_osd_num;

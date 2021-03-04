@@ -1,6 +1,7 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
 
+#undef NDEBUG
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>

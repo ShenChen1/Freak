@@ -141,20 +141,22 @@ static int __web_svr_num(web_svr_mgr_t *self)
 web_svr_mgr_t *__web_createSvrMgr(int proto)
 {
     int ret;
+    nnm_t req                = NULL;
     web_svr_mgr_t *mgr       = NULL;
     web_svr_mgr_priv_t *priv = NULL;
 
-    priv = malloc(sizeof(web_svr_mgr_priv_t));
-    assert(priv);
-    ret = nnm_req_create(PROTO_WEB_COM_NODE, &priv->req);
-    assert(!ret);
-    priv->proto = proto;
-
-    mgr = malloc(sizeof(web_svr_mgr_t));
-    if (mgr == NULL) {
+    ret = nnm_req_create(PROTO_WEB_COM_NODE, &req);
+    if (ret < 0) {
         return NULL;
     }
 
+    priv = malloc(sizeof(web_svr_mgr_priv_t));
+    assert(priv);
+    priv->proto = proto;
+    priv->req   = req;
+
+    mgr = malloc(sizeof(web_svr_mgr_t));
+    assert(mgr);
     mgr->priv    = priv;
     mgr->destroy = __web_svr_destroy;
     mgr->num     = __web_svr_num;

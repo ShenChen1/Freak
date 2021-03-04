@@ -141,20 +141,22 @@ static int __vsf_frame_num(vsf_frame_mgr_t *self)
 vsf_frame_mgr_t *__vsf_createFrameMgr(int proto)
 {
     int ret;
+    nnm_t req                  = NULL;
     vsf_frame_mgr_t *mgr       = NULL;
     vsf_frame_mgr_priv_t *priv = NULL;
 
-    priv = malloc(sizeof(vsf_frame_mgr_priv_t));
-    assert(priv);
-    ret = nnm_req_create(PROTO_VSF_COM_NODE, &priv->req);
-    assert(!ret);
-    priv->proto = proto;
-
-    mgr = malloc(sizeof(vsf_frame_mgr_t));
-    if (mgr == NULL) {
+    ret = nnm_req_create(PROTO_VSF_COM_NODE, &req);
+    if (ret < 0) {
         return NULL;
     }
 
+    priv = malloc(sizeof(vsf_frame_mgr_priv_t));
+    assert(priv);
+    priv->proto = proto;
+    priv->req   = req;
+
+    mgr = malloc(sizeof(vsf_frame_mgr_t));
+    assert(mgr);
     mgr->priv    = priv;
     mgr->destroy = __vsf_frame_destroy;
     mgr->num     = __vsf_frame_num;

@@ -112,15 +112,20 @@ static int __bsp_dummy_get(bsp_dummy_t *self, proto_bsp_dummy_cfg_t *cfg)
 static bsp_dummy_t *__bsp_createDummy(int id, int proto)
 {
     int ret;
+    nnm_t req              = NULL;
     bsp_dummy_t *obj       = NULL;
     bsp_dummy_priv_t *priv = NULL;
 
+    ret = nnm_req_create(PROTO_BSP_COM_NODE, &req);
+    if (ret < 0) {
+        return NULL;
+    }
+
     priv = malloc(sizeof(bsp_dummy_priv_t));
     assert(priv);
-    ret = nnm_req_create(PROTO_BSP_COM_NODE, &priv->req);
-    assert(!ret);
     priv->id    = id;
     priv->proto = proto;
+    priv->req   = req;
 
     obj = malloc(sizeof(bsp_dummy_t));
     assert(obj);
@@ -143,7 +148,9 @@ static int __bsp_getDummyNum(int proto)
     proto_num_t num      = {};
 
     ret = nnm_req_create(PROTO_BSP_COM_NODE, &req);
-    assert(!ret);
+    if (ret < 0) {
+        return ret;
+    }
 
     uint8_t ibuf[PROTO_PACKAGE_MAXSIZE] = {};
     proto_client_data_pre(proto, jsonb_opt_proto_num_t, &num, sizeof(proto_num_t), proto_package_data(ibuf), &isize);

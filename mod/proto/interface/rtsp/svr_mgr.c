@@ -141,20 +141,22 @@ static int __rtsp_svr_num(rtsp_svr_mgr_t *self)
 rtsp_svr_mgr_t *__rtsp_createSvrMgr(int proto)
 {
     int ret;
+    nnm_t req                 = NULL;
     rtsp_svr_mgr_t *mgr       = NULL;
     rtsp_svr_mgr_priv_t *priv = NULL;
 
-    priv = malloc(sizeof(rtsp_svr_mgr_priv_t));
-    assert(priv);
-    ret = nnm_req_create(PROTO_RTSP_COM_NODE, &priv->req);
-    assert(!ret);
-    priv->proto = proto;
-
-    mgr = malloc(sizeof(rtsp_svr_mgr_t));
-    if (mgr == NULL) {
+    ret = nnm_req_create(PROTO_RTSP_COM_NODE, &req);
+    if (ret < 0) {
         return NULL;
     }
 
+    priv = malloc(sizeof(rtsp_svr_mgr_priv_t));
+    assert(priv);
+    priv->proto = proto;
+    priv->req   = req;
+
+    mgr = malloc(sizeof(rtsp_svr_mgr_t));
+    assert(mgr);
     mgr->priv    = priv;
     mgr->destroy = __rtsp_svr_destroy;
     mgr->num     = __rtsp_svr_num;

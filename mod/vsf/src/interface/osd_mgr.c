@@ -266,11 +266,10 @@ vsf_osd_mgr_t *vsf_createOsdMgr()
     memset(priv, 0, sizeof(vsf_osd_mgr_priv_t));
     priv->info = cfg_get_member(osd);
     priv->font = cfg_get_member(font);
-    FT_Error error;
-    error = FT_Init_FreeType(&priv->ft_library);
-    assert(!error);
-    error = FT_New_Face(priv->ft_library, priv->font->path, 0, &priv->ft_face);
-    assert(!error);
+    FT_Init_FreeType(&priv->ft_library);
+    assert(priv->ft_library);
+    FT_New_Face(priv->ft_library, priv->font->path, 0, &priv->ft_face);
+    assert(priv->ft_face);
 
     mgr = malloc(sizeof(vsf_osd_mgr_t));
     assert(mgr);

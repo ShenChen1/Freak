@@ -37,7 +37,7 @@ static void *nnm_rep_routine(void *arg)
         size_t outlen = 0;
         if (!self->callback(buf, bytes, &outbuf, &outlen, self->arg)) {
             bytes = nn_send(self->socket, outbuf, outlen, 0);
-            if (bytes != outlen) {
+            if (bytes < 0) {
                 fatal("nn_send");
             }
         }

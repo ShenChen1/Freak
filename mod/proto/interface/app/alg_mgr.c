@@ -141,20 +141,22 @@ static int __app_alg_num(app_alg_mgr_t *self)
 app_alg_mgr_t *__app_createAlgMgr(int proto)
 {
     int ret;
+    nnm_t req                = NULL;
     app_alg_mgr_t *mgr       = NULL;
     app_alg_mgr_priv_t *priv = NULL;
 
-    priv = malloc(sizeof(app_alg_mgr_priv_t));
-    assert(priv);
-    ret = nnm_req_create(PROTO_APP_COM_NODE, &priv->req);
-    assert(!ret);
-    priv->proto = proto;
-
-    mgr = malloc(sizeof(app_alg_mgr_t));
-    if (mgr == NULL) {
+    ret = nnm_req_create(PROTO_APP_COM_NODE, &req);
+    if (ret < 0) {
         return NULL;
     }
 
+    priv = malloc(sizeof(app_alg_mgr_priv_t));
+    assert(priv);
+    priv->proto = proto;
+    priv->req   = req;
+
+    mgr = malloc(sizeof(app_alg_mgr_t));
+    assert(mgr);
     mgr->priv    = priv;
     mgr->destroy = __app_alg_destroy;
     mgr->num     = __app_alg_num;

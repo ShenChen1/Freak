@@ -54,6 +54,7 @@ static void __free(void *param, void *packet)
 {
     rtp_media_track_t *track = param;
     assert(track->packet == packet);
+    track = track;
 }
 
 static int __packet(void *param, const void *packet, int bytes, uint32_t timestamp, int flags)
@@ -63,7 +64,9 @@ static int __packet(void *param, const void *packet, int bytes, uint32_t timesta
     assert(track->packet == packet);
 
     ret = track->transport->send(track->transport, 0, (void *)packet, bytes);
-    assert(ret == (int)bytes);
+    if (ret < 0) {
+        return ret;
+    }
 
     return rtp_onsend(track->rtp, packet, bytes);
 }

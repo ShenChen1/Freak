@@ -21,7 +21,6 @@ static int __rtsp_svr_destroy(rtsp_svr_mgr_t *self)
 
 static int __rtsp_svr_set(rtsp_svr_mgr_t *self, proto_rtsp_svr_cfg_t *cfg)
 {
-    int ret;
     rtsp_svr_mgr_t *mgr       = self;
     rtsp_svr_mgr_priv_t *priv = mgr->priv;
 
@@ -32,8 +31,7 @@ static int __rtsp_svr_set(rtsp_svr_mgr_t *self, proto_rtsp_svr_cfg_t *cfg)
         }
     } else {
         if (priv->server[cfg->id]) {
-            ret = rtsp_server_uninit(priv->server[cfg->id]);
-            assert(ret == 0);
+            rtsp_server_uninit(priv->server[cfg->id]);
             priv->server[cfg->id] = NULL;
         }
     }

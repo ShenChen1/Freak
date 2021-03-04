@@ -7,7 +7,7 @@ int json_cfg_load(const char *filename, void *cfg, size_t size, jsonb_opt_func_t
     char *data  = NULL;
     cJSON *json = NULL;
     FILE *fp    = NULL;
-    long len    = 0;
+    ssize_t len = 0;
 
     fp = fopen(filename, "rb");
     if (fp == NULL) {
@@ -28,7 +28,7 @@ int json_cfg_load(const char *filename, void *cfg, size_t size, jsonb_opt_func_t
         goto end1;
     }
 
-    if (fread(data, 1, len, fp) != len) {
+    if (fread(data, 1, len, fp) != (size_t)len) {
         ret = -EIO;
         goto end2;
     }

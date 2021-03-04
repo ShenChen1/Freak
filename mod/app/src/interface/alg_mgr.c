@@ -30,7 +30,9 @@ static int __app_alg_get_frame(void *data, void *args)
     media_record_t *rec      = (media_record_t *)priv->bufs[cfg->id].data;
 
     ret = priv->fifos[cfg->id]->get(priv->fifos[cfg->id], priv->bufs[cfg->id].data, priv->bufs[cfg->id].size, -1);
-    assert(ret > 0 && ret <= priv->bufs[cfg->id].size);
+    if (ret < 0) {
+        return ret;
+    }
 
     void **_data = (void **)data;
     *_data       = (void *)rec->buf;
@@ -61,8 +63,8 @@ static int __app_alg_result(void *data, void *args)
 
     int i = 0;
     for (i = 0; i < cfg.info.objs.num; i++) {
-        cfg.info.objs.objs[i].id = result->objs[i].id;
-        cfg.info.objs.objs[i].color = 0x01ff0000;
+        cfg.info.objs.objs[i].id     = result->objs[i].id;
+        cfg.info.objs.objs[i].color  = 0x01ff0000;
         cfg.info.objs.objs[i].rect.x = result->objs[i].rect.x;
         cfg.info.objs.objs[i].rect.y = result->objs[i].rect.y;
         cfg.info.objs.objs[i].rect.w = result->objs[i].rect.w;
@@ -103,8 +105,8 @@ static int __app_alg_set(app_alg_mgr_t *self, proto_app_alg_cfg_t *cfg)
             frame_mgr->destroy(frame_mgr);
 
             mfifo_init_t fifo_init = {
-                .type = MEDIA_VIDEO_FRAME,
-                .chn = frame_cap.chn,
+                .type   = MEDIA_VIDEO_FRAME,
+                .chn    = frame_cap.chn,
                 .subchn = frame_cap.subchn,
             };
             priv->fifos[cfg->id] = mfifo_attach(&fifo_init, 1);

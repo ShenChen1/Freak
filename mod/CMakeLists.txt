@@ -6,7 +6,15 @@ include(nanomsg)
 include(uthash)
 include(ufifo)
 
-add_compile_options(-g -Os -Wall -Werror)
+# build type, by default to release (with optimisations)
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Choose the type of build." FORCE)
+    message(STATUS "Setting build type to '${CMAKE_BUILD_TYPE}' as none was specified.")
+    # Set the possible values of build type for cmake-gui
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+endif()
+add_compile_options(-Wall -Werror)
+
 add_subdirectory(utils)
 add_subdirectory(proto)
 add_subdirectory(media)
