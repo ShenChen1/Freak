@@ -98,8 +98,9 @@ void jsonb_opt_proto_vsf_chn_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "caps", json_child);
     }
-    const size_t array_size_list[8 + 1] = {VSF_CHN_MAX,0};
-    jsonb_opt_array(opt, json_child, element->caps, sizeof(proto_vsf_chn_cap_t) * 1 * VSF_CHN_MAX, array_size_list, jsonb_opt_proto_vsf_chn_cap_t);
+    const size_t size_list_data[] = {VSF_CHN_MAX,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->caps, sizeof(proto_vsf_chn_cap_t) * 1 * VSF_CHN_MAX, size_list_data, size_list_len, 0, jsonb_opt_proto_vsf_chn_cap_t);
 }
 {
     cJSON *json_child = NULL;
@@ -110,8 +111,9 @@ void jsonb_opt_proto_vsf_chn_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "cfgs", json_child);
     }
-    const size_t array_size_list[8 + 1] = {VSF_CHN_MAX,0};
-    jsonb_opt_array(opt, json_child, element->cfgs, sizeof(proto_vsf_chn_cap_t) * 1 * VSF_CHN_MAX, array_size_list, jsonb_opt_proto_vsf_chn_cap_t);
+    const size_t size_list_data[] = {VSF_CHN_MAX,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->cfgs, sizeof(proto_vsf_chn_cap_t) * 1 * VSF_CHN_MAX, size_list_data, size_list_len, 0, jsonb_opt_proto_vsf_chn_cap_t);
 }
 }
 void jsonb_opt_proto_vsf_frame_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
@@ -244,8 +246,9 @@ void jsonb_opt_proto_vsf_frame_t(jsonb_opt_e opt, cJSON *json, void *e, size_t s
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "caps", json_child);
     }
-    const size_t array_size_list[8 + 1] = {VSF_FRAME_MAX,0};
-    jsonb_opt_array(opt, json_child, element->caps, sizeof(proto_vsf_frame_cap_t) * 1 * VSF_FRAME_MAX, array_size_list, jsonb_opt_proto_vsf_frame_cap_t);
+    const size_t size_list_data[] = {VSF_FRAME_MAX,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->caps, sizeof(proto_vsf_frame_cap_t) * 1 * VSF_FRAME_MAX, size_list_data, size_list_len, 0, jsonb_opt_proto_vsf_frame_cap_t);
 }
 {
     cJSON *json_child = NULL;
@@ -256,8 +259,9 @@ void jsonb_opt_proto_vsf_frame_t(jsonb_opt_e opt, cJSON *json, void *e, size_t s
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "cfgs", json_child);
     }
-    const size_t array_size_list[8 + 1] = {VSF_FRAME_MAX,0};
-    jsonb_opt_array(opt, json_child, element->cfgs, sizeof(proto_vsf_frame_cfg_t) * 1 * VSF_FRAME_MAX, array_size_list, jsonb_opt_proto_vsf_frame_cfg_t);
+    const size_t size_list_data[] = {VSF_FRAME_MAX,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->cfgs, sizeof(proto_vsf_frame_cfg_t) * 1 * VSF_FRAME_MAX, size_list_data, size_list_len, 0, jsonb_opt_proto_vsf_frame_cfg_t);
 }
 }
 void jsonb_opt_proto_vsf_stream_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
@@ -390,8 +394,9 @@ void jsonb_opt_proto_vsf_stream_t(jsonb_opt_e opt, cJSON *json, void *e, size_t 
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "caps", json_child);
     }
-    const size_t array_size_list[8 + 1] = {VSF_STREAM_MAX,0};
-    jsonb_opt_array(opt, json_child, element->caps, sizeof(proto_vsf_stream_cap_t) * 1 * VSF_STREAM_MAX, array_size_list, jsonb_opt_proto_vsf_stream_cap_t);
+    const size_t size_list_data[] = {VSF_STREAM_MAX,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->caps, sizeof(proto_vsf_stream_cap_t) * 1 * VSF_STREAM_MAX, size_list_data, size_list_len, 0, jsonb_opt_proto_vsf_stream_cap_t);
 }
 {
     cJSON *json_child = NULL;
@@ -402,8 +407,9 @@ void jsonb_opt_proto_vsf_stream_t(jsonb_opt_e opt, cJSON *json, void *e, size_t 
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "cfgs", json_child);
     }
-    const size_t array_size_list[8 + 1] = {VSF_STREAM_MAX,0};
-    jsonb_opt_array(opt, json_child, element->cfgs, sizeof(proto_vsf_stream_cfg_t) * 1 * VSF_STREAM_MAX, array_size_list, jsonb_opt_proto_vsf_stream_cfg_t);
+    const size_t size_list_data[] = {VSF_STREAM_MAX,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->cfgs, sizeof(proto_vsf_stream_cfg_t) * 1 * VSF_STREAM_MAX, size_list_data, size_list_len, 0, jsonb_opt_proto_vsf_stream_cfg_t);
 }
 }
 void jsonb_opt_proto_vsf_osd_mask_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
@@ -418,8 +424,9 @@ void jsonb_opt_proto_vsf_osd_mask_t(jsonb_opt_e opt, cJSON *json, void *e, size_
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "points", json_child);
     }
-    const size_t array_size_list[8 + 1] = {4,0};
-    jsonb_opt_array(opt, json_child, element->points, sizeof(proto_point_t) * 1 * 4, array_size_list, jsonb_opt_proto_point_t);
+    const size_t size_list_data[] = {4,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->points, sizeof(proto_point_t) * 1 * 4, size_list_data, size_list_len, 0, jsonb_opt_proto_point_t);
 }
 {
     cJSON *json_child = NULL;
@@ -504,8 +511,9 @@ void jsonb_opt_proto_vsf_osd_texts_t(jsonb_opt_e opt, cJSON *json, void *e, size
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "texts", json_child);
     }
-    const size_t array_size_list[8 + 1] = {VSF_OSD_TEXTS_MAX,0};
-    jsonb_opt_array(opt, json_child, element->texts, sizeof(proto_vsf_osd_text_t) * 1 * VSF_OSD_TEXTS_MAX, array_size_list, jsonb_opt_proto_vsf_osd_text_t);
+    const size_t size_list_data[] = {VSF_OSD_TEXTS_MAX,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->texts, sizeof(proto_vsf_osd_text_t) * 1 * VSF_OSD_TEXTS_MAX, size_list_data, size_list_len, 0, jsonb_opt_proto_vsf_osd_text_t);
 }
 }
 void jsonb_opt_proto_vsf_osd_obj_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
@@ -568,8 +576,9 @@ void jsonb_opt_proto_vsf_osd_objs_t(jsonb_opt_e opt, cJSON *json, void *e, size_
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "objs", json_child);
     }
-    const size_t array_size_list[8 + 1] = {VSF_OSD_OBJS_MAX,0};
-    jsonb_opt_array(opt, json_child, element->objs, sizeof(proto_vsf_osd_obj_t) * 1 * VSF_OSD_OBJS_MAX, array_size_list, jsonb_opt_proto_vsf_osd_obj_t);
+    const size_t size_list_data[] = {VSF_OSD_OBJS_MAX,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->objs, sizeof(proto_vsf_osd_obj_t) * 1 * VSF_OSD_OBJS_MAX, size_list_data, size_list_len, 0, jsonb_opt_proto_vsf_osd_obj_t);
 }
 }
 void jsonb_opt_proto_vsf_osd_cfg_union_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
@@ -720,8 +729,9 @@ void jsonb_opt_proto_vsf_osd_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "caps", json_child);
     }
-    const size_t array_size_list[8 + 1] = {VSF_OSD_MAX,0};
-    jsonb_opt_array(opt, json_child, element->caps, sizeof(proto_vsf_osd_cap_t) * 1 * VSF_OSD_MAX, array_size_list, jsonb_opt_proto_vsf_osd_cap_t);
+    const size_t size_list_data[] = {VSF_OSD_MAX,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->caps, sizeof(proto_vsf_osd_cap_t) * 1 * VSF_OSD_MAX, size_list_data, size_list_len, 0, jsonb_opt_proto_vsf_osd_cap_t);
 }
 {
     cJSON *json_child = NULL;
@@ -732,7 +742,8 @@ void jsonb_opt_proto_vsf_osd_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "cfgs", json_child);
     }
-    const size_t array_size_list[8 + 1] = {VSF_OSD_MAX,0};
-    jsonb_opt_array(opt, json_child, element->cfgs, sizeof(proto_vsf_osd_cfg_t) * 1 * VSF_OSD_MAX, array_size_list, jsonb_opt_proto_vsf_osd_cfg_t);
+    const size_t size_list_data[] = {VSF_OSD_MAX,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->cfgs, sizeof(proto_vsf_osd_cfg_t) * 1 * VSF_OSD_MAX, size_list_data, size_list_len, 0, jsonb_opt_proto_vsf_osd_cfg_t);
 }
 }

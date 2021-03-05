@@ -61,8 +61,9 @@ void jsonb_opt_sdk_sys_vb_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t s
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "astCommPool", json_child);
     }
-    const size_t array_size_list[8 + 1] = {VB_MAX_COMM_POOLS,0};
-    jsonb_opt_array(opt, json_child, element->astCommPool, sizeof(sdk_sys_vb_pool_info_t) * 1 * VB_MAX_COMM_POOLS, array_size_list, jsonb_opt_sdk_sys_vb_pool_info_t);
+    const size_t size_list_data[] = {VB_MAX_COMM_POOLS,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->astCommPool, sizeof(sdk_sys_vb_pool_info_t) * 1 * VB_MAX_COMM_POOLS, size_list_data, size_list_len, 0, jsonb_opt_sdk_sys_vb_pool_info_t);
 }
 }
 void jsonb_opt_sdk_sys_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
@@ -166,8 +167,9 @@ void jsonb_opt_sdk_vi_pipe_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t 
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "aPipe", json_child);
     }
-    const size_t array_size_list[8 + 1] = {WDR_MAX_PIPE_NUM,0};
-    jsonb_opt_array(opt, json_child, element->aPipe, sizeof(int32_t) * 1 * WDR_MAX_PIPE_NUM, array_size_list, jsonb_opt_int32_t);
+    const size_t size_list_data[] = {WDR_MAX_PIPE_NUM,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->aPipe, sizeof(int32_t) * 1 * WDR_MAX_PIPE_NUM, size_list_data, size_list_len, 0, jsonb_opt_int32_t);
 }
 {
     cJSON *json_child = NULL;
@@ -233,8 +235,9 @@ void jsonb_opt_sdk_vi_pipe_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t 
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "u32VCNum", json_child);
     }
-    const size_t array_size_list[8 + 1] = {WDR_MAX_PIPE_NUM,0};
-    jsonb_opt_array(opt, json_child, element->u32VCNum, sizeof(uint32_t) * 1 * WDR_MAX_PIPE_NUM, array_size_list, jsonb_opt_uint32_t);
+    const size_t size_list_data[] = {WDR_MAX_PIPE_NUM,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->u32VCNum, sizeof(uint32_t) * 1 * WDR_MAX_PIPE_NUM, size_list_data, size_list_len, 0, jsonb_opt_uint32_t);
 }
 }
 void jsonb_opt_sdk_vi_chn_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
@@ -389,8 +392,9 @@ void jsonb_opt_sdk_vpss_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "abChnEnable", json_child);
     }
-    const size_t array_size_list[8 + 1] = {VPSS_MAX_PHY_CHN_NUM,0};
-    jsonb_opt_array(opt, json_child, element->abChnEnable, sizeof(uint32_t) * 1 * VPSS_MAX_PHY_CHN_NUM, array_size_list, jsonb_opt_uint32_t);
+    const size_t size_list_data[] = {VPSS_MAX_PHY_CHN_NUM,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->abChnEnable, sizeof(uint32_t) * 1 * VPSS_MAX_PHY_CHN_NUM, size_list_data, size_list_len, 0, jsonb_opt_uint32_t);
 }
 {
     cJSON *json_child = NULL;
@@ -401,8 +405,9 @@ void jsonb_opt_sdk_vpss_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "aenSize", json_child);
     }
-    const size_t array_size_list[8 + 1] = {VPSS_MAX_PHY_CHN_NUM,0};
-    jsonb_opt_array(opt, json_child, element->aenSize, sizeof(int32_t) * 1 * VPSS_MAX_PHY_CHN_NUM, array_size_list, jsonb_opt_int32_t);
+    const size_t size_list_data[] = {VPSS_MAX_PHY_CHN_NUM,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->aenSize, sizeof(int32_t) * 1 * VPSS_MAX_PHY_CHN_NUM, size_list_data, size_list_len, 0, jsonb_opt_int32_t);
 }
 {
     cJSON *json_child = NULL;
@@ -413,8 +418,9 @@ void jsonb_opt_sdk_vpss_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "au32Depth", json_child);
     }
-    const size_t array_size_list[8 + 1] = {VPSS_MAX_PHY_CHN_NUM,0};
-    jsonb_opt_array(opt, json_child, element->au32Depth, sizeof(int32_t) * 1 * VPSS_MAX_PHY_CHN_NUM, array_size_list, jsonb_opt_int32_t);
+    const size_t size_list_data[] = {VPSS_MAX_PHY_CHN_NUM,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->au32Depth, sizeof(int32_t) * 1 * VPSS_MAX_PHY_CHN_NUM, size_list_data, size_list_len, 0, jsonb_opt_int32_t);
 }
 {
     cJSON *json_child = NULL;
@@ -554,8 +560,9 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "as32SysId", json_child);
     }
-    const size_t array_size_list[8 + 1] = {1,0};
-    jsonb_opt_array(opt, json_child, element->as32SysId, sizeof(int32_t) * 1 * 1, array_size_list, jsonb_opt_int32_t);
+    const size_t size_list_data[] = {1,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->as32SysId, sizeof(int32_t) * 1 * 1, size_list_data, size_list_len, 0, jsonb_opt_int32_t);
 }
 {
     cJSON *json_child = NULL;
@@ -566,8 +573,9 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "astSysInfo", json_child);
     }
-    const size_t array_size_list[8 + 1] = {1,0};
-    jsonb_opt_array(opt, json_child, element->astSysInfo, sizeof(sdk_sys_info_t) * 1 * 1, array_size_list, jsonb_opt_sdk_sys_info_t);
+    const size_t size_list_data[] = {1,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->astSysInfo, sizeof(sdk_sys_info_t) * 1 * 1, size_list_data, size_list_len, 0, jsonb_opt_sdk_sys_info_t);
 }
 {
     cJSON *json_child = NULL;
@@ -589,8 +597,9 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "as32ViId", json_child);
     }
-    const size_t array_size_list[8 + 1] = {VI_MAX_DEV_NUM,0};
-    jsonb_opt_array(opt, json_child, element->as32ViId, sizeof(int32_t) * 1 * VI_MAX_DEV_NUM, array_size_list, jsonb_opt_int32_t);
+    const size_t size_list_data[] = {VI_MAX_DEV_NUM,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->as32ViId, sizeof(int32_t) * 1 * VI_MAX_DEV_NUM, size_list_data, size_list_len, 0, jsonb_opt_int32_t);
 }
 {
     cJSON *json_child = NULL;
@@ -601,8 +610,9 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "astViInfo", json_child);
     }
-    const size_t array_size_list[8 + 1] = {VI_MAX_DEV_NUM,0};
-    jsonb_opt_array(opt, json_child, element->astViInfo, sizeof(sdk_vi_info_t) * 1 * VI_MAX_DEV_NUM, array_size_list, jsonb_opt_sdk_vi_info_t);
+    const size_t size_list_data[] = {VI_MAX_DEV_NUM,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->astViInfo, sizeof(sdk_vi_info_t) * 1 * VI_MAX_DEV_NUM, size_list_data, size_list_len, 0, jsonb_opt_sdk_vi_info_t);
 }
 {
     cJSON *json_child = NULL;
@@ -624,8 +634,9 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "as32VpssId", json_child);
     }
-    const size_t array_size_list[8 + 1] = {VPSS_MAX_GRP_NUM,0};
-    jsonb_opt_array(opt, json_child, element->as32VpssId, sizeof(int32_t) * 1 * VPSS_MAX_GRP_NUM, array_size_list, jsonb_opt_int32_t);
+    const size_t size_list_data[] = {VPSS_MAX_GRP_NUM,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->as32VpssId, sizeof(int32_t) * 1 * VPSS_MAX_GRP_NUM, size_list_data, size_list_len, 0, jsonb_opt_int32_t);
 }
 {
     cJSON *json_child = NULL;
@@ -636,8 +647,9 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "astVpssInfo", json_child);
     }
-    const size_t array_size_list[8 + 1] = {VPSS_MAX_GRP_NUM,0};
-    jsonb_opt_array(opt, json_child, element->astVpssInfo, sizeof(sdk_vpss_info_t) * 1 * VPSS_MAX_GRP_NUM, array_size_list, jsonb_opt_sdk_vpss_info_t);
+    const size_t size_list_data[] = {VPSS_MAX_GRP_NUM,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->astVpssInfo, sizeof(sdk_vpss_info_t) * 1 * VPSS_MAX_GRP_NUM, size_list_data, size_list_len, 0, jsonb_opt_sdk_vpss_info_t);
 }
 {
     cJSON *json_child = NULL;
@@ -659,8 +671,9 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "as32VencId", json_child);
     }
-    const size_t array_size_list[8 + 1] = {VENC_MAX_CHN_NUM,0};
-    jsonb_opt_array(opt, json_child, element->as32VencId, sizeof(int32_t) * 1 * VENC_MAX_CHN_NUM, array_size_list, jsonb_opt_int32_t);
+    const size_t size_list_data[] = {VENC_MAX_CHN_NUM,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->as32VencId, sizeof(int32_t) * 1 * VENC_MAX_CHN_NUM, size_list_data, size_list_len, 0, jsonb_opt_int32_t);
 }
 {
     cJSON *json_child = NULL;
@@ -671,7 +684,8 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "astVencInfo", json_child);
     }
-    const size_t array_size_list[8 + 1] = {VENC_MAX_CHN_NUM,0};
-    jsonb_opt_array(opt, json_child, element->astVencInfo, sizeof(sdk_venc_info_t) * 1 * VENC_MAX_CHN_NUM, array_size_list, jsonb_opt_sdk_venc_info_t);
+    const size_t size_list_data[] = {VENC_MAX_CHN_NUM,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->astVencInfo, sizeof(sdk_venc_info_t) * 1 * VENC_MAX_CHN_NUM, size_list_data, size_list_len, 0, jsonb_opt_sdk_venc_info_t);
 }
 }

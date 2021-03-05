@@ -98,8 +98,9 @@ void jsonb_opt_proto_rtsp_svr_t(jsonb_opt_e opt, cJSON *json, void *e, size_t si
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "caps", json_child);
     }
-    const size_t array_size_list[8 + 1] = {RTSP_ITEM_MAX,0};
-    jsonb_opt_array(opt, json_child, element->caps, sizeof(proto_rtsp_svr_cap_t) * 1 * RTSP_ITEM_MAX, array_size_list, jsonb_opt_proto_rtsp_svr_cap_t);
+    const size_t size_list_data[] = {RTSP_ITEM_MAX,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->caps, sizeof(proto_rtsp_svr_cap_t) * 1 * RTSP_ITEM_MAX, size_list_data, size_list_len, 0, jsonb_opt_proto_rtsp_svr_cap_t);
 }
 {
     cJSON *json_child = NULL;
@@ -110,7 +111,8 @@ void jsonb_opt_proto_rtsp_svr_t(jsonb_opt_e opt, cJSON *json, void *e, size_t si
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "cfgs", json_child);
     }
-    const size_t array_size_list[8 + 1] = {RTSP_ITEM_MAX,0};
-    jsonb_opt_array(opt, json_child, element->cfgs, sizeof(proto_rtsp_svr_cfg_t) * 1 * RTSP_ITEM_MAX, array_size_list, jsonb_opt_proto_rtsp_svr_cfg_t);
+    const size_t size_list_data[] = {RTSP_ITEM_MAX,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->cfgs, sizeof(proto_rtsp_svr_cfg_t) * 1 * RTSP_ITEM_MAX, size_list_data, size_list_len, 0, jsonb_opt_proto_rtsp_svr_cfg_t);
 }
 }
