@@ -9,4 +9,7 @@
 #define PROTO_WEB_COM_NODE "ipc:///tmp/web-com.ipc"
 #define PROTO_APP_COM_NODE "ipc:///tmp/app-com.ipc"
 
+#define PROTO_WEB_PUB_NODE "ws://*:7789"
+#define PROTO_WEB_REP_NODE "ws://*:7790"
+
 #endif /* __NODE_H__ */

@@ -20,11 +20,13 @@
 		<button onclick="flv_pause()">Pause</button>
 		<button onclick="flv_destroy()">Destroy</button>
 		<button onclick="flv_seekto()">SeekTo</button>
+		<button onclick="pic_snapshot()">Snapshot</button>
 	</div>
 	<textarea name="logcatbox" class="logcatBox" rows="10" readonly></textarea>
 </body>
 
-<script type="text/javascript" src="js/flv.min.js"></script>
+<script type="text/javascript" src="js/flv.min.js" comment="https://github.com/Bilibili/flv.js"></script>
+<script type="text/javascript" src="js/nanomsg.js" comment="https://github.com/void-dragon/nanomsg-browser"></script>
 
 <script>
 	function flv_version() {
@@ -100,7 +102,24 @@
 		flv_version();
 		flv_load();
 	});
+</script>
 
+<script>
+	nanomsg.reconnectTime = 1000;       // Milliseconds between reconnects.
+	nanomsg.debug = true;               // Show some debug logging in the console.
+	nanomsg.sendArrayBuffer = false;    // Sends ArrayBuffer objects instead of strings. Default is `false`.
+	nanomsg.receiveArrayBuffer = false; // Receives ArrayBuffer objects instead of strings. Default is `false`.
+	const sock = new nanomsg.Socket(nanomsg.REQ);
+	sock.on('data', (msg) => {
+		console.log('got =>', msg);
+	});
+	sock.connect('ws://' + window.location.hostname + ':7790')
+
+	function pic_snapshot() {
+		const msg = 'some funky message';
+		console.log('put =>', msg);
+		sock.send(msg);
+	}
 </script>
 
 </html>

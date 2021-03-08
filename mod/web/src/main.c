@@ -11,6 +11,15 @@ static int __rep_recv(void *in, size_t isize, void **out, size_t *osize, void *a
     return msgbox_do_handler(in, isize, *out, osize);
 }
 
+static int __ws_recv(void *in, size_t isize, void **out, size_t *osize, void *arg)
+{
+    *out = arg;
+    memcpy(*out, in, isize);
+    errorf("isize:%zu", isize);
+    *osize = isize;
+    return 0;
+}
+
 int main()
 {
     nnm_t rep = NULL;
@@ -34,6 +43,13 @@ int main()
         server->set(server, &cfg);
     }
     server->destroy(server);
+
+    nnm_t web_pub = NULL;
+    nnm_pub_create(PROTO_WEB_PUB_NODE, &web_pub);
+    nnm_t web_rep = NULL;
+    static uint8_t rep_obuf[PROTO_PACKAGE_MAXSIZE];
+    nnm_rep_init_t rep_init = { __ws_recv, rep_obuf };
+    nnm_rep_create(PROTO_WEB_REP_NODE, &rep_init, &web_rep);
 
     while (1) {
         infof("keep alive");
