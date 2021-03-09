@@ -2,15 +2,29 @@
 #include "msgbox.h"
 #include "log.h"
 
-static msgbox_handler_t s_msgbox[64];
+static msgbox_handler_t *s_msgbox = NULL;
 
-int msgbox_init()
+int msgbox_init(int size)
 {
+    if (size <= 0) {
+        return -1;
+    }
+
+    s_msgbox = malloc(sizeof(msgbox_handler_t) * size);
+    if (s_msgbox == NULL) {
+        return -1;
+    }
+
     return 0;
 }
 
 int msgbox_deinit()
 {
+    if (s_msgbox == NULL) {
+        return -1;
+    }
+
+    free(s_msgbox);
     return 0;
 }
 

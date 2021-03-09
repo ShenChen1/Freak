@@ -24,6 +24,9 @@ int main()
 
     log_init(PROTO_LOG_COM_NODE, false);
     cfg_load(PROTO_WEB_CFG_PATH);
+    msgbox_init(PROTO_WEB_KEY_MAX);
+    extern int msgbox_web_svr(msgbox_param_t *param);
+    msgbox_reg_handler(PROTO_WEB_KEY_SERVER, msgbox_web_svr);
 
     static uint8_t obuf[PROTO_PACKAGE_MAXSIZE];
     nnm_rep_init_t init = { __rep_recv, obuf };
@@ -54,6 +57,7 @@ int main()
     }
 
     nnm_rep_destory(rep);
+    msgbox_deinit();
     log_deinit();
 
     return 0;

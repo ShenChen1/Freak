@@ -20,6 +20,13 @@ int main()
 
     log_init(PROTO_LOG_COM_NODE, false);
     cfg_load(PROTO_VSF_CFG_PATH);
+    msgbox_init(PROTO_VSF_KEY_MAX);
+    extern int msgbox_vsf_frame(msgbox_param_t *param);
+    msgbox_reg_handler(PROTO_VSF_KEY_FRAME, msgbox_vsf_frame);
+    extern int msgbox_vsf_stream(msgbox_param_t *param);
+    msgbox_reg_handler(PROTO_VSF_KEY_STREAM, msgbox_vsf_stream);
+    extern int msgbox_vsf_osd(msgbox_param_t *param);
+    msgbox_reg_handler(PROTO_VSF_KEY_OSD, msgbox_vsf_osd);
 
     static uint8_t obuf[PROTO_PACKAGE_MAXSIZE];
     nnm_rep_init_t init = { __rep_recv, obuf };
@@ -65,6 +72,7 @@ int main()
     }
 
     nnm_rep_destory(rep);
+    msgbox_deinit();
     log_deinit();
 
     return 0;
