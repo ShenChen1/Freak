@@ -7,7 +7,6 @@ add_executable(${PROJECT_NAME}
     src/cfg.c
     src/web/web-http.c
     src/web/web-media.c
-    src/msgbox/msgbox.c
     src/msgbox/msgbox_http.c
     src/interface/svr_mgr.c
     cfg/cfg.c)

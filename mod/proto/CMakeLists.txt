@@ -17,7 +17,8 @@ add_library(${PROJECT_NAME} STATIC
     interface/vsf/stream_mgr.c
     interface/rtsp/svr_mgr.c
     interface/web/svr_mgr.c
-    interface/app/alg_mgr.c)
+    interface/app/alg_mgr.c
+    msgbox/msgbox.c)
 
 target_link_libraries(${PROJECT_NAME}
     utils)

@@ -1,7 +1,8 @@
-#include "bsp/dummy.h"
 #include "common.h"
+#include "msgbox.h"
+#include "proto.h"
+#include "bsp/dummy.h"
 #include "inc/cfg.h"
-#include "inc/msgbox.h"
 #include "jsonb_c_base.h"
 
 static int msgbox_dummy_set(msgbox_param_t *param)

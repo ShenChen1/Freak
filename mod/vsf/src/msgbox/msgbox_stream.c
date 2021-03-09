@@ -1,5 +1,7 @@
+#include "common.h"
+#include "msgbox.h"
+#include "proto.h"
 #include "inc/cfg.h"
-#include "inc/msgbox.h"
 #include "vsf/stream_mgr.h"
 
 static int msgbox_stream_set(msgbox_param_t *param)

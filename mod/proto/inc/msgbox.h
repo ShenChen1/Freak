@@ -1,7 +1,7 @@
 #ifndef __MSGBOX_H__
 #define __MSGBOX_H__
 
-#include "proto.h"
+#include "common.h"
 
 typedef struct {
     uint8_t chn;
@@ -18,5 +18,6 @@ typedef int (*msgbox_handler_t)(msgbox_param_t *param);
 int msgbox_init();
 int msgbox_deinit();
 int msgbox_do_handler(void *in, size_t isize, void *out, size_t *osize);
+int msgbox_reg_handler(int key, void *value);
 
 #endif /* __MSGBOX_H__ */

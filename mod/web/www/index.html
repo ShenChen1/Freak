@@ -20,9 +20,10 @@
 		<button onclick="flv_pause()">Pause</button>
 		<button onclick="flv_destroy()">Destroy</button>
 		<button onclick="flv_seekto()">SeekTo</button>
-		<button onclick="pic_snapshot()">Snapshot</button>
+		<button onclick="msg_send()">Send</button>
 	</div>
 	<textarea name="logcatbox" class="logcatBox" rows="10" readonly></textarea>
+	<textarea name="msgbox" class="msgbox" rows="10"></textarea>
 </body>
 
 <script type="text/javascript" src="js/flv.min.js" comment="https://github.com/Bilibili/flv.js"></script>
@@ -112,13 +113,14 @@
 	const sock = new nanomsg.Socket(nanomsg.REQ);
 	sock.on('data', (msg) => {
 		console.log('got =>', msg);
+		var msgbox = document.getElementsByName('msgbox')[0];
+		msgbox.value = msg
 	});
 	sock.connect('ws://' + window.location.hostname + ':7790')
 
-	function pic_snapshot() {
-		const msg = 'some funky message';
-		console.log('put =>', msg);
-		sock.send(msg);
+	function msg_send() {
+		var msgbox = document.getElementsByName('msgbox')[0];
+		sock.send(msgbox.value);
 	}
 </script>
 

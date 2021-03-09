@@ -1,8 +1,9 @@
 #include "common.h"
 #include "log.h"
+#include "msgbox.h"
 #include "nnm.h"
+#include "proto.h"
 #include "inc/cfg.h"
-#include "inc/msgbox.h"
 #include "bsp/dummy.h"
 
 static int __rep_recv(void *in, size_t isize, void **out, size_t *osize, void *arg)
@@ -18,7 +19,6 @@ int main()
 
     log_init(PROTO_LOG_COM_NODE, true);
     cfg_load(PROTO_BSP_CFG_PATH);
-    msgbox_init();
 
     static uint8_t obuf[PROTO_PACKAGE_MAXSIZE];
     nnm_rep_init_t init = { __rep_recv, obuf };
@@ -45,7 +45,6 @@ int main()
 
     nnm_rep_destory(rep);
     nnm_pub_destory(pub);
-    msgbox_deinit();
     log_deinit();
 
     return 0;

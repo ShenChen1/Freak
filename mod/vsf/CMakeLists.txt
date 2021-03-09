@@ -7,7 +7,6 @@ add_definitions(-DMODULE_NAME="${PROJECT_NAME}")
 add_executable(${PROJECT_NAME}
     src/main.c
     src/cfg.c
-    src/msgbox/msgbox.c
     src/msgbox/msgbox_stream.c
     src/msgbox/msgbox_frame.c
     src/msgbox/msgbox_osd.c

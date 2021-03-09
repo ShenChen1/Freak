@@ -1,5 +1,7 @@
+#include "common.h"
+#include "msgbox.h"
+#include "proto.h"
 #include "inc/cfg.h"
-#include "inc/msgbox.h"
 #include "web/svr_mgr.h"
 
 static int msgbox_svr_set(msgbox_param_t *param)

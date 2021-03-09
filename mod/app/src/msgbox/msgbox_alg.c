@@ -1,5 +1,7 @@
+#include "common.h"
+#include "msgbox.h"
+#include "proto.h"
 #include "inc/cfg.h"
-#include "inc/msgbox.h"
 #include "app/alg_mgr.h"
 
 static int msgbox_alg_set(msgbox_param_t *param)

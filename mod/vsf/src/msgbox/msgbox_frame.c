@@ -1,5 +1,7 @@
+#include "common.h"
+#include "msgbox.h"
+#include "proto.h"
 #include "inc/cfg.h"
-#include "inc/msgbox.h"
 #include "vsf/frame_mgr.h"
 
 static int msgbox_frame_set(msgbox_param_t *param)
