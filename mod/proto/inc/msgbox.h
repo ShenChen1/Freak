@@ -15,9 +15,8 @@ typedef struct {
 
 typedef int (*msgbox_handler_t)(msgbox_param_t *param);
 
-int msgbox_init(int size);
-int msgbox_deinit();
+int msgbox_do_forward(void *in, size_t isize, void *out, size_t *osize);
 int msgbox_do_handler(void *in, size_t isize, void *out, size_t *osize);
-int msgbox_reg_handler(int key, void *value);
+int msgbox_reg_handler(int key, msgbox_handler_t value);
 
 #endif /* __MSGBOX_H__ */

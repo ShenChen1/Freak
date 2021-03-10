@@ -19,7 +19,6 @@ int main()
 
     log_init(PROTO_LOG_COM_NODE, true);
     cfg_load(PROTO_BSP_CFG_PATH);
-    msgbox_init(PROTO_KEY_MAX);
     extern int msgbox_dummy(msgbox_param_t *param);
     msgbox_reg_handler(PROTO_BSP_KEY_DUMMY, msgbox_dummy);
 
@@ -48,7 +47,6 @@ int main()
 
     nnm_rep_destory(rep);
     nnm_pub_destory(pub);
-    msgbox_deinit();
     log_deinit();
 
     return 0;

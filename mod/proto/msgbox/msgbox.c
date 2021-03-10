@@ -1,30 +1,47 @@
 #include "proto.h"
 #include "msgbox.h"
+#include "nnm.h"
 #include "log.h"
 
-static msgbox_handler_t *s_msgbox = NULL;
+typedef struct {
+    const int key;
+    const nnm_t node;
+    msgbox_handler_t handler;
+} msgbox_node_t;
 
-int msgbox_init(int size)
+static msgbox_node_t s_msgbox_node[PROTO_KEY_MAX] = {
+    {PROTO_BSP_KEY_DUMMY, PROTO_BSP_COM_NODE, NULL},
+    {PROTO_RTSP_KEY_SVR, PROTO_RTSP_COM_NODE, NULL},
+    {PROTO_VSF_KEY_FRAME, PROTO_VSF_COM_NODE, NULL},
+    {PROTO_VSF_KEY_STREAM, PROTO_VSF_COM_NODE, NULL},
+    {PROTO_VSF_KEY_OSD, PROTO_VSF_COM_NODE, NULL},
+    {PROTO_WEB_KEY_SVR, PROTO_WEB_COM_NODE, NULL},
+    {PROTO_APP_KEY_ALG, PROTO_APP_COM_NODE, NULL},
+};
+
+int msgbox_do_forward(void *in, size_t isize, void *out, size_t *osize)
 {
-    if (size <= 0) {
-        return -1;
+    int ret;
+    nnm_t req = NULL;
+    proto_header_t *packet_in  = in;
+    proto_header_t *packet_out = out;
+
+    ret = nnm_req_create(s_msgbox_node[packet_in->key].node, &req);
+    if (ret < 0) {
+        return ret;
     }
 
-    s_msgbox = calloc(size, sizeof(msgbox_handler_t));
-    if (s_msgbox == NULL) {
-        return -1;
-    }
+    proto_header_dump(packet_in);
+    nnm_req_exchange(req, packet_in, proto_package_size(packet_in), (void **)&packet_out, osize);
+    proto_header_dump(packet_out);
 
-    return 0;
-}
+    assert(packet_out->key == packet_in->key);
+    assert(!packet_out->errcode);
 
-int msgbox_deinit()
-{
-    if (s_msgbox == NULL) {
-        return -1;
-    }
+    memcpy(out, packet_out, *osize);
+    nnm_free(packet_out);
+    nnm_req_destory(req);
 
-    free(s_msgbox);
     return 0;
 }
 
@@ -36,7 +53,7 @@ int msgbox_do_handler(void *in, size_t isize, void *out, size_t *osize)
     msgbox_handler_t func      = NULL;
 
     proto_header_dump(packet_in);
-    func = s_msgbox[packet_in->key];
+    func = s_msgbox_node[packet_in->key].handler;
     assert(func);
 
     msgbox_param_t param = {};
@@ -58,8 +75,12 @@ int msgbox_do_handler(void *in, size_t isize, void *out, size_t *osize)
     return 0;
 }
 
-int msgbox_reg_handler(int key, void *value)
+int msgbox_reg_handler(int key, msgbox_handler_t value)
 {
-    s_msgbox[key] = value;
+    if (key < 0 || key >= PROTO_KEY_MAX) {
+        return -1;
+    }
+
+    s_msgbox_node[key].handler = value;
     return 0;
 }

@@ -18,7 +18,6 @@ int main()
 
     log_init(PROTO_LOG_COM_NODE, false);
     cfg_load(PROTO_APP_CFG_PATH);
-    msgbox_init(PROTO_KEY_MAX);
     extern int msgbox_app_alg(msgbox_param_t *param);
     msgbox_reg_handler(PROTO_APP_KEY_ALG, msgbox_app_alg);
 
@@ -43,7 +42,6 @@ int main()
     }
 
     nnm_rep_destory(rep);
-    msgbox_deinit();
     log_deinit();
 
     return 0;

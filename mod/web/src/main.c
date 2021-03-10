@@ -1,9 +1,9 @@
 #include "common.h"
+#include "inc/cfg.h"
 #include "log.h"
 #include "msgbox.h"
 #include "nnm.h"
 #include "proto.h"
-#include "inc/cfg.h"
 #include "web/svr_mgr.h"
 
 static int __rep_recv(void *in, size_t isize, void **out, size_t *osize, void *arg)
@@ -15,17 +15,31 @@ static int __rep_recv(void *in, size_t isize, void **out, size_t *osize, void *a
 static int __ws_recv(void *in, size_t isize, void **out, size_t *osize, void *arg)
 {
     *out = arg;
-    proto_header_t *hdr = malloc(PROTO_PACKAGE_MAXSIZE);
+
+    cJSON *json = NULL;
+    size_t size = 0;
+    proto_header_t *hdr = NULL;
+
+    hdr = malloc(PROTO_PACKAGE_MAXSIZE);
     if (hdr == NULL) {
         return -1;
     }
 
-    cJSON *json = cJSON_Parse((const char *)in);
+    json = cJSON_Parse((const char *)in);
     jsonb_opt_proto_header_t(JSONB_OPT_J2S, json, hdr, sizeof(proto_header_t));
     cJSON_Delete(json);
-
     memcpy(hdr->data, in + isize - hdr->size, hdr->size);
-    proto_header_dump(hdr);
+
+    msgbox_do_forward(hdr, sizeof(proto_header_t) + hdr->size, hdr, &size);
+
+    json = cJSON_CreateObject();
+    jsonb_opt_proto_header_t(JSONB_OPT_S2J, json, hdr, sizeof(proto_header_t));
+    cJSON_PrintPreallocated(json, *out, PROTO_PACKAGE_MAXSIZE, 0);
+    cJSON_Delete(json);
+
+    size = strlen((char *)*out);
+    memcpy(*out + size, hdr->data, hdr->size);
+    *osize = size + hdr->size;
 
     free(hdr);
     return 0;
@@ -37,7 +51,6 @@ int main()
 
     log_init(PROTO_LOG_COM_NODE, false);
     cfg_load(PROTO_WEB_CFG_PATH);
-    msgbox_init(PROTO_KEY_MAX);
     extern int msgbox_web_svr(msgbox_param_t *param);
     msgbox_reg_handler(PROTO_WEB_KEY_SVR, msgbox_web_svr);
 
@@ -70,7 +83,6 @@ int main()
     }
 
     nnm_rep_destory(rep);
-    msgbox_deinit();
     log_deinit();
 
     return 0;

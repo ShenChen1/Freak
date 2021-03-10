@@ -19,7 +19,6 @@ int main(int argc, char *argv[])
     log_init(PROTO_LOG_COM_NODE, false);
     log_setlevel(LOG_LV_INFO);
     cfg_load(PROTO_RTSP_CFG_PATH);
-    msgbox_init(PROTO_KEY_MAX);
     extern int msgbox_rtsp_svr(msgbox_param_t *param);
     msgbox_reg_handler(PROTO_RTSP_KEY_SVR, msgbox_rtsp_svr);
 
@@ -45,7 +44,6 @@ int main(int argc, char *argv[])
     }
 
     nnm_rep_destory(rep);
-    msgbox_deinit();
     log_deinit();
 
     return 0;

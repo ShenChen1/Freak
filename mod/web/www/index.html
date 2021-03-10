@@ -23,7 +23,7 @@
 		<button onclick="msg_send()">Send</button>
 	</div>
 	<textarea name="logcatbox" class="logcatBox" rows="10" readonly></textarea>
-	<textarea name="msgbox" class="msgbox" rows="10"></textarea>
+	<textarea name="msgbox" class="msgbox" rows="10">{"version":1,"ts":"102005930","chn":0,"key":"PROTO_BSP_KEY_DUMMY","action":"PROTO_ACTION_NUM","errcode":0,"format":"PROTO_FORMAT_JSON","size":10,"data":[]}{"num":2}</textarea>
 </body>
 
 <script type="text/javascript" src="js/flv.min.js" comment="https://github.com/Bilibili/flv.js"></script>
@@ -114,13 +114,13 @@
 	sock.on('data', (msg) => {
 		console.log('got =>', msg);
 		var msgbox = document.getElementsByName('msgbox')[0];
-		msgbox.value = msg
+		msgbox.value = msg.slice(0, msg.length-1)
 	});
 	sock.connect('ws://' + window.location.hostname + ':7790')
 
 	function msg_send() {
 		var msgbox = document.getElementsByName('msgbox')[0];
-		sock.send(msgbox.value);
+		sock.send(msgbox.value + '\0');
 	}
 </script>
 
