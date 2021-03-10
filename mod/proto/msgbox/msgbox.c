@@ -10,7 +10,7 @@ int msgbox_init(int size)
         return -1;
     }
 
-    s_msgbox = malloc(sizeof(msgbox_handler_t) * size);
+    s_msgbox = calloc(size, sizeof(msgbox_handler_t));
     if (s_msgbox == NULL) {
         return -1;
     }

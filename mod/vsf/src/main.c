@@ -20,7 +20,7 @@ int main()
 
     log_init(PROTO_LOG_COM_NODE, false);
     cfg_load(PROTO_VSF_CFG_PATH);
-    msgbox_init(PROTO_VSF_KEY_MAX);
+    msgbox_init(PROTO_KEY_MAX);
     extern int msgbox_vsf_frame(msgbox_param_t *param);
     msgbox_reg_handler(PROTO_VSF_KEY_FRAME, msgbox_vsf_frame);
     extern int msgbox_vsf_stream(msgbox_param_t *param);

@@ -4,63 +4,7 @@
 #include "common.h"
 #include "node.h"
 #include "path.h"
-
-#define PROTO_PACKAGE_MAXSIZE (2048)
-
-typedef struct {
-    uint8_t version;
-    uint8_t res[7];
-    uint64_t ts;
-    uint8_t chn;
-    uint8_t key;
-    uint8_t action;
-    uint8_t res1[5];
-    uint8_t errcode;
-    uint8_t format;
-    uint8_t res2[4];
-    uint16_t size;
-    uint8_t data[0];
-} proto_header_t;
-
-typedef enum {
-    PROTO_ACTION_NUM,
-    PROTO_ACTION_CAP,
-    PROTO_ACTION_GET,
-    PROTO_ACTION_SET,
-    PROTO_ACTION_TGR,
-} proto_action_e;
-
-typedef enum {
-    PROTO_FORMAT_STRUCTE,
-    PROTO_FORMAT_JSON,
-} proto_format_e;
-
-typedef enum {
-    PROTO_BSP_KEY_DUMMY,
-    PROTO_BSP_KEY_MAX,
-} proto_bsp_key_e;
-
-typedef enum {
-    PROTO_VSF_KEY_FRAME,
-    PROTO_VSF_KEY_STREAM,
-    PROTO_VSF_KEY_OSD,
-    PROTO_VSF_KEY_MAX,
-} proto_vsf_key_e;
-
-typedef enum {
-    PROTO_RTSP_KEY_SERVER,
-    PROTO_RTSP_KEY_MAX,
-} proto_rtsp_key_e;
-
-typedef enum {
-    PROTO_WEB_KEY_SERVER,
-    PROTO_WEB_KEY_MAX,
-} proto_web_key_e;
-
-typedef enum {
-    PROTO_APP_KEY_ALG,
-    PROTO_APP_KEY_MAX,
-} proto_app_key_e;
+#include "proto_hdr.h"
 
 #define proto_header_dump(_package)                               \
     (void)({                                                      \

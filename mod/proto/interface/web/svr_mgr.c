@@ -33,9 +33,9 @@ static int __web_svr_get(web_svr_mgr_t *self, proto_web_svr_cfg_t *cfg)
                           proto_package_data(ibuf),
                           &isize);
 
-    proto_package_fill_header(ibuf, cfg->id, PROTO_RTSP_KEY_SERVER, PROTO_ACTION_GET, priv->proto, isize);
+    proto_package_fill_header(ibuf, cfg->id, PROTO_WEB_KEY_SVR, PROTO_ACTION_GET, priv->proto, isize);
     nnm_req_exchange(priv->req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
-    assert(obuf->key == PROTO_RTSP_KEY_SERVER);
+    assert(obuf->key == PROTO_WEB_KEY_SVR);
     assert(!obuf->errcode);
 
     proto_client_data_post(priv->proto,
@@ -63,9 +63,9 @@ static int __web_svr_set(web_svr_mgr_t *self, proto_web_svr_cfg_t *cfg)
                           proto_package_data(ibuf),
                           &isize);
 
-    proto_package_fill_header(ibuf, cfg->id, PROTO_RTSP_KEY_SERVER, PROTO_ACTION_SET, priv->proto, isize);
+    proto_package_fill_header(ibuf, cfg->id, PROTO_WEB_KEY_SVR, PROTO_ACTION_SET, priv->proto, isize);
     nnm_req_exchange(priv->req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
-    assert(obuf->key == PROTO_RTSP_KEY_SERVER);
+    assert(obuf->key == PROTO_WEB_KEY_SVR);
     assert(!obuf->errcode);
 
     proto_client_data_post(priv->proto,
@@ -93,9 +93,9 @@ static int __web_svr_cap(web_svr_mgr_t *self, proto_web_svr_cap_t *cap)
                           proto_package_data(ibuf),
                           &isize);
 
-    proto_package_fill_header(ibuf, cap->id, PROTO_RTSP_KEY_SERVER, PROTO_ACTION_CAP, priv->proto, isize);
+    proto_package_fill_header(ibuf, cap->id, PROTO_WEB_KEY_SVR, PROTO_ACTION_CAP, priv->proto, isize);
     nnm_req_exchange(priv->req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
-    assert(obuf->key == PROTO_RTSP_KEY_SERVER);
+    assert(obuf->key == PROTO_WEB_KEY_SVR);
     assert(!obuf->errcode);
 
     proto_client_data_post(priv->proto,
@@ -123,9 +123,9 @@ static int __web_svr_num(web_svr_mgr_t *self)
                           proto_package_data(ibuf),
                           &isize);
 
-    proto_package_fill_header(ibuf, -1, PROTO_RTSP_KEY_SERVER, PROTO_ACTION_NUM, priv->proto, isize);
+    proto_package_fill_header(ibuf, -1, PROTO_WEB_KEY_SVR, PROTO_ACTION_NUM, priv->proto, isize);
     nnm_req_exchange(priv->req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
-    assert(obuf->key == PROTO_RTSP_KEY_SERVER);
+    assert(obuf->key == PROTO_WEB_KEY_SVR);
     assert(!obuf->errcode);
 
     proto_client_data_post(priv->proto,

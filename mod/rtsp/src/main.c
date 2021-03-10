@@ -19,9 +19,9 @@ int main(int argc, char *argv[])
     log_init(PROTO_LOG_COM_NODE, false);
     log_setlevel(LOG_LV_INFO);
     cfg_load(PROTO_RTSP_CFG_PATH);
-    msgbox_init(PROTO_RTSP_KEY_MAX);
+    msgbox_init(PROTO_KEY_MAX);
     extern int msgbox_rtsp_svr(msgbox_param_t *param);
-    msgbox_reg_handler(PROTO_RTSP_KEY_SERVER, msgbox_rtsp_svr);
+    msgbox_reg_handler(PROTO_RTSP_KEY_SVR, msgbox_rtsp_svr);
 
     static uint8_t obuf[PROTO_PACKAGE_MAXSIZE];
     nnm_rep_init_t init = { __rep_recv, obuf };

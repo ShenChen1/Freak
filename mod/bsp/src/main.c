@@ -19,7 +19,7 @@ int main()
 
     log_init(PROTO_LOG_COM_NODE, true);
     cfg_load(PROTO_BSP_CFG_PATH);
-    msgbox_init(PROTO_BSP_KEY_MAX);
+    msgbox_init(PROTO_KEY_MAX);
     extern int msgbox_dummy(msgbox_param_t *param);
     msgbox_reg_handler(PROTO_BSP_KEY_DUMMY, msgbox_dummy);
 
