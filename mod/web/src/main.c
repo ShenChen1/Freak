@@ -18,30 +18,33 @@ static int __ws_recv(void *in, size_t isize, void **out, size_t *osize, void *ar
 
     cJSON *json = NULL;
     size_t size = 0;
-    proto_header_t *hdr = NULL;
 
-    hdr = malloc(PROTO_PACKAGE_MAXSIZE);
-    if (hdr == NULL) {
+    char *tmpbuf = calloc(1, PROTO_PACKAGE_MAXSIZE);
+    if (tmpbuf == NULL) {
         return -1;
     }
 
     json = cJSON_Parse((const char *)in);
-    jsonb_opt_proto_header_t(JSONB_OPT_J2S, json, hdr, sizeof(proto_header_t));
+    jsonb_opt_proto_header_t(JSONB_OPT_J2S, json, tmpbuf, sizeof(proto_header_t));
     cJSON_Delete(json);
-    memcpy(hdr->data, in + isize - hdr->size, hdr->size);
+    memcpy(proto_package_data(tmpbuf),
+           in + isize - (proto_package_size(tmpbuf) - sizeof(proto_header_t)),
+           proto_package_size(tmpbuf) - sizeof(proto_header_t));
 
-    msgbox_do_forward(hdr, sizeof(proto_header_t) + hdr->size, hdr, &size);
+    msgbox_do_forward(tmpbuf, proto_package_size(tmpbuf), tmpbuf, &size);
 
     json = cJSON_CreateObject();
-    jsonb_opt_proto_header_t(JSONB_OPT_S2J, json, hdr, sizeof(proto_header_t));
-    cJSON_PrintPreallocated(json, *out, PROTO_PACKAGE_MAXSIZE, 0);
+    jsonb_opt_proto_header_t(JSONB_OPT_S2J, json, tmpbuf, sizeof(proto_header_t));
+    cJSON_PrintPreallocated(json, *out, isize, 0);
     cJSON_Delete(json);
 
     size = strlen((char *)*out);
-    memcpy(*out + size, hdr->data, hdr->size);
-    *osize = size + hdr->size;
+    memcpy(*out + size,
+           proto_package_data(tmpbuf),
+           proto_package_size(tmpbuf) - sizeof(proto_header_t));
+    *osize = size + proto_package_size(tmpbuf) - sizeof(proto_header_t);
 
-    free(hdr);
+    free(tmpbuf);
     return 0;
 }
 
