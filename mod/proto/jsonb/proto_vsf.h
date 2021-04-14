@@ -101,9 +101,9 @@ extern void jsonb_opt_proto_vsf_osd_cfg_union_t(jsonb_opt_e opt, cJSON *json, vo
 typedef struct {
     char condition[32];
     union {
-        proto_vsf_osd_mask_t mask;
-        proto_vsf_osd_texts_t texts;
-        proto_vsf_osd_objs_t objs;
+    proto_vsf_osd_mask_t mask;
+    proto_vsf_osd_texts_t texts;
+    proto_vsf_osd_objs_t objs;
     };
 } proto_vsf_osd_cfg_union_t;
 extern void jsonb_opt_proto_vsf_osd_cfg_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);

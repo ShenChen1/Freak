@@ -104,11 +104,11 @@ JSONB_FIELD(num, uint32_t)
 JSONB_FIELD_ARRAY(objs, VSF_OSD_OBJS_MAX, proto_vsf_osd_obj_t)
 JSONB_STRUCT_END(proto_vsf_osd_objs_t)
 
-JSONB_UNION_START(proto_vsf_osd_cfg_union_t)
+JSONB_UNION_START(proto_vsf_osd_cfg_union_t, condition)
 JSONB_UNION_FIELD(mask, proto_vsf_osd_mask_t)
 JSONB_UNION_FIELD(texts, proto_vsf_osd_texts_t)
 JSONB_UNION_FIELD(objs, proto_vsf_osd_objs_t)
-JSONB_UNION_END(proto_vsf_osd_cfg_union_t)
+JSONB_UNION_END(proto_vsf_osd_cfg_union_t, condition)
 
 JSONB_STRUCT_START(proto_vsf_osd_cfg_t)
 JSONB_FIELD(id, int)
