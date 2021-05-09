@@ -4,7 +4,7 @@ ExternalProject_Add(build-${PROJECT_NAME}
     URL ${PROJECT_SOURCE_DIR}/src/mongoose-6.18.tar.gz
     CONFIGURE_COMMAND true
     BUILD_COMMAND true
-    COMMAND ${CMAKE_C_COMPILER} -shared -o libmongoose.so mongoose.c -Wall -Werror -Os -g -fPIC
+    COMMAND ${CMAKE_C_COMPILER} -shared -o libmongoose.so mongoose.c -Os -g -fPIC
     INSTALL_COMMAND true
     BUILD_IN_SOURCE 1)
 
