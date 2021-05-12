@@ -32,22 +32,23 @@ Freak
 │   └── uthash - C macros for hash tables and more
 |       (https://github.com/troydhanson/uthash.git)
 ├── mod
-│   ├── alg-hi3516d
-│   ├── alg-host
-│   ├── app
-│   ├── bsp
-│   ├── media
-│   ├── proto
-│   ├── rtsp
-│   ├── utils
-│   ├── vsf
-│   ├── vsf-hi3516d
-│   ├── vsf-host
-│   └── web
+│   ├── alg-hi3516d - algorithm library for hi3516d
+│   ├── alg-host - algorithm library for host
+│   ├── app - application for user business logic
+│   ├── bsp - board support package
+│   ├── media - media data format wrapper library
+│   ├── proto - message protocol library
+│   ├── rtsp - a rtsp server
+│   ├── utils - common library provided some useful functions
+│   ├── vsf - video stream framework
+│   ├── vsf-hi3516d - vsf low-level part for hi3516d
+│   ├── vsf-host - vsf low-level part for host
+│   └── web - a web server provided video preview
 ├── scripts
 ├── sdk
-│   ├── hi3516d
-│   └── host
+│   ├── hi3516d - hi3516d SDK
+│   └── host - host SDK
 └── tools
-    └── jsonb-c
+    └── jsonb-c - An automatic generated binding layer for converting C structure to/from JSON messages.
+        (https://github.com/ShenChen1/jsonb-c.git)
 ```
