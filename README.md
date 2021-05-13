@@ -6,10 +6,10 @@
        src="https://scan.coverity.com/projects/22575/badge.svg"/>
 </a>
 
-## how to build
+## How to build
 ```
 cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=./cmake/platforms/host.cmake
-cmake --build .
+cmake --build build
 ```
 
 ## Directory structure
@@ -21,9 +21,9 @@ Freak
 |   |   (https://github.com/DaveGamble/cJSON.git)
 │   ├── freetype - a freely available software library to render fonts
 |   |   (https://gitlab.freedesktop.org/freetype/freetype.git)
-│   ├── media-server - a streaming media server related library
+│   ├── media-server - a media stream library
 |   |   (https://github.com/ireader/media-server.git)
-│   ├── mongoose - embedded web server
+│   ├── mongoose - a library for embedded web server
 |   |   (https://github.com/cesanta/mongoose.git)
 │   ├── nanomsg - a simple high-performance implementation of several "scalability protocols"
 |   |   (https://github.com/nanomsg/nanomsg.git)
@@ -32,8 +32,7 @@ Freak
 │   └── uthash - C macros for hash tables and more
 |       (https://github.com/troydhanson/uthash.git)
 ├── mod
-│   ├── alg-hi3516d - algorithm library for hi3516d
-│   ├── alg-host - algorithm library for host
+│   ├── alg-xxxx - algorithm library for xxxx platform
 │   ├── app - application for user business logic
 │   ├── bsp - board support package
 │   ├── media - media data format wrapper library
@@ -41,9 +40,8 @@ Freak
 │   ├── rtsp - a rtsp server
 │   ├── utils - common library provided some useful functions
 │   ├── vsf - video stream framework
-│   ├── vsf-hi3516d - vsf low-level part for hi3516d
-│   ├── vsf-host - vsf low-level part for host
-│   └── web - a web server provided video preview
+│   ├── vsf-xxxx - vsf low-level part for xxxx platform
+│   └── web - a web server for video preview
 ├── scripts
 ├── sdk
 │   ├── hi3516d - hi3516d SDK
