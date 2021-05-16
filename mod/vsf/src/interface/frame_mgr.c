@@ -159,13 +159,15 @@ static int __vsf_frame_set(vsf_frame_mgr_t *self, proto_vsf_frame_cfg_t *cfg)
     vsf_frame_mgr_priv_t *priv = mgr->priv;
 
     if (cfg->enable) {
-        mfifo_init_t init = {
-            .type = MEDIA_VIDEO_STREAM,
-            .chn = priv->info->caps[cfg->id].chn,
-            .subchn = priv->info->caps[cfg->id].subchn,
-        };
-        priv->fifo[cfg->id] = mfifo_create(&init, 4 * 1024 * 1024);
-        assert(priv->fifo[cfg->id]);
+        if (!priv->fifo[cfg->id]) {
+            mfifo_init_t init = {
+                .type = MEDIA_VIDEO_FRAME,
+                .chn = priv->info->caps[cfg->id].chn,
+                .subchn = priv->info->caps[cfg->id].subchn,
+            };
+            priv->fifo[cfg->id] = mfifo_create(&init, 4 * 1024 * 1024);
+            assert(priv->fifo[cfg->id]);
+        }
     } else {
         if (priv->fifo[cfg->id]) {
             priv->fifo[cfg->id]->destroy(priv->fifo[cfg->id]);

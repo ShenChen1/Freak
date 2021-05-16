@@ -109,7 +109,7 @@ static int __app_alg_set(app_alg_mgr_t *self, proto_app_alg_cfg_t *cfg)
                 .chn    = frame_cap.chn,
                 .subchn = frame_cap.subchn,
             };
-            priv->fifos[cfg->id] = mfifo_attach(&fifo_init, 1);
+            priv->fifos[cfg->id] = mfifo_attach(&fifo_init, 0);
             assert(priv->fifos[cfg->id]);
             priv->fifos[cfg->id]->newest(priv->fifos[cfg->id]);
             priv->osds[cfg->id] = vsf_createOsdMgr_r();

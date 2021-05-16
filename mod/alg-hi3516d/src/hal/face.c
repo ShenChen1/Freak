@@ -166,6 +166,7 @@ static void *hs_fd_task(void *args)
         if (priv->cb[APP_ALG_CB_RESULT_OUT].func) {
             proto_app_alg_result_t *results = malloc(sizeof(proto_app_alg_result_t));
             if (results) {
+                memset(results, 0, sizeof(proto_app_alg_result_t));
                 results->num = result_bag.obj_num;
                 for (i = 0; i < result_out.obj_num; i++) {
                     results->objs[i].id     = result_out.obj[i].ID;

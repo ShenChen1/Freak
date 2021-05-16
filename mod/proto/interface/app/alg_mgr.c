@@ -33,9 +33,9 @@ static int __app_alg_get(app_alg_mgr_t *self, proto_app_alg_cfg_t *cfg)
                           proto_package_data(ibuf),
                           &isize);
 
-    proto_package_fill_header(ibuf, cfg->id, PROTO_VSF_KEY_FRAME, PROTO_ACTION_GET, priv->proto, isize);
+    proto_package_fill_header(ibuf, cfg->id, PROTO_APP_KEY_ALG, PROTO_ACTION_GET, priv->proto, isize);
     nnm_req_exchange(priv->req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
-    assert(obuf->key == PROTO_VSF_KEY_FRAME);
+    assert(obuf->key == PROTO_APP_KEY_ALG);
     assert(!obuf->errcode);
 
     proto_client_data_post(priv->proto,
@@ -63,9 +63,9 @@ static int __app_alg_set(app_alg_mgr_t *self, proto_app_alg_cfg_t *cfg)
                           proto_package_data(ibuf),
                           &isize);
 
-    proto_package_fill_header(ibuf, cfg->id, PROTO_VSF_KEY_FRAME, PROTO_ACTION_SET, priv->proto, isize);
+    proto_package_fill_header(ibuf, cfg->id, PROTO_APP_KEY_ALG, PROTO_ACTION_SET, priv->proto, isize);
     nnm_req_exchange(priv->req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
-    assert(obuf->key == PROTO_VSF_KEY_FRAME);
+    assert(obuf->key == PROTO_APP_KEY_ALG);
     assert(!obuf->errcode);
 
     proto_client_data_post(priv->proto,
@@ -93,9 +93,9 @@ static int __app_alg_cap(app_alg_mgr_t *self, proto_app_alg_cap_t *cap)
                           proto_package_data(ibuf),
                           &isize);
 
-    proto_package_fill_header(ibuf, cap->id, PROTO_VSF_KEY_FRAME, PROTO_ACTION_CAP, priv->proto, isize);
+    proto_package_fill_header(ibuf, cap->id, PROTO_APP_KEY_ALG, PROTO_ACTION_CAP, priv->proto, isize);
     nnm_req_exchange(priv->req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
-    assert(obuf->key == PROTO_VSF_KEY_FRAME);
+    assert(obuf->key == PROTO_APP_KEY_ALG);
     assert(!obuf->errcode);
 
     proto_client_data_post(priv->proto,
@@ -123,9 +123,9 @@ static int __app_alg_num(app_alg_mgr_t *self)
                           proto_package_data(ibuf),
                           &isize);
 
-    proto_package_fill_header(ibuf, -1, PROTO_VSF_KEY_FRAME, PROTO_ACTION_NUM, priv->proto, isize);
+    proto_package_fill_header(ibuf, -1, PROTO_APP_KEY_ALG, PROTO_ACTION_NUM, priv->proto, isize);
     nnm_req_exchange(priv->req, ibuf, proto_package_size(ibuf), (void **)&obuf, &osize);
-    assert(obuf->key == PROTO_VSF_KEY_FRAME);
+    assert(obuf->key == PROTO_APP_KEY_ALG);
     assert(!obuf->errcode);
 
     proto_client_data_post(priv->proto,
