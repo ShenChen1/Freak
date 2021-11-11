@@ -1,19 +1,21 @@
 #include "jsonb_c_type.h"
 #include "jsonb_c_base.h"
 #include "sdk_cfg.h"
-void jsonb_opt_sdk_sys_vb_pool_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
+void jsonb_opt_sdk_vi_chn_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
 {
-    sdk_sys_vb_pool_info_t *element= e;
+    sdk_vi_chn_info_t *element= e;
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
         if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "u32BlkCnt");
+        json_child = cJSON_GetObjectItem(json, "pcVideoNode");
     } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "u32BlkCnt", json_child);
+        json_child = cJSON_CreateArray();
+        cJSON_AddItemToObject(json, "pcVideoNode", json_child);
     }
-    jsonb_opt_uint32_t(opt, json_child, &element->u32BlkCnt, sizeof(uint32_t));
+    const size_t size_list_data[] = {16,0};
+    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
+    jsonb_opt_array(opt, json_child, element->pcVideoNode, sizeof(char) * 1 * 16, size_list_data, size_list_len, 0, jsonb_opt_char);
 }
 {
     cJSON *json_child = NULL;
@@ -37,184 +39,6 @@ void jsonb_opt_sdk_sys_vb_pool_info_t(jsonb_opt_e opt, cJSON *json, void *e, siz
     }
     jsonb_opt_uint32_t(opt, json_child, &element->u32Height, sizeof(uint32_t));
 }
-}
-void jsonb_opt_sdk_sys_vb_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
-{
-    sdk_sys_vb_info_t *element= e;
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "u32MaxPoolCnt");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "u32MaxPoolCnt", json_child);
-    }
-    jsonb_opt_uint32_t(opt, json_child, &element->u32MaxPoolCnt, sizeof(uint32_t));
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "astCommPool");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateArray();
-        cJSON_AddItemToObject(json, "astCommPool", json_child);
-    }
-    const size_t size_list_data[] = {VB_MAX_COMM_POOLS,0};
-    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
-    jsonb_opt_array(opt, json_child, element->astCommPool, sizeof(sdk_sys_vb_pool_info_t) * 1 * VB_MAX_COMM_POOLS, size_list_data, size_list_len, 0, jsonb_opt_sdk_sys_vb_pool_info_t);
-}
-}
-void jsonb_opt_sdk_sys_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
-{
-    sdk_sys_info_t *element= e;
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "stVbConf");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "stVbConf", json_child);
-    }
-    jsonb_opt_sdk_sys_vb_info_t(opt, json_child, &element->stVbConf, sizeof(sdk_sys_vb_info_t));
-}
-}
-void jsonb_opt_sdk_vi_sensor_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
-{
-    sdk_vi_sensor_info_t *element= e;
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "enSnsType");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "enSnsType", json_child);
-    }
-    jsonb_opt_uint32_t(opt, json_child, &element->enSnsType, sizeof(uint32_t));
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "s32SnsId");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "s32SnsId", json_child);
-    }
-    jsonb_opt_int32_t(opt, json_child, &element->s32SnsId, sizeof(int32_t));
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "s32BusId");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "s32BusId", json_child);
-    }
-    jsonb_opt_int32_t(opt, json_child, &element->s32BusId, sizeof(int32_t));
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "MipiDev");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "MipiDev", json_child);
-    }
-    jsonb_opt_int32_t(opt, json_child, &element->MipiDev, sizeof(int32_t));
-}
-}
-void jsonb_opt_sdk_vi_dev_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
-{
-    sdk_vi_dev_info_t *element= e;
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "ViDev");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "ViDev", json_child);
-    }
-    jsonb_opt_int32_t(opt, json_child, &element->ViDev, sizeof(int32_t));
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "enWDRMode");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "enWDRMode", json_child);
-    }
-    jsonb_opt_uint32_t(opt, json_child, &element->enWDRMode, sizeof(uint32_t));
-}
-}
-void jsonb_opt_sdk_vi_pipe_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
-{
-    sdk_vi_pipe_info_t *element= e;
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "aPipe");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateArray();
-        cJSON_AddItemToObject(json, "aPipe", json_child);
-    }
-    const size_t size_list_data[] = {WDR_MAX_PIPE_NUM,0};
-    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
-    jsonb_opt_array(opt, json_child, element->aPipe, sizeof(int32_t) * 1 * WDR_MAX_PIPE_NUM, size_list_data, size_list_len, 0, jsonb_opt_int32_t);
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "enMastPipeMode");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "enMastPipeMode", json_child);
-    }
-    jsonb_opt_uint32_t(opt, json_child, &element->enMastPipeMode, sizeof(uint32_t));
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "bMultiPipe");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "bMultiPipe", json_child);
-    }
-    jsonb_opt_uint32_t(opt, json_child, &element->bMultiPipe, sizeof(uint32_t));
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "bVcNumCfged");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "bVcNumCfged", json_child);
-    }
-    jsonb_opt_int32_t(opt, json_child, &element->bVcNumCfged, sizeof(int32_t));
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "bIspBypass");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "bIspBypass", json_child);
-    }
-    jsonb_opt_uint32_t(opt, json_child, &element->bIspBypass, sizeof(uint32_t));
-}
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
@@ -230,73 +54,34 @@ void jsonb_opt_sdk_vi_pipe_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t 
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
         if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "u32VCNum");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateArray();
-        cJSON_AddItemToObject(json, "u32VCNum", json_child);
-    }
-    const size_t size_list_data[] = {WDR_MAX_PIPE_NUM,0};
-    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
-    jsonb_opt_array(opt, json_child, element->u32VCNum, sizeof(uint32_t) * 1 * WDR_MAX_PIPE_NUM, size_list_data, size_list_len, 0, jsonb_opt_uint32_t);
-}
-}
-void jsonb_opt_sdk_vi_chn_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
-{
-    sdk_vi_chn_info_t *element= e;
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "ViChn");
+        json_child = cJSON_GetObjectItem(json, "u32BufCnt");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "ViChn", json_child);
+        cJSON_AddItemToObject(json, "u32BufCnt", json_child);
     }
-    jsonb_opt_int32_t(opt, json_child, &element->ViChn, sizeof(int32_t));
+    jsonb_opt_uint32_t(opt, json_child, &element->u32BufCnt, sizeof(uint32_t));
 }
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
         if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "enPixFormat");
+        json_child = cJSON_GetObjectItem(json, "enBufType");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "enPixFormat", json_child);
+        cJSON_AddItemToObject(json, "enBufType", json_child);
     }
-    jsonb_opt_uint32_t(opt, json_child, &element->enPixFormat, sizeof(uint32_t));
+    jsonb_opt_uint32_t(opt, json_child, &element->enBufType, sizeof(uint32_t));
 }
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
         if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "enDynamicRange");
+        json_child = cJSON_GetObjectItem(json, "enWorkMode");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "enDynamicRange", json_child);
+        cJSON_AddItemToObject(json, "enWorkMode", json_child);
     }
-    jsonb_opt_uint32_t(opt, json_child, &element->enDynamicRange, sizeof(uint32_t));
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "enVideoFormat");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "enVideoFormat", json_child);
-    }
-    jsonb_opt_uint32_t(opt, json_child, &element->enVideoFormat, sizeof(uint32_t));
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "enCompressMode");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "enCompressMode", json_child);
-    }
-    jsonb_opt_uint32_t(opt, json_child, &element->enCompressMode, sizeof(uint32_t));
+    jsonb_opt_uint32_t(opt, json_child, &element->enWorkMode, sizeof(uint32_t));
 }
 }
 void jsonb_opt_sdk_vi_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
@@ -306,34 +91,23 @@ void jsonb_opt_sdk_vi_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
         if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "stSnsInfo");
+        json_child = cJSON_GetObjectItem(json, "pipeId");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "stSnsInfo", json_child);
+        cJSON_AddItemToObject(json, "pipeId", json_child);
     }
-    jsonb_opt_sdk_vi_sensor_info_t(opt, json_child, &element->stSnsInfo, sizeof(sdk_vi_sensor_info_t));
+    jsonb_opt_uint32_t(opt, json_child, &element->pipeId, sizeof(uint32_t));
 }
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
         if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "stDevInfo");
+        json_child = cJSON_GetObjectItem(json, "chnId");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "stDevInfo", json_child);
+        cJSON_AddItemToObject(json, "chnId", json_child);
     }
-    jsonb_opt_sdk_vi_dev_info_t(opt, json_child, &element->stDevInfo, sizeof(sdk_vi_dev_info_t));
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "stPipeInfo");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "stPipeInfo", json_child);
-    }
-    jsonb_opt_sdk_vi_pipe_info_t(opt, json_child, &element->stPipeInfo, sizeof(sdk_vi_pipe_info_t));
+    jsonb_opt_uint32_t(opt, json_child, &element->chnId, sizeof(uint32_t));
 }
 {
     cJSON *json_child = NULL;
@@ -347,93 +121,6 @@ void jsonb_opt_sdk_vi_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
     jsonb_opt_sdk_vi_chn_info_t(opt, json_child, &element->stChnInfo, sizeof(sdk_vi_chn_info_t));
 }
 }
-void jsonb_opt_sdk_vpss_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
-{
-    sdk_vpss_info_t *element= e;
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "VpssGrp");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "VpssGrp", json_child);
-    }
-    jsonb_opt_int32_t(opt, json_child, &element->VpssGrp, sizeof(int32_t));
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "ViPipe");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "ViPipe", json_child);
-    }
-    jsonb_opt_int32_t(opt, json_child, &element->ViPipe, sizeof(int32_t));
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "ViChn");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "ViChn", json_child);
-    }
-    jsonb_opt_int32_t(opt, json_child, &element->ViChn, sizeof(int32_t));
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "abChnEnable");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateArray();
-        cJSON_AddItemToObject(json, "abChnEnable", json_child);
-    }
-    const size_t size_list_data[] = {VPSS_MAX_PHY_CHN_NUM,0};
-    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
-    jsonb_opt_array(opt, json_child, element->abChnEnable, sizeof(uint32_t) * 1 * VPSS_MAX_PHY_CHN_NUM, size_list_data, size_list_len, 0, jsonb_opt_uint32_t);
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "aenSize");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateArray();
-        cJSON_AddItemToObject(json, "aenSize", json_child);
-    }
-    const size_t size_list_data[] = {VPSS_MAX_PHY_CHN_NUM,0};
-    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
-    jsonb_opt_array(opt, json_child, element->aenSize, sizeof(int32_t) * 1 * VPSS_MAX_PHY_CHN_NUM, size_list_data, size_list_len, 0, jsonb_opt_int32_t);
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "au32Depth");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateArray();
-        cJSON_AddItemToObject(json, "au32Depth", json_child);
-    }
-    const size_t size_list_data[] = {VPSS_MAX_PHY_CHN_NUM,0};
-    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
-    jsonb_opt_array(opt, json_child, element->au32Depth, sizeof(int32_t) * 1 * VPSS_MAX_PHY_CHN_NUM, size_list_data, size_list_len, 0, jsonb_opt_int32_t);
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "enSnsSize");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "enSnsSize", json_child);
-    }
-    jsonb_opt_uint32_t(opt, json_child, &element->enSnsSize, sizeof(uint32_t));
-}
-}
 void jsonb_opt_sdk_venc_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
 {
     sdk_venc_info_t *element= e;
@@ -441,78 +128,45 @@ void jsonb_opt_sdk_venc_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
         if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "VencChn");
+        json_child = cJSON_GetObjectItem(json, "DevId");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "VencChn", json_child);
+        cJSON_AddItemToObject(json, "DevId", json_child);
     }
-    jsonb_opt_int32_t(opt, json_child, &element->VencChn, sizeof(int32_t));
+    jsonb_opt_uint32_t(opt, json_child, &element->DevId, sizeof(uint32_t));
 }
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
         if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "VpssGrp");
+        json_child = cJSON_GetObjectItem(json, "ViChnId");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "VpssGrp", json_child);
+        cJSON_AddItemToObject(json, "ViChnId", json_child);
     }
-    jsonb_opt_int32_t(opt, json_child, &element->VpssGrp, sizeof(int32_t));
+    jsonb_opt_uint32_t(opt, json_child, &element->ViChnId, sizeof(uint32_t));
 }
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
         if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "VpssChn");
+        json_child = cJSON_GetObjectItem(json, "ChnId");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "VpssChn", json_child);
+        cJSON_AddItemToObject(json, "ChnId", json_child);
     }
-    jsonb_opt_int32_t(opt, json_child, &element->VpssChn, sizeof(int32_t));
+    jsonb_opt_uint32_t(opt, json_child, &element->ChnId, sizeof(uint32_t));
 }
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
         if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "u32Profile");
+        json_child = cJSON_GetObjectItem(json, "enType");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "u32Profile", json_child);
+        cJSON_AddItemToObject(json, "enType", json_child);
     }
-    jsonb_opt_uint32_t(opt, json_child, &element->u32Profile, sizeof(uint32_t));
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "enPayLoad");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "enPayLoad", json_child);
-    }
-    jsonb_opt_uint32_t(opt, json_child, &element->enPayLoad, sizeof(uint32_t));
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "enSize");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "enSize", json_child);
-    }
-    jsonb_opt_uint32_t(opt, json_child, &element->enSize, sizeof(uint32_t));
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "bRcnRefShareBuf");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "bRcnRefShareBuf", json_child);
-    }
-    jsonb_opt_uint32_t(opt, json_child, &element->bRcnRefShareBuf, sizeof(uint32_t));
+    jsonb_opt_uint32_t(opt, json_child, &element->enType, sizeof(uint32_t));
 }
 {
     cJSON *json_child = NULL;
@@ -529,54 +183,105 @@ void jsonb_opt_sdk_venc_info_t(jsonb_opt_e opt, cJSON *json, void *e, size_t siz
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
         if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "enGopMode");
+        json_child = cJSON_GetObjectItem(json, "PicWidth");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "enGopMode", json_child);
+        cJSON_AddItemToObject(json, "PicWidth", json_child);
     }
-    jsonb_opt_uint32_t(opt, json_child, &element->enGopMode, sizeof(uint32_t));
+    jsonb_opt_uint32_t(opt, json_child, &element->PicWidth, sizeof(uint32_t));
+}
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) return;
+        json_child = cJSON_GetObjectItem(json, "PicHeight");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "PicHeight", json_child);
+    }
+    jsonb_opt_uint32_t(opt, json_child, &element->PicHeight, sizeof(uint32_t));
+}
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) return;
+        json_child = cJSON_GetObjectItem(json, "Gop");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "Gop", json_child);
+    }
+    jsonb_opt_uint32_t(opt, json_child, &element->Gop, sizeof(uint32_t));
+}
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) return;
+        json_child = cJSON_GetObjectItem(json, "SrcFrameRateDen");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "SrcFrameRateDen", json_child);
+    }
+    jsonb_opt_uint32_t(opt, json_child, &element->SrcFrameRateDen, sizeof(uint32_t));
+}
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) return;
+        json_child = cJSON_GetObjectItem(json, "SrcFrameRateNum");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "SrcFrameRateNum", json_child);
+    }
+    jsonb_opt_uint32_t(opt, json_child, &element->SrcFrameRateNum, sizeof(uint32_t));
+}
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) return;
+        json_child = cJSON_GetObjectItem(json, "DstFrameRateDen");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "DstFrameRateDen", json_child);
+    }
+    jsonb_opt_uint32_t(opt, json_child, &element->DstFrameRateDen, sizeof(uint32_t));
+}
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) return;
+        json_child = cJSON_GetObjectItem(json, "DstFrameRateNum");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "DstFrameRateNum", json_child);
+    }
+    jsonb_opt_uint32_t(opt, json_child, &element->DstFrameRateNum, sizeof(uint32_t));
+}
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) return;
+        json_child = cJSON_GetObjectItem(json, "imageType");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "imageType", json_child);
+    }
+    jsonb_opt_uint32_t(opt, json_child, &element->imageType, sizeof(uint32_t));
+}
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) return;
+        json_child = cJSON_GetObjectItem(json, "Profile");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "Profile", json_child);
+    }
+    jsonb_opt_uint32_t(opt, json_child, &element->Profile, sizeof(uint32_t));
 }
 }
 void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
 {
     sdk_cfg_t *element= e;
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "s32SysNum");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "s32SysNum", json_child);
-    }
-    jsonb_opt_int32_t(opt, json_child, &element->s32SysNum, sizeof(int32_t));
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "as32SysId");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateArray();
-        cJSON_AddItemToObject(json, "as32SysId", json_child);
-    }
-    const size_t size_list_data[] = {1,0};
-    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
-    jsonb_opt_array(opt, json_child, element->as32SysId, sizeof(int32_t) * 1 * 1, size_list_data, size_list_len, 0, jsonb_opt_int32_t);
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "astSysInfo");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateArray();
-        cJSON_AddItemToObject(json, "astSysInfo", json_child);
-    }
-    const size_t size_list_data[] = {1,0};
-    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
-    jsonb_opt_array(opt, json_child, element->astSysInfo, sizeof(sdk_sys_info_t) * 1 * 1, size_list_data, size_list_len, 0, jsonb_opt_sdk_sys_info_t);
-}
 {
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
@@ -597,9 +302,9 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "as32ViId", json_child);
     }
-    const size_t size_list_data[] = {VI_MAX_DEV_NUM,0};
+    const size_t size_list_data[] = {4,0};
     const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
-    jsonb_opt_array(opt, json_child, element->as32ViId, sizeof(int32_t) * 1 * VI_MAX_DEV_NUM, size_list_data, size_list_len, 0, jsonb_opt_int32_t);
+    jsonb_opt_array(opt, json_child, element->as32ViId, sizeof(int32_t) * 1 * 4, size_list_data, size_list_len, 0, jsonb_opt_int32_t);
 }
 {
     cJSON *json_child = NULL;
@@ -610,46 +315,9 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "astViInfo", json_child);
     }
-    const size_t size_list_data[] = {VI_MAX_DEV_NUM,0};
+    const size_t size_list_data[] = {4,0};
     const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
-    jsonb_opt_array(opt, json_child, element->astViInfo, sizeof(sdk_vi_info_t) * 1 * VI_MAX_DEV_NUM, size_list_data, size_list_len, 0, jsonb_opt_sdk_vi_info_t);
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "s32VpssNum");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateObject();
-        cJSON_AddItemToObject(json, "s32VpssNum", json_child);
-    }
-    jsonb_opt_int32_t(opt, json_child, &element->s32VpssNum, sizeof(int32_t));
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "as32VpssId");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateArray();
-        cJSON_AddItemToObject(json, "as32VpssId", json_child);
-    }
-    const size_t size_list_data[] = {VPSS_MAX_GRP_NUM,0};
-    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
-    jsonb_opt_array(opt, json_child, element->as32VpssId, sizeof(int32_t) * 1 * VPSS_MAX_GRP_NUM, size_list_data, size_list_len, 0, jsonb_opt_int32_t);
-}
-{
-    cJSON *json_child = NULL;
-    if (opt == JSONB_OPT_J2S) {
-        if (cJSON_IsNull(json)) return;
-        json_child = cJSON_GetObjectItem(json, "astVpssInfo");
-    } else if (opt == JSONB_OPT_S2J) {
-        json_child = cJSON_CreateArray();
-        cJSON_AddItemToObject(json, "astVpssInfo", json_child);
-    }
-    const size_t size_list_data[] = {VPSS_MAX_GRP_NUM,0};
-    const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
-    jsonb_opt_array(opt, json_child, element->astVpssInfo, sizeof(sdk_vpss_info_t) * 1 * VPSS_MAX_GRP_NUM, size_list_data, size_list_len, 0, jsonb_opt_sdk_vpss_info_t);
+    jsonb_opt_array(opt, json_child, element->astViInfo, sizeof(sdk_vi_info_t) * 1 * 4, size_list_data, size_list_len, 0, jsonb_opt_sdk_vi_info_t);
 }
 {
     cJSON *json_child = NULL;
@@ -671,9 +339,9 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "as32VencId", json_child);
     }
-    const size_t size_list_data[] = {VENC_MAX_CHN_NUM,0};
+    const size_t size_list_data[] = {4,0};
     const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
-    jsonb_opt_array(opt, json_child, element->as32VencId, sizeof(int32_t) * 1 * VENC_MAX_CHN_NUM, size_list_data, size_list_len, 0, jsonb_opt_int32_t);
+    jsonb_opt_array(opt, json_child, element->as32VencId, sizeof(int32_t) * 1 * 4, size_list_data, size_list_len, 0, jsonb_opt_int32_t);
 }
 {
     cJSON *json_child = NULL;
@@ -684,8 +352,8 @@ void jsonb_opt_sdk_cfg_t(jsonb_opt_e opt, cJSON *json, void *e, size_t size)
         json_child = cJSON_CreateArray();
         cJSON_AddItemToObject(json, "astVencInfo", json_child);
     }
-    const size_t size_list_data[] = {VENC_MAX_CHN_NUM,0};
+    const size_t size_list_data[] = {4,0};
     const int size_list_len = sizeof(size_list_data)/sizeof(size_t);
-    jsonb_opt_array(opt, json_child, element->astVencInfo, sizeof(sdk_venc_info_t) * 1 * VENC_MAX_CHN_NUM, size_list_data, size_list_len, 0, jsonb_opt_sdk_venc_info_t);
+    jsonb_opt_array(opt, json_child, element->astVencInfo, sizeof(sdk_venc_info_t) * 1 * 4, size_list_data, size_list_len, 0, jsonb_opt_sdk_venc_info_t);
 }
 }

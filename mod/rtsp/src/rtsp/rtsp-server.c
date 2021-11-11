@@ -62,7 +62,7 @@ static int rtsp_ondescribe(void *ptr, rtsp_server_t *rtsp, const char *uri)
         sm = malloc(sizeof(rtsp_server_media_t));
         assert(sm);
         memset(sm, 0, sizeof(rtsp_server_media_t));
-        strncpy(sm->key, key, sizeof(key));
+        strcpy(sm->key, key);
         rtsp_uri_parse(uri, sm->path, sizeof(sm->path));
         sm->media = rtp_media_live_new(sm->path);
         assert(sm->media);

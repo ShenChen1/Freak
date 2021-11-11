@@ -1,8 +1,9 @@
 project(media-server)
 
 ExternalProject_Add(build-${PROJECT_NAME}
-    GIT_REPOSITORY "https://github.com/ireader/media-server.git"
-    GIT_TAG "fbb9539c7f57193f7c09cf250e88cd5e61ecde2b"
+#    GIT_REPOSITORY "https://github.com/ireader/media-server.git"
+#    GIT_TAG "fbb9539c7f57193f7c09cf250e88cd5e61ecde2b"
+    URL ${PROJECT_SOURCE_DIR}/src/media-server.tar.gz
     CONFIGURE_COMMAND true
     BUILD_COMMAND true
     COMMAND make CROSS=${CMAKE_CROSS_PREFIX}- RELEASE=0 OUTPATH=${PROJECT_BINARY_DIR}/build -C libflv
@@ -35,8 +36,9 @@ set(MEDIA_SRV_LINK_DIR "${PROJECT_BINARY_DIR}/build"
     CACHE PATH INTERNAL FORCE)
 
 ExternalProject_Add(build-${PROJECT_NAME}-sdk
-    GIT_REPOSITORY "https://github.com/ireader/sdk.git"
-    GIT_TAG "3b44375b0cda9cebff7096ac0fa6ebe4d2458118"
+    #GIT_REPOSITORY "https://github.com/ireader/sdk.git"
+    #GIT_TAG "3b44375b0cda9cebff7096ac0fa6ebe4d2458118"
+    URL ${PROJECT_SOURCE_DIR}/src/media-server-sdk.tar.gz
     CONFIGURE_COMMAND true
     BUILD_COMMAND true
     COMMAND make CROSS=${CMAKE_CROSS_PREFIX}- RELEASE=0 OUTPATH=${PROJECT_BINARY_DIR}/build -C libhttp

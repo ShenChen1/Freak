@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "vi.h": "c",
+        "log.h": "c",
+        "sdk_cfg.h": "c",
+        "common.h": "c",
+        "jsonb_c_type.h": "c",
+        "sdk_common.h": "c",
+        "sample_comm.h": "c",
+        "ratio": "c",
+        "xiosbase": "c",
+        "media.h": "c",
+        "video_stream.h": "c"
+    }
+}

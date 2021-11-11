@@ -5,9 +5,10 @@ ExternalProject_Add(${PROJECT_NAME}
     CONFIGURE_COMMAND true
     BUILD_COMMAND true
     INSTALL_COMMAND true
-    COMMAND cmake -E copy_directory ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-prefix/src/${PROJECT_NAME}/easymedia/common ${FREAK_HOME_PATH}/mod/vsf-hi3516d/sample/
-    COMMAND cp -av ${PROJECT_SOURCE_DIR}/libnnieface.so ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-prefix/src/${PROJECT_NAME}/lib/
-    COMMAND cp -av ${PROJECT_SOURCE_DIR}/libtracker.so ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-prefix/src/${PROJECT_NAME}/lib/
+    COMMAND mkdir -p ${FREAK_HOME_PATH}/mod/vsf-rv1126/sdk_inc/
+    COMMAND cmake -E copy_directory ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-prefix/src/${PROJECT_NAME}/include/ ${FREAK_HOME_PATH}/mod/vsf-rv1126/sdk_inc/
+    #COMMAND cp -av ${PROJECT_SOURCE_DIR}/libnnieface.so ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-prefix/src/${PROJECT_NAME}/lib/
+    #COMMAND cp -av ${PROJECT_SOURCE_DIR}/libtracker.so ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-prefix/src/${PROJECT_NAME}/lib/
     BUILD_IN_SOURCE 1)
 
 # set search path

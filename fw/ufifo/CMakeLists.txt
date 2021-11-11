@@ -1,7 +1,7 @@
 project(ufifo)
 
 ExternalProject_Add(build-${PROJECT_NAME}
-    GIT_REPOSITORY "https://github.com/ShenChen1/ufifo.git"
+    URL ${PROJECT_SOURCE_DIR}/src/ufifo.tar.gz  
     CONFIGURE_COMMAND true
     BUILD_COMMAND make all CROSS_COMPILE=${CMAKE_CROSS_PREFIX}
     INSTALL_COMMAND true

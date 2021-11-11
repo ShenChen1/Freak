@@ -1,6 +1,8 @@
 include_directories(${MEDIA_SDK_HEADER_DIR})
 link_directories(${MEDIA_SDK_LINK_DIR})
 
+list(APPEND LIB_VSF_SDK_NAME "z")
+list(APPEND LIB_VSF_SDK_NAME "drm")
 list(APPEND LIB_VSF_SDK_NAME "asound")
 list(APPEND LIB_VSF_SDK_NAME "avcodec")
 list(APPEND LIB_VSF_SDK_NAME "avformat")
