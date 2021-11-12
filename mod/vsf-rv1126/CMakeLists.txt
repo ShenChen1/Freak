@@ -4,6 +4,7 @@ project(vsf-rv1126)
 include(sdk-${CMAKE_CHIP_NAME})
 
 add_definitions(-DMODULE_NAME="${PROJECT_NAME}")
+add_definitions(-DRKAIQ)
 #add_definitions(-DSENSOR0_TYPE=SONY_IMX327_2L_MIPI_2M_30FPS_12BIT)
 #add_definitions(-DSENSOR1_TYPE=SONY_IMX327_2L_MIPI_2M_30FPS_12BIT)
 add_compile_options(-ffunction-sections -fdata-sections)
@@ -14,12 +15,19 @@ add_library(${PROJECT_NAME} STATIC
     src/hal/vi.c
     src/hal/venc.c
     src/sdk_cfg.c
-    cfg/sdk_cfg.c)
+    cfg/sdk_cfg.c
+    src/hal/sample_common_isp.c)
 
 target_link_libraries(${PROJECT_NAME}
     utils
     media)
 include_directories(${PROJECT_SOURCE_DIR})
+include_directories(${PROJECT_SOURCE_DIR}/isp_include/algos)
+include_directories(${PROJECT_SOURCE_DIR}/isp_include/common)
+include_directories(${PROJECT_SOURCE_DIR}/isp_include/ipc_server)
+include_directories(${PROJECT_SOURCE_DIR}/isp_include/iq_parser)
+include_directories(${PROJECT_SOURCE_DIR}/isp_include/uAPI)
+include_directories(${PROJECT_SOURCE_DIR}/isp_include/xcore)
 include_directories(${PROJECT_SOURCE_DIR}/../vsf/)
 add_dependencies(${PROJECT_NAME} sdk-${CMAKE_CHIP_NAME})
 

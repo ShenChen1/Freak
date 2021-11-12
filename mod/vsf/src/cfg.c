@@ -6,14 +6,14 @@
 
 static vsf_cfg_t s_cfg = {
     .stream = {
-        .num = { 3 },
+        .num = { 1 },
         .cfgs[0] = {
             .id = 0,
             .enable = 1,
             .encode = VIDEO_STREAM_TYPE_H264,
             .width = 1920,
             .height = 1080,
-            .fps = 25,
+            .fps = 30,
         },
         .caps[0] = {
             .id = 0,

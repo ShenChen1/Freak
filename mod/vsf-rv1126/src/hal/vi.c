@@ -1,4 +1,5 @@
 #include "inc/hal/vi.h"
+#include "inc/sample_common.h"
 #include "common.h"
 #include "inc/sdk_cfg.h"
 #include "log.h"
@@ -108,12 +109,17 @@ static void __attribute__((constructor(VSF_VI_PRIORITY))) sdk_vi_constructor()
     mod->objs = calloc(mod->num, sizeof(vsf_vi_t *));
     assert(mod->objs);
 
-
+    rk_aiq_working_mode_t hdr_mode = RK_AIQ_WORKING_MODE_NORMAL;
+    SAMPLE_COMM_ISP_Init(0, hdr_mode, 0, "/etc/iqfiles/");
+    SAMPLE_COMM_ISP_Run(0);
+    SAMPLE_COMM_ISP_SetFrameRate(0, 30);
     for (i = 0; i < mod->num; i++) {
         vsf_vi_t *obj = VSF_createVi(i);
         __transfor_transfor_cfg(*(sdk_cfg_get_member(astViInfo)+i),(vsf_vi_priv_t *)obj->priv);
         assert(!obj->init(obj));
     }
+    //for test
+
 
 }
 

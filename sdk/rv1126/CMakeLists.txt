@@ -7,7 +7,7 @@ ExternalProject_Add(${PROJECT_NAME}
     INSTALL_COMMAND true
     COMMAND mkdir -p ${FREAK_HOME_PATH}/mod/vsf-rv1126/sdk_inc/
     COMMAND cmake -E copy_directory ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-prefix/src/${PROJECT_NAME}/include/ ${FREAK_HOME_PATH}/mod/vsf-rv1126/sdk_inc/
-    #COMMAND cp -av ${PROJECT_SOURCE_DIR}/libnnieface.so ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-prefix/src/${PROJECT_NAME}/lib/
+    COMMAND cp -rf ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-prefix/src/${PROJECT_NAME}/isp_include/ ${FREAK_HOME_PATH}/mod/vsf-rv1126/
     #COMMAND cp -av ${PROJECT_SOURCE_DIR}/libtracker.so ${PROJECT_BINARY_DIR}/${PROJECT_NAME}-prefix/src/${PROJECT_NAME}/lib/
     BUILD_IN_SOURCE 1)
 

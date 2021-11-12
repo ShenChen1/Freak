@@ -58,24 +58,12 @@ static void __transfor_stream_info(MEDIA_BUFFER mb, video_stream_t *dst,vsf_venc
 
 /*void video_packet_cb(MEDIA_BUFFER mb)
 {
-    int s32Ret            = 0;
-    video_stream_t stream = { NULL };
-    vsf_venc_mod_t *mod   = &s_mod;
-    vsf_venc_t *obj       = mod->objs[i];
-    vsf_venc_priv_t *priv = obj->priv;
-    priv                  = mod->objs[i]->priv;
-    if (priv->cb.func) {
-
-        __transfor_stream_info(mb, &stream);
-        stream.enType = __transfor_encode_format(enPayLoadType[i]);
-        s32Ret        = priv->cb.func(&stream, priv->cb.args);
-        if (HI_SUCCESS != s32Ret) {
-            errorf("proc stream failed!");
-        }
-    }
+    static int packet_cnt = 0;
+    packet_cnt++;
+    printf("#Get packet-%d, size %zu\n", packet_cnt, RK_MPI_MB_GetSize(mb));
+    RK_MPI_MB_ReleaseBuffer(mb);
     return;
 }*/
-
 
 static void *GetMediaBuffer(void *arg) {
    /* printf("#Start %s hq_thread, arg:%p\n", __func__, arg);
@@ -149,17 +137,17 @@ static int __venc_init(vsf_venc_t *self)
         venc_chn_attr.stRcAttr.stH264Cbr.u32Gop     = priv->info->Gop;
         venc_chn_attr.stRcAttr.stH264Cbr.u32BitRate = priv->info->PicWidth * priv->info->PicHeight;
         // frame rate: in 30/1, out 30/1.
-        venc_chn_attr.stRcAttr.stH264Cbr.fr32DstFrameRateDen = priv->info->SrcFrameRateDen;
-        venc_chn_attr.stRcAttr.stH264Cbr.fr32DstFrameRateNum = priv->info->SrcFrameRateNum;
-        venc_chn_attr.stRcAttr.stH264Cbr.u32SrcFrameRateDen  = priv->info->DstFrameRateDen;
-        venc_chn_attr.stRcAttr.stH264Cbr.u32SrcFrameRateNum  = priv->info->DstFrameRateNum;
+        venc_chn_attr.stRcAttr.stH264Cbr.fr32DstFrameRateDen = priv->info->DstFrameRateDen;
+        venc_chn_attr.stRcAttr.stH264Cbr.fr32DstFrameRateNum = priv->info->DstFrameRateNum;
+        venc_chn_attr.stRcAttr.stH264Cbr.u32SrcFrameRateDen  = priv->info->SrcFrameRateDen;
+        venc_chn_attr.stRcAttr.stH264Cbr.u32SrcFrameRateNum  = priv->info->SrcFrameRateNum;
         break;
     }
     venc_chn_attr.stVencAttr.imageType    = priv->info->imageType;
     venc_chn_attr.stVencAttr.u32PicWidth  = priv->info->PicWidth;
     venc_chn_attr.stVencAttr.u32PicHeight = priv->info->PicHeight;
     venc_chn_attr.stVencAttr.u32VirWidth  = (priv->info->PicWidth + 15) & (~15);
-    venc_chn_attr.stVencAttr.u32VirHeight = (priv->info->PicHeight + 15) & (~15);
+    venc_chn_attr.stVencAttr.u32VirHeight = priv->info->PicHeight;//(priv->info->PicHeight + 15) & (~15);
     venc_chn_attr.stVencAttr.u32Profile   = priv->info->Profile;
 
     s32Ret = RK_MPI_VENC_CreateChn(priv->info->ChnId, &venc_chn_attr);
@@ -173,12 +161,12 @@ static int __venc_init(vsf_venc_t *self)
     stEncChn.enModId = RK_ID_VENC;
     stEncChn.s32DevId = priv->info->DevId;
     stEncChn.s32ChnId = priv->info->ChnId;
-    s32Ret = RK_MPI_SYS_RegisterOutCb(&stEncChn, video_packet_cb[]);
+    s32Ret = RK_MPI_SYS_RegisterOutCb(&stEncChn, video_packet_cb);
     if (s32Ret) {
         printf("ERROR: register output callback for VENC[0] error! ret=%d\n", s32Ret);
         return 0;
     }*/
-    pthread_create(&priv->hq_thread, NULL, GetMediaBuffer, priv);
+    //RK_MPI_VI_StartStream(priv->info->DevId, priv->info->ChnId);
     MPP_CHN_S stSrcChn;
     stSrcChn.enModId = RK_ID_VI;
     stSrcChn.s32ChnId = priv->info->ViChnId;
@@ -186,6 +174,7 @@ static int __venc_init(vsf_venc_t *self)
     stDestChn.enModId = RK_ID_VENC;
     stDestChn.s32ChnId = priv->info->ChnId;
     s32Ret = RK_MPI_SYS_Bind(&stSrcChn, &stDestChn);
+    pthread_create(&priv->hq_thread, NULL, GetMediaBuffer, priv);
     return s32Ret;
 }
 

@@ -10,6 +10,8 @@
         "ratio": "c",
         "xiosbase": "c",
         "media.h": "c",
-        "video_stream.h": "c"
+        "video_stream.h": "c",
+        "sample_common.h": "c",
+        "ios": "c"
     }
 }

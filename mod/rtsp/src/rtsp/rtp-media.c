@@ -30,14 +30,14 @@ typedef struct {
     void *rtp;
     void *packer;
     mfifo_t *fifo;
-    uint8_t packet[64 * 1024];
+    uint8_t packet[512 * 1024];
     struct rtp_transport_t *transport;
 } rtp_media_track_t;
 
 typedef struct {
     struct rtp_media_t base;
     char path[64];
-    uint8_t data[512 * 1024];
+    uint8_t data[1024 * 1024];
     pthread_t thread;
     int status;
     rtp_media_track_t track[MEDIA_TRACK_MAX];

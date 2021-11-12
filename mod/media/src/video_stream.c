@@ -96,7 +96,7 @@ unsigned int video_stream_recput(unsigned char *p1, unsigned int n1, unsigned ch
 
     for (i = 0; i < stream->u32PackCount; i++) {
         // copy data
-        p = (unsigned char *)(stream->pstPack[i].pu8Addr);
+        p = (unsigned char *)(stream->pstPack[i].pu8Addr  + stream->pstPack[i].u32Offset);
         a = stream->pstPack[i].u32Len - stream->pstPack[i].u32Offset;
         l = min(a, _n1);
         memcpy(_p1, p, l);
