@@ -13,6 +13,7 @@ add_link_options(-Wl,--gc-sections)
 add_library(${PROJECT_NAME} STATIC
     src/hal/sys.c
     src/hal/vi.c
+    src/hal/vpss.c
     src/hal/venc.c
     src/sdk_cfg.c
     cfg/sdk_cfg.c

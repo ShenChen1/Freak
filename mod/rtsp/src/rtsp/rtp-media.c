@@ -127,7 +127,7 @@ static int rtp_get_sdp(struct rtp_media_t *m, char *sdp)
         "a=range:npt=now-\n"
         "a=recvonly\n"
         "a=control:video\n"
-        "a=fmtp:%d profile-level-id=%02X%02X%02X;packetization-mode=1;sprop-parameter-sets=";
+        "a=fmtp:%d profile-level-id=%02X%02X%02X;packetization-mode=2;sprop-parameter-sets=";
     uint32_t ssrc = rtp_ssrc();
 
     if (!priv->track[MEDIA_TRACK_VIDEO].packer) {
@@ -155,6 +155,7 @@ static int rtp_get_sdp(struct rtp_media_t *m, char *sdp)
     }
 
     sprintf(&sdp[strlen(sdp)], pattern_video, RTP_PAYLOAD_H264, RTP_PAYLOAD_H264, RTP_PAYLOAD_H264, 0, 0, 0);
+    printf("%s\n",sdp);
     return 0;
 }
 
@@ -172,6 +173,7 @@ static int rtp_play(struct rtp_media_t *m)
     if (priv->track[MEDIA_TRACK_VIDEO].fifo) {
         priv->track[MEDIA_TRACK_VIDEO].fifo->newest(priv->track[MEDIA_TRACK_VIDEO].fifo);
     }
+    //
     priv->status = MEDIA_STATUS_PLAY;
     return 0;
 }

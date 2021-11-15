@@ -161,6 +161,7 @@ typedef enum {
 typedef struct {
     uint32_t u32Width;
     uint32_t u32Height;
+    uint32_t size;
     video_frame_format_e enPixelFormat;
     uint32_t u32HeaderStride[3];
     uint32_t u32Stride[3];
@@ -182,6 +183,7 @@ typedef struct {
     uint64_t u64PTS;
 
     uint64_t u64PrivateData;
+    void *ptr;
 } video_frame_t;
 
 #endif /* __VIDEO_FRAME_H__ */

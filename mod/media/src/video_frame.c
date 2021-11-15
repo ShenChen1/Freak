@@ -77,17 +77,32 @@ unsigned int video_frame_recput(unsigned char *p1, unsigned int n1, unsigned cha
     _p2 += a - l;
 
     // copy data
-    uint32_t uSize = frame->u64ExtVirAddr[0] - frame->u64HeaderVirAddr[0];
-    uint8_t *pMap = physmap(frame->u64PhyAddr[0], uSize);
-    p = pMap;
-    a = uSize;
-    l = min(a, _n1);
-    memcpy(_p1, p, l);
-    memcpy(_p2, p + l, a - l);
-    _n1 -= l;
-    _p1 += l;
-    _p2 += a - l;
-    physunmap(pMap, uSize);
+    if(frame->size == 0)
+    {
+        uint32_t uSize = frame->u64ExtVirAddr[0] - frame->u64HeaderVirAddr[0];
+        uint8_t *pMap = physmap(frame->u64PhyAddr[0], uSize);
+        p = pMap;
+        a = uSize;
+        l = min(a, _n1);
+        memcpy(_p1, p, l);
+        memcpy(_p2, p + l, a - l);
+        _n1 -= l;
+        _p1 += l;
+        _p2 += a - l;
+        physunmap(pMap, uSize);
+    }
+    else
+    {
+        p = frame->ptr;
+        a = frame->size;
+        l = min(a, _n1);
+        memcpy(_p1, p, l);
+        memcpy(_p2, p + l, a - l);
+        _n1 -= l;
+        _p1 += l;
+        _p2 += a - l;
+    }
+
 
     tracef("frame:%u", frame->u32TimeRef);
     return totalsize;

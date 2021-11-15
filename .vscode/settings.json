@@ -12,6 +12,16 @@
         "media.h": "c",
         "video_stream.h": "c",
         "sample_common.h": "c",
-        "ios": "c"
+        "ios": "c",
+        "array": "c",
+        "deque": "c",
+        "format": "c",
+        "initializer_list": "c",
+        "list": "c",
+        "type_traits": "c",
+        "vector": "c",
+        "xstring": "c",
+        "xtree": "c",
+        "xutility": "c"
     }
 }

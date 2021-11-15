@@ -54,6 +54,7 @@ static void __transfor_stream_info(MEDIA_BUFFER mb, video_stream_t *dst,vsf_venc
     dst->pstPack[0].u32Offset   = 0;
     dst->pstPack[0].u64PTS      = RK_MPI_MB_GetTimestamp(mb);
     dst->pstPack[0].u32PackType = (uint32_t)RK_MPI_MB_GetFlag(mb); 
+    printf("dst pts %lld\n",dst->pstPack[0].u64PTS);
 }
 
 /*void video_packet_cb(MEDIA_BUFFER mb)
@@ -61,6 +62,19 @@ static void __transfor_stream_info(MEDIA_BUFFER mb, video_stream_t *dst,vsf_venc
     static int packet_cnt = 0;
     packet_cnt++;
     printf("#Get packet-%d, size %zu\n", packet_cnt, RK_MPI_MB_GetSize(mb));
+    vsf_venc_t *obj       = s_mod.objs[0];
+    vsf_venc_priv_t *priv = obj->priv;
+    int s32Ret            = 0;
+    video_stream_t stream = { NULL };
+    if (priv->cb.func)
+    {
+        __transfor_stream_info(mb, &stream,priv);
+        stream.enType = __transfor_encode_format(priv->info->enType);
+        s32Ret        = priv->cb.func(&stream, priv->cb.args);
+        if (0 != s32Ret) {
+            errorf("proc stream failed!");
+        }
+    }
     RK_MPI_MB_ReleaseBuffer(mb);
     return;
 }*/
@@ -149,6 +163,14 @@ static int __venc_init(vsf_venc_t *self)
     venc_chn_attr.stVencAttr.u32VirWidth  = (priv->info->PicWidth + 15) & (~15);
     venc_chn_attr.stVencAttr.u32VirHeight = priv->info->PicHeight;//(priv->info->PicHeight + 15) & (~15);
     venc_chn_attr.stVencAttr.u32Profile   = priv->info->Profile;
+
+    VENC_GOP_ATTR_S stGopModeAttr;
+    stGopModeAttr.enGopMode = VENC_GOPMODE_SMARTP;
+    stGopModeAttr.s32IPQpDelta = 3;
+    stGopModeAttr.s32ViQpDelta = 3;
+    stGopModeAttr.u32BgInterval = 300;
+    stGopModeAttr.u32GopSize = 30;
+    RK_MPI_VENC_SetGopMode(0, &stGopModeAttr);
 
     s32Ret = RK_MPI_VENC_CreateChn(priv->info->ChnId, &venc_chn_attr);
     if (s32Ret) {

@@ -48,13 +48,13 @@ static vsf_cfg_t s_cfg = {
         },
     },
     .frame = {
-        .num = { 2 },
+        .num = { 1 },
         .cfgs[0] = {
             .id = 0,
             .enable = 0,
             .format = VIDEO_FRAME_FORMAT_YUV420P_YVU,
-            .width = 1920,
-            .height = 1080,
+            .width = 640,
+            .height = 640,
             .fps = 10,
         },
         .caps[0] = {

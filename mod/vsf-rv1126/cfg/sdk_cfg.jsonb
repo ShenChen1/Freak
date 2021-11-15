@@ -23,9 +23,6 @@ JSONB_FIELD(stChnInfo, sdk_vi_chn_info_t)
 JSONB_STRUCT_END(sdk_vi_info_t)
 
 //////////////////////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////////////////////
-
 JSONB_STRUCT_START(sdk_venc_info_t)
 JSONB_FIELD(DevId, uint32_t)
 JSONB_FIELD(ViChnId, uint32_t)
@@ -45,11 +42,26 @@ JSONB_STRUCT_END(sdk_venc_info_t)
 
 //////////////////////////////////////////////////////////////////////////////////
 
+JSONB_STRUCT_START(sdk_vpss_info_t)
+JSONB_FIELD(DevId, uint32_t)
+JSONB_FIELD(ViChn, int32_t)
+JSONB_FIELD(RgaId, int32_t)
+JSONB_FIELD(imgType, int32_t)
+JSONB_FIELD(u32Width, int32_t)
+JSONB_FIELD(u32Height, int32_t)
+JSONB_STRUCT_END(sdk_vpss_info_t)
+
+//////////////////////////////////////////////////////////////////////////////////
+
 JSONB_STRUCT_START(sdk_cfg_t)
 
 JSONB_FIELD(s32ViNum, int32_t)
 JSONB_FIELD_ARRAY(as32ViId, 4, int32_t)
 JSONB_FIELD_ARRAY(astViInfo, 4, sdk_vi_info_t)
+
+JSONB_FIELD(s32VpssNum, int32_t)
+JSONB_FIELD_ARRAY(as32VpssId, 4, int32_t)
+JSONB_FIELD_ARRAY(astVpssInfo, 4, sdk_vpss_info_t)
 
 JSONB_FIELD(s32VencNum, int32_t)
 JSONB_FIELD_ARRAY(as32VencId, 4, int32_t)
