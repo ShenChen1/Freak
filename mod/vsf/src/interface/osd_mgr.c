@@ -19,6 +19,7 @@ typedef struct {
 
 static vsf_osd_mgr_t *s_mgr = NULL;
 
+#if 0
 static inline unsigned short argb8888_1555(unsigned int color)
 {
     unsigned char a = (color >> 24) & 0xff;
@@ -154,6 +155,132 @@ static int __draw_obj(vsf_rgn_bitmap_t *bitmap, proto_vsf_osd_obj_t *obj)
     __draw_text(bitmap, &text);
     return 0;
 }
+#else
+
+static void __draw_char(vsf_rgn_bitmap_t *src, FT_Bitmap *dst, proto_point_t *point, uint32_t color)
+{
+    FT_Int i, j, p, q;
+    FT_Int x_max = point->x + dst->width;
+    FT_Int y_max = point->y + dst->rows;
+
+    /* for simplicity, we assume that `bitmap->pixel_mode' */
+    /* is `FT_PIXEL_MODE_GRAY' (i.e., not a bitmap font)   */
+
+    for (i = point->x, p = 0; i < x_max; i++, p++) {
+        for (j = point->y, q = 0; j < y_max; j++, q++) {
+            if (i < 0 || j < 0 || i >= src->u32Width || j >= src->u32Height) {
+                continue;
+            }
+
+            if (dst->buffer[q * dst->width + p]) {
+                ((uint32_t *)src->pData)[j * src->u32Width + i] = color;
+            }
+        }
+    }
+}
+
+static int __draw_text(vsf_rgn_bitmap_t *bitmap, proto_vsf_osd_text_t *text)
+{
+    int n, num_chars;
+    FT_Error error;
+    vsf_osd_mgr_priv_t *priv = s_mgr->priv;
+
+    num_chars = strlen(text->text);
+    /* set character size */
+    error = FT_Set_Pixel_Sizes(priv->ft_face, 0, text->size);
+    assert(!error);
+    FT_GlyphSlot slot = priv->ft_face->glyph;
+
+    /* set up matrix */
+    FT_Matrix matrix; /* transformation matrix */
+    matrix.xx = (FT_Fixed)(1 * 0x10000L);
+    matrix.xy = (FT_Fixed)(0 * 0x10000L);
+    matrix.yx = (FT_Fixed)(0 * 0x10000L);
+    matrix.yy = (FT_Fixed)(1 * 0x10000L);
+
+    /* the pen position in 26.6 cartesian space coordinates; */
+    /* start at (x,y) relative to the upper left corner  */
+    FT_Vector pen; /* untransformed origin  */
+    proto_point_t point;
+    point.x = range(text->point.x, 0, 8191) * bitmap->u32Width / 8192;
+    point.y = range(text->point.y, 0, 8191) * bitmap->u32Height / 8192;
+    pen.x   = point.x * 64;
+    pen.y   = (bitmap->u32Height - point.y) * 64;
+
+    for (n = 0; n < num_chars; n++) {
+        /* set transformation */
+        FT_Set_Transform(priv->ft_face, &matrix, &pen);
+
+        /* load glyph image into the slot (erase previous one) */
+        error = FT_Load_Char(priv->ft_face, text->text[n], FT_LOAD_RENDER);
+        if (error) {
+            /* ignore errors */
+            continue;
+        }
+
+        /* now, draw to our target surface (convert position) */
+        point.x = slot->bitmap_left;
+        point.y = bitmap->u32Height - slot->bitmap_top;
+        __draw_char(bitmap, &slot->bitmap, &point, text->color);
+
+        /* increment pen position */
+        pen.x += slot->advance.x;
+        pen.y += slot->advance.y;
+    }
+
+    return 0;
+}
+
+static int __draw_obj(vsf_rgn_bitmap_t *bitmap, proto_vsf_osd_obj_t *obj)
+{
+    int i;
+    uint32_t color = obj->color;
+
+    proto_rect_t rect;
+    rect.x = range(obj->rect.x, 0, 8191) * bitmap->u32Width / 8192;
+    rect.y = range(obj->rect.y, 0, 8191) * bitmap->u32Height / 8192;
+    rect.w = range(obj->rect.w, 0, 8192 - obj->rect.x) * bitmap->u32Width / 8192;
+    rect.h = range(obj->rect.h, 0, 8192 - obj->rect.y) * bitmap->u32Height / 8192;
+    if (rect.w * rect.h == 0) {
+        return 0;
+    }
+
+    uint32_t *box = &((uint32_t *)bitmap->pData)[rect.y * bitmap->u32Width + rect.x];
+    for (i = 0; i < rect.w; i++) {
+        box[0 * bitmap->u32Width + i]            = color;
+        box[1 * bitmap->u32Width + i]            = color;
+        box[2 * bitmap->u32Width + i]            = color;
+        box[3 * bitmap->u32Width + i]            = color;
+        box[(rect.h - 1) * bitmap->u32Width + i] = color;
+        box[(rect.h - 2) * bitmap->u32Width + i] = color;
+        box[(rect.h - 3) * bitmap->u32Width + i] = color;
+        box[(rect.h - 4) * bitmap->u32Width + i] = color;
+    }
+
+    for (i = 0; i < rect.h; i++) {
+        box[i * bitmap->u32Width + 0]            = color;
+        box[i * bitmap->u32Width + 1]            = color;
+        box[i * bitmap->u32Width + 2]            = color;
+        box[i * bitmap->u32Width + 3]            = color;
+        box[i * bitmap->u32Width + (rect.w - 1)] = color;
+        box[i * bitmap->u32Width + (rect.w - 2)] = color;
+        box[i * bitmap->u32Width + (rect.w - 3)] = color;
+        box[i * bitmap->u32Width + (rect.w - 4)] = color;
+    }
+
+    proto_vsf_osd_text_t text = {};
+    text.color = obj->color;
+    text.size = 32;
+    sprintf(text.text, "id: %d", obj->id);
+    text.point.x = obj->rect.x - text.size - 2;
+    text.point.y = obj->rect.y;
+    __draw_text(bitmap, &text);
+    return 0;
+}
+
+#endif
+
+
 
 static int __vsf_osd_destroy(vsf_osd_mgr_t *self)
 {

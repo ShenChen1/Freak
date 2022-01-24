@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-11-05 11:20:27
- * @LastEditTime: 2021-11-15 15:09:32
+ * @LastEditTime: 2021-11-29 14:44:38
  * @LastEditors: Please set LastEditors
  * @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  * @FilePath: \Freak\mod\vsf-rv1126\src\sdk_cfg.c
@@ -32,6 +32,7 @@ static sdk_cfg_t s_cfg = {
     .astVpssInfo[0] = {
         .DevId = 0,
         .ViChn = 0,
+        .RgaId = 0,
         .imgType = IMAGE_TYPE_RGB888,
         .u32Width = 640,
         .u32Height = 640,
@@ -41,7 +42,7 @@ static sdk_cfg_t s_cfg = {
     .astVencInfo[0] = {
         .DevId = 0,
         .ViChnId = 0,
-        .RgaId = 0,
+        .ChnId = 0,
         .enType = RK_CODEC_TYPE_H264,
         .enRcMode = VENC_RC_MODE_H264CBR,
         .Gop = 30,
