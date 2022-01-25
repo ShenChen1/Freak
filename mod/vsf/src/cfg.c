@@ -95,7 +95,7 @@ static vsf_cfg_t s_cfg = {
         .caps[0] = {
             .id = 0,
             .chn = 0,
-            .subchn = -1,
+            .subchn = 0,
         },
         .cfgs[1] = {
             .id = 1,
@@ -150,7 +150,7 @@ static vsf_cfg_t s_cfg = {
         },
     },
     .font = {
-        .path = "/var/consola.ttf"
+        .path = "/var/CONSOLA.TTF"
     }
 };
 

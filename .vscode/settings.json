@@ -22,6 +22,12 @@
         "vector": "c",
         "xstring": "c",
         "xtree": "c",
-        "xutility": "c"
+        "xutility": "c",
+        "istream": "cpp",
+        "ostream": "cpp",
+        "xlocale": "cpp",
+        "xlocinfo": "cpp",
+        "xlocnum": "cpp",
+        "*.rh": "cpp"
     }
 }

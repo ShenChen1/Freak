@@ -64,18 +64,41 @@ int main()
 
     vsf_osd_mgr_t *osd = vsf_createOsdMgr_r();
     total = osd->num(osd);
-    for (i = 0; i < total; i++) {
+    /*for (i = 0; i < total; i++) {
         proto_vsf_osd_cfg_t cfg = {.id = i};
         // get cfg
         osd->get(osd, &cfg);
         // set cfg
         osd->set(osd, &cfg);
-    }
-    osd->destroy(osd);
+    }*/
+   // osd->destroy(osd);
 
     while (1) {
         infof("keep alive");
-        sleep(1);
+        proto_vsf_osd_cfg_t cfg = {0};
+        // get cfg
+        cfg.id = 0;
+        cfg.enable = 1;
+        char *strcondition = "objs";
+        memcpy(cfg.info.condition,strcondition,5);
+        cfg.info.objs.num = 2;
+        cfg.info.objs.objs[0].id = 0;
+        cfg.info.objs.objs[0].color = 0xffffffaa;
+        cfg.info.objs.objs[0].rect.h = 640;
+        cfg.info.objs.objs[0].rect.w = 640;
+        cfg.info.objs.objs[0].rect.x = 1024;
+        cfg.info.objs.objs[0].rect.y = 1024;
+
+        cfg.info.objs.objs[1].id = 1;
+        cfg.info.objs.objs[1].color = 0xffffffaa;
+        cfg.info.objs.objs[1].rect.h = 640;
+        cfg.info.objs.objs[1].rect.w = 640;
+        cfg.info.objs.objs[1].rect.x = 4096;
+        cfg.info.objs.objs[1].rect.y = 4096;
+        // set cfg
+        osd->set(osd, &cfg);
+    
+        sleep(5);
     }
 
     nnm_rep_destory(rep);

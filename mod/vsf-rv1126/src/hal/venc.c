@@ -54,7 +54,6 @@ static void __transfor_stream_info(MEDIA_BUFFER mb, video_stream_t *dst,vsf_venc
     dst->pstPack[0].u32Offset   = 0;
     dst->pstPack[0].u64PTS      = RK_MPI_MB_GetTimestamp(mb);
     dst->pstPack[0].u32PackType = (uint32_t)RK_MPI_MB_GetFlag(mb); 
-    printf("dst pts %lld\n",dst->pstPack[0].u64PTS);
 }
 
 /*void video_packet_cb(MEDIA_BUFFER mb)
