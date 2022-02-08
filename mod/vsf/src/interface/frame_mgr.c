@@ -8,7 +8,7 @@
 #include "mm.h"
 #include "media.h"
 #include "proto.h"
-
+#include "inc/hal/alg_type.h"
 typedef struct {
     mfifo_t *fifo[VSF_FRAME_MAX];
     proto_vsf_frame_t *info;
@@ -114,10 +114,12 @@ static void __vsf_frame_SaveYUVFile(FILE *pfd, video_frame_t *pVBuf)
 }
 #endif
 
+NCE_S32 nce_c_write_img(const char *img_path, img_t *input_img);
+
 static int __vsf_get_frame_proc(void *data, void *args)
 {
     video_frame_t *frame       = data;
-    size_t totalsize           = sizeof(media_record_t) + sizeof(video_frame_t) + (frame->u64ExtVirAddr[0] - frame->u64HeaderVirAddr[0]);
+    size_t totalsize           = sizeof(media_record_t) + sizeof(video_frame_t) + frame->size;
     vsf_frame_mgr_priv_t *priv = s_mgr->priv;
     proto_vsf_frame_cfg_t *cfg = args;
 
@@ -143,8 +145,7 @@ static int __vsf_get_frame_proc(void *data, void *args)
     __vsf_frame_SaveYUVFile(pFile, frame);
     fclose(pFile);
 #endif
-
-    return priv->fifo[cfg->id]->put(priv->fifo[cfg->id], frame, totalsize, -1) != totalsize;
+    return priv->fifo[cfg->id]->put(priv->fifo[cfg->id], frame, totalsize, 15) != totalsize;
 }
 
 static int __vsf_frame_destroy(vsf_frame_mgr_t *self)
@@ -165,7 +166,7 @@ static int __vsf_frame_set(vsf_frame_mgr_t *self, proto_vsf_frame_cfg_t *cfg)
                 .chn = priv->info->caps[cfg->id].chn,
                 .subchn = priv->info->caps[cfg->id].subchn,
             };
-            priv->fifo[cfg->id] = mfifo_create(&init, 4 * 1024 * 1024);
+            priv->fifo[cfg->id] = mfifo_create(&init, 8 * 1024 * 1024);
             assert(priv->fifo[cfg->id]);
         }
     } else {

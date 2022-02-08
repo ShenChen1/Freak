@@ -145,6 +145,17 @@ void jsonb_opt_proto_app_alg_obj_t(jsonb_opt_e opt, cJSON *json, void *e, size_t
     cJSON *json_child = NULL;
     if (opt == JSONB_OPT_J2S) {
         if (cJSON_IsNull(json)) return;
+        json_child = cJSON_GetObjectItem(json, "text");
+    } else if (opt == JSONB_OPT_S2J) {
+        json_child = cJSON_CreateObject();
+        cJSON_AddItemToObject(json, "text", json_child);
+    }
+    jsonb_opt_string(opt, json_child, element->text, 16);
+}
+{
+    cJSON *json_child = NULL;
+    if (opt == JSONB_OPT_J2S) {
+        if (cJSON_IsNull(json)) return;
         json_child = cJSON_GetObjectItem(json, "rect");
     } else if (opt == JSONB_OPT_S2J) {
         json_child = cJSON_CreateObject();

@@ -29,6 +29,7 @@ extern void jsonb_opt_proto_app_alg_obj_t(jsonb_opt_e opt, cJSON *json, void *el
 typedef struct {
     int id;
     int score;
+    char text[16];
     proto_rect_t rect;
     proto_point_t keypoints[ALG_KEY_POINT_NUM];
 } proto_app_alg_obj_t;

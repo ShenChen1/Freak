@@ -51,7 +51,7 @@ static int __app_alg_result(void *data, void *args)
     vsf_osd_mgr_t *osd             = args;
     proto_app_alg_result_t *result = data;
     proto_vsf_osd_cfg_t cfg = {
-        .id = VSF_OSD_MAX - 1,
+        .id = 0,
         .enable = 1,
         .info = {
             .condition = "objs",
@@ -62,17 +62,28 @@ static int __app_alg_result(void *data, void *args)
     };
 
     int i = 0;
+    //int k = 0;
     for (i = 0; i < cfg.info.objs.num; i++) {
         cfg.info.objs.objs[i].id     = result->objs[i].id;
-        cfg.info.objs.objs[i].color  = 0x01ff0000;
+        memcpy(cfg.info.objs.objs[i].text, result->objs[i].text, 16);
+        cfg.info.objs.objs[i].color  = 0xffffffaa;
         cfg.info.objs.objs[i].rect.x = result->objs[i].rect.x;
         cfg.info.objs.objs[i].rect.y = result->objs[i].rect.y;
         cfg.info.objs.objs[i].rect.w = result->objs[i].rect.w;
         cfg.info.objs.objs[i].rect.h = result->objs[i].rect.h;
-    }
 
+        /*for(k = 0; k < 5; k++)
+        {
+            cfg.info.objs.objs[i*6+k+1].id = -1;
+            cfg.info.objs.objs[i*6+k+1].color = 0xffffffaa;
+            cfg.info.objs.objs[i*6+k+1].rect.x = result->objs[i].keypoints[k].x;
+            cfg.info.objs.objs[i*6+k+1].rect.x = result->objs[i].keypoints[k].y;
+            cfg.info.objs.objs[i*6+k+1].rect.h = 64;
+            cfg.info.objs.objs[i*6+k+1].rect.w = 64;
+        }*/
+    }
     if (osd && osd->tgr) {
-        osd->tgr(osd, &cfg);
+        osd->set(osd, &cfg);
     }
 
     return 0;
@@ -92,9 +103,9 @@ static int __app_alg_set(app_alg_mgr_t *self, proto_app_alg_cfg_t *cfg)
     case ALG_TYPE_FR: {
         if (cfg->enable) {
             vsf_frame_mgr_t *frame_mgr      = vsf_createFrameMgr_r();
-            proto_vsf_frame_cap_t frame_cap = { .id = priv->info->caps[cfg->id].frame };
+            proto_vsf_frame_cap_t frame_cap = { .id = priv->info->caps[cfg->id].id };
             frame_mgr->cap(frame_mgr, &frame_cap);
-            proto_vsf_frame_cfg_t frame_cfg = { .id = priv->info->caps[cfg->id].frame };
+            proto_vsf_frame_cfg_t frame_cfg = { .id = priv->info->caps[cfg->id].id };
             frame_mgr->get(frame_mgr, &frame_cfg);
             frame_cfg.enable = 1;
             frame_cfg.format = VIDEO_FRAME_FORMAT_YUV420P_YVU;
@@ -103,7 +114,6 @@ static int __app_alg_set(app_alg_mgr_t *self, proto_app_alg_cfg_t *cfg)
             frame_cfg.fps    = 15;
             frame_mgr->set(frame_mgr, &frame_cfg);
             frame_mgr->destroy(frame_mgr);
-
             mfifo_init_t fifo_init = {
                 .type   = MEDIA_VIDEO_FRAME,
                 .chn    = frame_cap.chn,
@@ -132,6 +142,7 @@ static int __app_alg_set(app_alg_mgr_t *self, proto_app_alg_cfg_t *cfg)
             if (hFace && hFace->init) {
                 hFace->init(hFace, cfg->algpath);
             }
+            priv->fifos[cfg->id]->newest(priv->fifos[cfg->id]);
         } else {
             if (priv->fifos[cfg->id]) {
                 priv->fifos[cfg->id]->destroy(priv->fifos[cfg->id]);

@@ -17,6 +17,7 @@ typedef struct {
     pthread_t hq_thread;
     int quit;
     int seq;
+    int fps;
     vsf_frame_cb_t cb;
 } vsf_vpss_priv_t;
 
@@ -38,17 +39,19 @@ static void __transfor_frame_info(MEDIA_BUFFER mb, video_frame_t *dst)
     dst->u32Height       = stImageInfo.u32Height;
     dst->enPixelFormat   = stImageInfo.enImgType;
     dst->ptr  = RK_MPI_MB_GetPtr(mb);
+    //这里偷懒了,默认当做RGB888对齐。
+    dst->size = stImageInfo.u32Width * stImageInfo.u32Height * 3;
 }
 
 static void *__vpss_get_chn_frame_proc(void *p)
 {
     int s32Ret = 0;
     vsf_vpss_priv_t *priv = p;
+    int input = 1; 
     MEDIA_BUFFER mb = NULL;
     while (!priv->quit) {
         mb = RK_MPI_SYS_GetMediaBuffer(RK_ID_RGA, priv->info->RgaId, -1);
-
-        if (priv->cb.func) {
+        if (priv->cb.func&& (input%8 == 0)) {
             video_frame_t frame;
             __transfor_frame_info(mb, &frame);
             tracef("frame:%u", frame.u32TimeRef);
@@ -58,9 +61,14 @@ static void *__vpss_get_chn_frame_proc(void *p)
             }
         }
         RK_MPI_MB_ReleaseBuffer(mb);
+        input++;
         if (0 != s32Ret) {
             errorf("ReleaseChnFrame %d-%d err:0x%x\n", priv->info->ViChn, priv->info->RgaId, s32Ret);
         }
+        //todo 优化帧率控制
+        // infof("%d\n",priv->fps);
+        // if(priv->fps > 0)
+        //     usleep(1000000/priv->fps);
     }
 
     return NULL;
@@ -141,8 +149,10 @@ static int __vpss_destroy(vsf_vpss_t *self)
 
 static int __vpss_ctrl(vsf_vpss_t *self, int id, vsf_frame_cfg_t *cfg)
 {
-//todo 优化，实时改变获取的分辨率
-
+//todo 优化，实时改变获取的分辨率，帧率
+    vsf_vpss_t *obj       = self;
+    vsf_vpss_priv_t *priv = obj->priv;
+    priv->fps = cfg->fps;
     return 0;
 }
 

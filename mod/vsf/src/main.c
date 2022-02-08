@@ -39,8 +39,8 @@ int main()
     nnm_rep_init_t init = { __rep_recv, obuf };
     nnm_rep_create(PROTO_VSF_COM_NODE, &init, &rep);
 
-    int i, total;
-    vsf_frame_mgr_t *frame = vsf_createFrameMgr_r();
+    int  i,total;
+    /*vsf_frame_mgr_t *frame = vsf_createFrameMgr_r();
     total = frame->num(frame);
     for (i = 0; i < total; i++) {
         proto_vsf_frame_cfg_t cfg = {.id = i};
@@ -49,7 +49,7 @@ int main()
         // set cfg
         frame->set(frame, &cfg);
     }
-    frame->destroy(frame);
+    frame->destroy(frame);*/
 
     vsf_stream_mgr_t *stream = vsf_createStreamMgr_r();
     total = stream->num(stream);
@@ -62,27 +62,25 @@ int main()
     }
     stream->destroy(stream);
 
-    vsf_osd_mgr_t *osd = vsf_createOsdMgr_r();
-    total = osd->num(osd);
+    //vsf_osd_mgr_t *osd = vsf_createOsdMgr_r();
+    //total = osd->num(osd);
     /*for (i = 0; i < total; i++) {
         proto_vsf_osd_cfg_t cfg = {.id = i};
         // get cfg
         osd->get(osd, &cfg);
         // set cfg
         osd->set(osd, &cfg);
-    }*/
-   // osd->destroy(osd);
-
-    while (1) {
-        infof("keep alive");
-        proto_vsf_osd_cfg_t cfg = {0};
+    }
+   osd->destroy(osd);*/
+        /*proto_vsf_osd_cfg_t cfg = {0};
         // get cfg
         cfg.id = 0;
         cfg.enable = 1;
         char *strcondition = "objs";
         memcpy(cfg.info.condition,strcondition,5);
-        cfg.info.objs.num = 2;
+        cfg.info.objs.num = 3;
         cfg.info.objs.objs[0].id = 0;
+        memcpy( cfg.info.objs.objs[0].text,"cjy",4);
         cfg.info.objs.objs[0].color = 0xffffffaa;
         cfg.info.objs.objs[0].rect.h = 640;
         cfg.info.objs.objs[0].rect.w = 640;
@@ -90,14 +88,66 @@ int main()
         cfg.info.objs.objs[0].rect.y = 1024;
 
         cfg.info.objs.objs[1].id = 1;
+        memcpy( cfg.info.objs.objs[1].text,"unknow",7);
         cfg.info.objs.objs[1].color = 0xffffffaa;
         cfg.info.objs.objs[1].rect.h = 640;
         cfg.info.objs.objs[1].rect.w = 640;
         cfg.info.objs.objs[1].rect.x = 4096;
         cfg.info.objs.objs[1].rect.y = 4096;
+        cfg.info.objs.objs[1].id = -1;
+        memcpy( cfg.info.objs.objs[2].text,"unknow",7);
+        cfg.info.objs.objs[2].color = 0xffffffaa;
+        cfg.info.objs.objs[2].rect.h = 640;
+        cfg.info.objs.objs[2].rect.w = 640;
+        cfg.info.objs.objs[2].rect.x = 6144;
+        cfg.info.objs.objs[2].rect.y = 6144;
         // set cfg
         osd->set(osd, &cfg);
-    
+        osd->destroy(osd);*/
+
+
+    while (1) {
+        infof("keep alive");
+               /* time_t             timesec; 
+    struct tm         *p; 
+          time(&timesec); 
+    p = localtime(&timesec); 
+       aaaa++;
+        
+        proto_vsf_osd_cfg_t cfg = {0};
+        // get cfg
+        cfg.id = 0;
+        cfg.enable = 1;
+        char *strcondition = "objs";
+        memcpy(cfg.info.condition,strcondition,5);
+        cfg.info.objs.num = 3;
+        cfg.info.objs.objs[0].id = 0;
+        //memcpy( cfg.info.objs.objs[0].text,"cjy",4);
+        sprintf(cfg.info.objs.objs[0].text,"%d-%d-%d\n", p->tm_hour, p->tm_min, p->tm_sec); 
+        //sprintf(cfg.info.objs.objs[0].text,"x%d-y%d\n", 1024 + (aaaa%15) * 64, 1024+(aaaa%15) * 64); 
+        cfg.info.objs.objs[0].color = 0xffffffaa;
+        cfg.info.objs.objs[0].rect.h = 640;
+        cfg.info.objs.objs[0].rect.w = 640;
+        cfg.info.objs.objs[0].rect.x = 1024 + (aaaa%15) * 64;
+        cfg.info.objs.objs[0].rect.y = 1024+(aaaa%15) * 64;
+
+        cfg.info.objs.objs[1].id = 1;
+        memcpy( cfg.info.objs.objs[1].text,"unknow",7);
+        cfg.info.objs.objs[1].color = 0xffffffaa;
+        cfg.info.objs.objs[1].rect.h = 640;
+        cfg.info.objs.objs[1].rect.w = 640;
+        cfg.info.objs.objs[1].rect.x = 4096;
+        cfg.info.objs.objs[1].rect.y = 4096;
+        cfg.info.objs.objs[1].id = -1;
+        memcpy( cfg.info.objs.objs[2].text,"unknow",7);
+        cfg.info.objs.objs[2].color = 0xffffffaa;
+        cfg.info.objs.objs[2].rect.h = 640;
+        cfg.info.objs.objs[2].rect.w = 640;
+        cfg.info.objs.objs[2].rect.x = 6144;
+        cfg.info.objs.objs[2].rect.y = 6144;
+        // set cfg
+        osd->set(osd, &cfg);
+        usleep(60*1000);*/
         sleep(5);
     }
 

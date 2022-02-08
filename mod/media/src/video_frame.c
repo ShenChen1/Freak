@@ -45,7 +45,7 @@ unsigned int video_frame_rectag(unsigned char *p1, unsigned int n1, unsigned cha
 unsigned int video_frame_recput(unsigned char *p1, unsigned int n1, unsigned char *p2, void *arg)
 {
     video_frame_t *frame = arg;
-    size_t totalsize     = sizeof(media_record_t) + sizeof(video_frame_t) + (frame->u64ExtVirAddr[0] - frame->u64HeaderVirAddr[0]);
+    size_t totalsize     = sizeof(media_record_t) + sizeof(video_frame_t) + frame->size;
     media_record_t rec   = {};
     unsigned int a = 0, l = 0, _n1 = n1;
     unsigned char *p = NULL, *_p1 = p1, *_p2 = p2;

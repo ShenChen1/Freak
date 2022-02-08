@@ -95,6 +95,7 @@ JSONB_STRUCT_END(proto_vsf_osd_texts_t)
 
 JSONB_STRUCT_START(proto_vsf_osd_obj_t)
 JSONB_FIELD(id, int)
+JSONB_STRING(text, 16)
 JSONB_FIELD(color, uint32_t)
 JSONB_FIELD(rect, proto_rect_t)
 JSONB_STRUCT_END(proto_vsf_osd_obj_t)

@@ -33,7 +33,7 @@ static sdk_cfg_t s_cfg = {
         .DevId = 0,
         .ViChn = 0,
         .RgaId = 0,
-        .imgType = IMAGE_TYPE_RGB888,
+        .imgType = IMAGE_TYPE_BGR888,
         .u32Width = 640,
         .u32Height = 640,
     },

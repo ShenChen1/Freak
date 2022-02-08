@@ -89,6 +89,7 @@ typedef struct {
 extern void jsonb_opt_proto_vsf_osd_obj_t(jsonb_opt_e opt, cJSON *json, void *element, size_t size);
 typedef struct {
     int id;
+    char text[16];
     uint32_t color;
     proto_rect_t rect;
 } proto_vsf_osd_obj_t;

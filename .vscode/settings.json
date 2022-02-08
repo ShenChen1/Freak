@@ -28,6 +28,9 @@
         "xlocale": "cpp",
         "xlocinfo": "cpp",
         "xlocnum": "cpp",
-        "*.rh": "cpp"
+        "*.rh": "cpp",
+        "face.h": "c",
+        "proto_app.h": "c",
+        "frame_mgr.h": "c"
     }
 }

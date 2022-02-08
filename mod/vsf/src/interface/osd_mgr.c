@@ -267,14 +267,16 @@ static int __draw_obj(vsf_rgn_bitmap_t *bitmap, proto_vsf_osd_obj_t *obj)
         box[i * bitmap->u32Width + (rect.w - 3)] = color;
         box[i * bitmap->u32Width + (rect.w - 4)] = color;
     }
-
-    proto_vsf_osd_text_t text = {};
-    text.color = obj->color;
-    text.size = 32;
-    sprintf(text.text, "id: %d", obj->id);
-    text.point.x = obj->rect.x - text.size - 2;
-    text.point.y = obj->rect.y;
-    __draw_text(bitmap, &text);
+    if(obj->id>=0)
+    {
+        proto_vsf_osd_text_t text = {};
+        text.color = obj->color;
+        text.size = 32;
+        sprintf(text.text, "id:%d,%s", obj->id,obj->text);
+        text.point.x = obj->rect.x - text.size - 2;
+        text.point.y = obj->rect.y;
+        __draw_text(bitmap, &text);
+    }
     return 0;
 }
 

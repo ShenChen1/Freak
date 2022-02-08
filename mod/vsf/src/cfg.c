@@ -51,11 +51,11 @@ static vsf_cfg_t s_cfg = {
         .num = { 1 },
         .cfgs[0] = {
             .id = 0,
-            .enable = 0,
+            .enable = 1,
             .format = VIDEO_FRAME_FORMAT_YUV420P_YVU,
             .width = 640,
             .height = 640,
-            .fps = 10,
+            .fps = 20,
         },
         .caps[0] = {
             .id = 0,

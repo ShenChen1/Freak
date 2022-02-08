@@ -147,7 +147,6 @@ static int __rgn_ctrl_bitmap(vsf_rgn_t *self, void *param)
         priv->status = VSF_RGN_CREATE;
     }
 
-    // set bitmap
     s32Ret = RK_MPI_VENC_RGN_SetBitMap(cfg->chn, &priv->RngInfo, &priv->BitMap);
     if (0 != s32Ret) {
             errorf("RK_MPI_VENC_RGN_SetBitMap faild with %d!", s32Ret);
